@@ -97,10 +97,9 @@ function civigiftaid_civicrm_custom( $op, $groupID, $entityID, &$params ) {
     }
     
      //Do this only for online contributions     
-    /* $task = JRequest::getVar('task');
-     if ($task != 'civicrm/contribute/transact'){
+     if ($_GET['q'] != 'civicrm/contribute/transact' OR empty($_GET['q'])){
         return;
-     }  */
+     }  
     
     require_once 'CRM/Core/DAO.php';
     $tableName = CRM_Core_DAO::getFieldValue( 'CRM_Core_DAO_CustomGroup', $groupID, 'table_name', 'id' );
