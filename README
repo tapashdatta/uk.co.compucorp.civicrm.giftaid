@@ -1,21 +1,23 @@
 CiviGiftaid Extension for CiviCRM 4.2 
 -------------------------------------------
 
-Install CiviCRM v4.2. Note that this extension does not work with previous versions of CiviCRM 
+Installation
+
+Install CiviCRM v4.2. Note that this extension does not work with previous versions of CiviCRM.
 
 Create and set the extensions directory in CiviCRM
 
-Download this extension in the above directory using git clone. 
+Download this extension in the above directory using git clone.
 
 Install this extension in CiviCRM on q=civicrm/admin/extensions?reset=1
 
-The extension creates 2 new custom data group (Gift Aid, Gift Aid Declaration) to hold data related to giftaid. 
+The extension creates 2 new custom data group (Gift Aid, Gift Aid Declaration) to hold data related to giftaid.
 
 Edit the settings for the 'Gift Aid' custom data group (which has the 'Eligible for Gift Aid?' field) to be used for only specific contribution types (eg. only donation)
 
 Register the gift aid report
 
-The Gift aid module comes with a report that can be submitted to HMRC.  You need to register this report in CiviCRM's report registry.
+The Gift aid module comes with a report that can be submitted to HMRC. You need to register this report in CiviCRM's report registry.
 
 Go to Administer > CiviReport > Register Report.
 
@@ -28,10 +30,57 @@ A sensible title would be: Gift Aid
 And a sensible description would be: For submitting Gift Aid reports to HMRC treasury.
 
 You should add it as part of the CiviContribute component.
+Configuration
 
-For information about configuration/usage of Gift Aid, please visit: http://wiki.civicrm.org/confluence/display/CRM/Gift+aid+installation,+configuration+and+usage (See bottom of the page)
+You'll need to add a Gift aid profile to any contribution forms that you want to use to collect 'Gift-aid-able' donations.
+
+1. Configure the Gift aid profile and disclaimer
+
+Out of the box, the module comes with a standard profile which collects all info required by HMRC and includes standard disclaimer text. You'll want to change this disclaimer to make it relevant to your organisation. Of course it is also your responsibility to make sure you are meeting any legal obligations of collecting gift aid and using this module.
+
+The gift aid profile also includes address fields (some of which are obligatory). You should feel free to change and update this profile to suit your organisation but make sure that you are collecting all the information you need to create a Gift aid report (i.e. eligibility, first and last name, address and postcode).
+
+2. Create an online contribution page
+
+As per instructions at http://en.flossmanual.net/CiviCRM/CiviContributeConfigure.
+
+3. Add the gift aid profile to your contribution page
+
+Either create a new contribution page using the New contribution page wizard and add the profile at step 6.
+
+Or add the profile to an existing contribution page. Go to Contributions > Manage contribution pages. Select your contribution page > Configure > Include profiles.
+
+4. Preview and test drive the contribution page as normal
+
+Make sure that there is no duplication in the profile fields you are asking people to complete.
+Everyday use
+
+There are two parts to every day use of Gift aid.
+
+Creating the batch
+Creating a report based on the batch.
+
+Creating a batch
+
+Create a batch by finding contributions and selecting 'Add to Gift aid batch' from the list of actions.
+
+The 'Add to Gift aid batch' form gives some summary information on your batch.
+
+It tells you how how many contributions will be added to the batch.
+It tells how many won't be added either because they are already in a batch, or because they are not eligible for gift aid.
+
+You'll need to name your batch and you can also add a description to the batch.
+
+The report takes the primary address of the contact.
+
+To create a batch, click on 'Add to batch'. Note, you cannot remove contributions from a batch once you have added them and you can only add contributions to a single batch.
+
+Creating a Gift aid report
+
+Select the Gift aid report from Reports > Create report from templates.
+
+You can add more than one batch to a report.
+
+Once you are happy with your report you can save it and print a PDF copy of the report for submission to HMRC.
 
 For information about the latest improvements, please visit: http://forum.civicrm.org/index.php/topic,24653.msg103783.html
-
-  
-
