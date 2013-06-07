@@ -7,4 +7,8 @@ CiviCRM GiftAid for 4.2 https://github.com/rajeshrhino/uk.co.nfpservices.module.
 
 This extension is currently under development. 
 
-The bugs and improvement list to be listed soon. 
+The bugs and improvement list to be listed.
+
+- Show list of invalid contributions when adding to the batch 
+- Integration with https://github.com/veda-consulting/uk.co.vedaconsulting.module.giftaidonline/
+- Report on 4.3
