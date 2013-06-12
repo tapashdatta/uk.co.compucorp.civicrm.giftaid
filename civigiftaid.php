@@ -17,8 +17,8 @@ function civigiftaid_civicrm_install( ) {
     $import->run( $giftAidXMLFile );
   
     // rebuild the menu so our path is picked up
-    //require_once 'CRM/Core/Invoke.php';
-    //CRM_Core_Invoke::rebuildMenuAndCaches( );
+    require_once 'CRM/Core/Invoke.php';
+    CRM_Core_Invoke::rebuildMenuAndCaches( );
 }
 
 
