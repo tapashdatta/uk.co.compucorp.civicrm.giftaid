@@ -54,8 +54,8 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
      * @return void
      * @access public
      */
-	function preProcess()
-    {	
+	function preProcess(){
+
 		parent::preProcess( );
 		
         require_once 'GiftAid/Utils/Contribution.php';
@@ -79,6 +79,8 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
         $contributionsNotValid = array( );
         $contributionsNotValid = GiftAid_Utils_Contribution::getContributionDetails ( $notValid );
         $this->assign( 'contributionsNotValid', $contributionsNotValid );
+
+
         
 	}
 	
@@ -92,7 +94,6 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
      */
     function buildQuickForm( ) {
 		$attributes	= CRM_Core_DAO::getAttribute( 'CRM_Batch_DAO_Batch' );
-   
     
 		$this->add( 'text', 'title', 
                     ts('Batch Title'),
@@ -100,7 +101,7 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
               
     
 		$this->addRule( 'title', ts('Label already exists in Database.'),
-						'objectExists', array( 'CRM_Core_DAO_Batch', $this->_id, 'title' ) );
+						'objectExists', array( 'CRM_Batch_DAO_Batch', $this->_id, 'title' ) );
 		
 		$this->add( 'textarea', 'description', ts('Description:') . ' ', 
                     $attributes['description'] );
@@ -112,6 +113,8 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
         $this->setDefaults( $defaults );
                            
 		$this->addDefaultButtons( ts('Add to batch') );
+
+
     }
    
     /**
@@ -121,7 +124,6 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
      * @return None
      */
     public function postProcess() {
-      
 
 		$params = $this->controller->exportValues( );
 		$batchParams = array();
@@ -139,7 +141,7 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
 
 		//require_once 'CRM/Core/BAO/Batch.php'; //version 4.2
         require_once 'CRM/Batch/BAO/Batch.php';
-		$createdBatch   =& CRM_Core_BAO_Batch::create( $batchParams );
+		$createdBatch   =& CRM_Batch_BAO_Batch::create( $batchParams );
     
 		$batchID        = $createdBatch->id;
 		$batchLabel     = $batchParams['title'];   
