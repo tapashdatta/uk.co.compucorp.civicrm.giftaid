@@ -81,6 +81,7 @@ UPDATE civicrm_value_gift_aid_declaration
 SET  address = %1, 
 post_code = %2
 WHERE  id = %3";
+        print_r($addressDetails);
         $dao = CRM_Core_DAO::executeQuery( $sql, array(
             1 => array($addressDetails[0], 'String'),
             2 => array($addressDetails[1], 'String'),
@@ -263,9 +264,19 @@ function _civigiftaid_civicrm_custom_get_address_and_postal_code ( $contactId , 
     require_once 'api/api.php';
     require_once 'CRM/Utils/Address.php';
     $address = civicrm_api("Address","get", array ('version' =>'3' , 'contact_id' => $contactId , 'location_type_id' => $location_type_id ));
+    dprint_r($address);
     if ($address['count'] > 0) {
-        $fullFormatedAddress = _civigiftaid_civicrm_custom_get_address_and_postal_code_format_address($address['values'][$address['id']]);
+
+      if(!isset($address['id'])){ //check if the contact has more than one home address so use the first one
+        $addressValue = array_shift(array_values($address['values']));
+        $postalCode = $addressValue['postal_code']; 
+
+      }else{
+        $addressValue = $address['values'][$address['id']];
         $postalCode = $address['values'][$address['id']]['postal_code']; 
+      }
+      $fullFormatedAddress = _civigiftaid_civicrm_custom_get_address_and_postal_code_format_address($addressValue);
+
     }
     return array($fullFormatedAddress , $postalCode );    
 }
