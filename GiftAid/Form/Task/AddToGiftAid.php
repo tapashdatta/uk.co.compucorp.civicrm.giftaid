@@ -91,7 +91,7 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
      * @return void
      */
     function buildQuickForm( ) {
-		$attributes	= CRM_Core_DAO::getAttribute( 'CRM_Core_DAO_Batch' );
+		$attributes	= CRM_Core_DAO::getAttribute( 'CRM_Batch_DAO_Batch' );
    
     
 		$this->add( 'text', 'title', 
