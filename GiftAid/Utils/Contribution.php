@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.3                                               |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2011                                |
  +--------------------------------------------------------------------+
@@ -61,15 +61,14 @@ class GiftAid_Utils_Contribution {
 
         require_once "GiftAid/Utils/GiftAid.php";
         require_once "CRM/Contribute/BAO/Contribution.php";
-        require_once 'CRM/Core/DAO/EntityBatch.php';
         require_once "CRM/Core/BAO/Address.php";
         require_once "CRM/Contact/BAO/Contact.php";
         require_once "CRM/Utils/Address.php";
         
         
         // Get the batch name
-        require_once 'CRM/Core/DAO/Batch.php';
-        $batch = new CRM_Core_DAO_Batch( );
+        require_once "CRM/Batch/DAO/EntityBatch.php";
+        $batch = new CRM_Batch_DAO_EntityBatch( );
         $batch->id = $batchID;
         $batch->find(  true );
         $batchName = $batch->title;
@@ -77,7 +76,7 @@ class GiftAid_Utils_Contribution {
         $charityColumnExists = CRM_Core_DAO::checkFieldExists( 'civicrm_value_gift_aid_submission', 'charity' );
 
         foreach ( $contributionIDs as $contributionID ) {
-           	$batchContribution =& new CRM_Core_DAO_EntityBatch( );
+           	$batchContribution =& new CRM_Batch_DAO_EntityBatch( );
             $batchContribution->entity_table = 'civicrm_contribution';
 			$batchContribution->entity_id    = $contributionID;
 		
@@ -161,11 +160,11 @@ batch_name = %4
         $contributionsNotValid 	   = array( );
                 
         require_once "GiftAid/Utils/GiftAid.php";
-        require_once "CRM/Core/DAO/EntityBatch.php";
+        require_once "CRM/Batch/DAO/EntityBatch.php";
         require_once "CRM/Contribute/BAO/Contribution.php";
         
         foreach ( $contributionIDs as $contributionID ) {
-           	$batchContribution =& new CRM_Core_DAO_EntityBatch( );
+           	$batchContribution =& new CRM_Batch_DAO_EntityBatch( );
             $batchContribution->entity_table = 'civicrm_contribution';
 			$batchContribution->entity_id    = $contributionID;
             
@@ -217,12 +216,9 @@ batch_name = %4
         if ( empty( $contributionIds ) ) {
             return;
         } 
-        $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, contribution_type.name,
-                          contribution.source, contribution.receive_date, batch.title FROM civicrm_contribution contribution
+        $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount,
+                          contribution.source, contribution.receive_date FROM civicrm_contribution contribution
                    LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
-                   LEFT JOIN civicrm_contribution_type contribution_type ON ( contribution_type.id = contribution.contribution_type_id )
-                   LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id ) 
-                   LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id ) 
                    WHERE contribution.id IN (" . implode(',', $contributionIds ) . ")" ; 
         
         $dao    = CRM_Core_DAO::executeQuery( $query );
@@ -234,7 +230,7 @@ batch_name = %4
             $result[$dao->id]['financial_account'] = $dao->name;
             $result[$dao->id]['source']            = $dao->source;
             $result[$dao->id]['receive_date']      = $dao->receive_date;
-            $result[$dao->id]['batch']             = $dao->title;
+           // $result[$dao->id]['batch']             = $dao->title;
         } 
         return $result;
     }
