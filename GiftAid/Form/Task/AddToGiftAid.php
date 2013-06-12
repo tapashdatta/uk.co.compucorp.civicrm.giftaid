@@ -137,7 +137,8 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
         require_once 'CRM/Core/Transaction.php';
         $transaction = new CRM_Core_Transaction( );
 
-		require_once 'CRM/Core/BAO/Batch.php';
+		//require_once 'CRM/Core/BAO/Batch.php'; //version 4.2
+        require_once 'CRM/Batch/BAO/Batch.php';
 		$createdBatch   =& CRM_Core_BAO_Batch::create( $batchParams );
     
 		$batchID        = $createdBatch->id;
