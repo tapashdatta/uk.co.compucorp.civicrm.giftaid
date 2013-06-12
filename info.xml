@@ -2,7 +2,7 @@
  <extension key="uk.co.compucorp.civicrm.giftaid" type="module">
   <downloadUrl>https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid</downloadUrl>
   <file>civigiftaid</file>
-  <name>CiviCRM UK GiftAid Extension for CiviCRM</name>
+  <name>CiviCRM UK GiftAid</name>
   <description>
     CiviCRM support for Gift Aid.
     The extension comprises a couple of custom data sets to hold all Gift Aid data, a profile to use on contribution forms to collect this data, a task to batch 'gift-aidable' contributions and a report to submit batches to HMRC.
