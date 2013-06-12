@@ -43,7 +43,7 @@ class GiftAid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
     function __construct( ) {
         $this->_columns = 
             array( 'civicrm_entity_batch'      =>
-                   array( 'dao'     => 'CRM_Core_DAO_EntityBatch',
+                   array( 'dao'     => 'CRM_Batch_DAO_EntityBatch',
                           'filters' =>             
                           array(
                                 'batch_id' => 
