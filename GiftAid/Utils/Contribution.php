@@ -219,10 +219,10 @@ batch_name = %4
         if ( empty( $contributionIds ) ) {
             return;
         } 
-        $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, contribution_type.name,
+        $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, financial_type.name,
                           contribution.source, contribution.receive_date, batch.title FROM civicrm_contribution contribution
                    LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
-                   LEFT JOIN civicrm_financial_type financial_type ON ( financial_type .id = contribution.financial_type_id  )
+                   LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
                    LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id ) 
                    LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id ) 
                    WHERE contribution.id IN (" . implode(',', $contributionIds ) . ")" ; 
