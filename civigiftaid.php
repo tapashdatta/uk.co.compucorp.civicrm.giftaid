@@ -1,7 +1,7 @@
 <?php     
 
 // Set the GiftAid Basic Tax Rate (%)
-define( 'CIVICRM_GIFTAID_PERCENTAGE', 20);
+//define( 'CIVICRM_GIFTAID_PERCENTAGE', 20);
 
 define( 'CIVICRM_GIFTAID_TASKID', 1435 );
 
@@ -20,6 +20,29 @@ function civigiftaid_civicrm_install( ) {
     require_once 'CRM/Core/Invoke.php';
     CRM_Core_Invoke::rebuildMenuAndCaches( );
 }
+
+function civigiftaid_civicrm_uninstall( ){
+    $getResult = civicrm_api('OptionGroup', 'getsingle', array(
+      'version' => 3,
+      'name' => 'giftaid_basic_rate_tax',
+   ));
+  if($getResult['id']){
+    $ovResult = civicrm_api('OptionValue', 'get', array(
+            'version' => 3,
+            'option_group_id' =>  $getResult['id'],
+          ));
+      if($ovResult['values']){
+        foreach ($ovResult['values'] as $ov) {
+          $delResult = civicrm_api('OptionValue', 'delete', array(
+           'version' => 3,
+           'id' => $ov['id'],
+          ));
+        }
+       }
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
+  } 
+}
+
 
 
 function civigiftaid_civicrm_config( &$config ) {

@@ -145,9 +145,31 @@ batch_name = %4
   formula used is: (basic rate of year*contributed amount)/(100-basic rate of year)
   */
   function _calculateGiftAidAmt( $contributionAmount ){ 
-    $basicRate = CIVICRM_GIFTAID_PERCENTAGE;
+
+    $gResult = civicrm_api('OptionGroup', 'getsingle', array(
+      'version' => 3,
+      'name' => 'giftaid_basic_rate_tax',
+   ));
+   if($gResult['id']){
+     $params = array(
+      'version' => 3,
+      'sequential' => 1,
+      'option_group_id' => $gResult['id'],
+      'name' => 'basic_rate_tax',
+     );
+     $result = civicrm_api('OptionValue', 'get', $params);
+     if($result['values']){
+      $basicRate = null;
+      foreach ($result['values'] as $ov) {
+        if($result['id'] == $ov['id']){
+         $basicRate = $ov['value'];
+        }
+      }
+     }
+   }
+
+    //$basicRate = CIVICRM_GIFTAID_PERCENTAGE;
     //return (($contributionAmount * $basicRate) / 100);
-        //$basicRate  = 20;
     return (( $basicRate * $contributionAmount ) / ( 100- $basicRate ));
   }
 
