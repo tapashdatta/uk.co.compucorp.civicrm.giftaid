@@ -196,6 +196,16 @@ batch_name = %4
   }
 
 
+  static function _validationRemoveContributionFromBatch(&$contributionIDs ){
+    $contributionsAlreadySubmited = array();
+    $contributionsToRemove = $contributionIDs;
+
+     return array( count($contributionIDs), 
+                   $contributionsToRemove,
+                   $contributionsAlreadySubmited);
+
+
+  }
 
   /*
      * this function check contribution is valid for giftaid or not:
