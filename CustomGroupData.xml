@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <CustomData>
+  <OptionGroups>
+    <OptionGroup>
+      <title>GiftAid Batch Name</title>
+      <name>giftaid_batch_name</name>
+      <label>giftaid_batch_name</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+  </OptionGroups>
   <CustomGroups>
     <CustomGroup>
       <name>Gift_Aid_Declaration</name>
@@ -248,9 +256,9 @@
       <name>Batch_Name</name>
       <label>Batch Name</label>
       <data_type>String</data_type>
-      <html_type>Text</html_type>
+      <html_type>Select</html_type>
       <is_required>0</is_required>
-      <is_searchable>0</is_searchable>
+      <is_searchable>1</is_searchable>
       <is_search_range>0</is_search_range>
       <weight>4</weight>
       <is_active>1</is_active>
@@ -259,6 +267,7 @@
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
       <column_name>batch_name</column_name>
+      <option_group_name>giftaid_batch_name</option_group_name>
       <custom_group_name>Gift_Aid</custom_group_name>
     </CustomField>
   </CustomFields>
