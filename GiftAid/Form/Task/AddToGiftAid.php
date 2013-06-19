@@ -106,10 +106,8 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
 		$this->add( 'textarea', 'description', ts('Description:') . ' ', 
                     $attributes['description'] );
 
-        $defaults = array( 'label' =>	ts( 'Gift Aid Batch %1 (%2)'),
-                           '%1' =>		date('d-m-Y'),
-                           '%2' => 		date('H:i:s')
-		);
+        $defaults = array( 'title' =>	ts( 'Gift Aid Batch ' . date('d-m-Y H:i:s')));
+
         $this->setDefaults( $defaults );
                            
 		$this->addDefaultButtons( ts('Add to batch') );
