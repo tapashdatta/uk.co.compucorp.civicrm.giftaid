@@ -83,28 +83,27 @@
            {else}
              <td>
                  <div class="crm-accordion-header">
-                 Number of selected contributions: {$totalAddedContributions}
+                  Number of contributions that will be added to this batch: {$totalAddedContributions}
                  </div>
              </td>
            {/if}
         </tr>
-    	<tr>
+	<tr>
            {if $alreadyAddedContributions}
            <td><div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
            <div class="crm-accordion-header">
-           <div class="icon crm-accordion-pointer"></div>
-           Number of contributions already in a batch: {$alreadyAddedContributions}
+             <div class="icon crm-accordion-pointer"></div>Number of contributions already in a batch: {$alreadyAddedContributions}
            </div><!-- /.crm-accordion-header -->
            <div class="crm-accordion-body">
            <table class="selector">
 	      <thead class="crm-accordion-header">
 	      <tr>
-           <th>{ts}Name{/ts}</th>
+                 <th>{ts}Name{/ts}</th>
 	         <th>{ts}Amount{/ts}</th>
 	         <th>{ts}Type{/ts}</th>
 	         <th>{ts}Source{/ts}</th>
 	         <th>{ts}Recieved{/ts}</th>
-	         <th>{ts}Batch name{/ts}</th>
+	         <th>{ts}Batch{/ts}</th>
              </tr>
              </thead>
              {foreach from=$contributionsAlreadyAddedRows item=row}
