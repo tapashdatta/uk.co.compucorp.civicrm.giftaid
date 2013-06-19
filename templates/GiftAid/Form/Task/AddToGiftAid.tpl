@@ -88,7 +88,7 @@
              </td>
            {/if}
         </tr>
-	<tr>
+    	<tr>
            {if $alreadyAddedContributions}
            <td><div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
            <div class="crm-accordion-header">
@@ -99,12 +99,12 @@
            <table class="selector">
 	      <thead class="crm-accordion-header">
 	      <tr>
-                 <th>{ts}Name{/ts}</th>
+           <th>{ts}Name{/ts}</th>
 	         <th>{ts}Amount{/ts}</th>
 	         <th>{ts}Type{/ts}</th>
 	         <th>{ts}Source{/ts}</th>
 	         <th>{ts}Recieved{/ts}</th>
-	         <th>{ts}Batch{/ts}</th>
+	         <th>{ts}Batch name{/ts}</th>
              </tr>
              </thead>
              {foreach from=$contributionsAlreadyAddedRows item=row}
