@@ -3,7 +3,9 @@
 // Set the GiftAid Basic Tax Rate (%)
 //define( 'CIVICRM_GIFTAID_PERCENTAGE', 20);
 
-define( 'CIVICRM_GIFTAID_TASKID', 1435 );
+define( 'CIVICRM_GIFTAID_ADD_TASKID', 1435 );
+define( 'CIVICRM_GIFTAID_REMOVE_TASKID', 1436 );
+
 
 function civigiftaid_civicrm_install( ) {
 
@@ -67,8 +69,11 @@ function civigiftaid_civicrm_config( &$config ) {
 
 function civigiftaid_civicrm_searchTasks( $objectType, &$tasks ) {
 	if ( $objectType == 'contribution' ) {
-        $tasks[CIVICRM_GIFTAID_TASKID] = array( 'title'  => ts( 'Add to Gift Aid batch' ),
+        $tasks[CIVICRM_GIFTAID_ADD_TASKID] = array( 'title'  => ts( 'Add to Gift Aid batch' ),
                                                 'class'  => 'GiftAid_Form_Task_AddToGiftAid',
+                                                'result' => false );
+        $tasks[CIVICRM_GIFTAID_REMOVE_TASKID] = array( 'title'  => ts( 'Remove to Gift Aid batch' ),
+                                                'class'  => 'GiftAid_Form_Task_RemoveFromBatch',
                                                 'result' => false );
     }
 }
