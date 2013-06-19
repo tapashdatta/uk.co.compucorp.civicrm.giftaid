@@ -42,6 +42,8 @@
  *
  */
 class GiftAid_Utils_Contribution {
+
+
     
     /**
      * Given an array of contributionIDs, add them to a batch
@@ -73,6 +75,24 @@ class GiftAid_Utils_Contribution {
         $batch->id = $batchID;
         $batch->find(  true );
         $batchName = $batch->title;
+
+        $batchNameGroup = civicrm_api('OptionGroup', 'getsingle', array(
+            'version' => 3,
+            'sequential' => 1,
+            'name' => 'giftaid_batch_name ')
+        );
+        if($batchNameGroup['id']){
+          $groupId = $batchNameGroup['id'];
+          $params = array(
+            'version' => 3,
+            'sequential' => 1,
+            'option_group_id' => $groupId,
+            'value' => $batchName,
+            'label' => $batchName
+          );
+          $result = civicrm_api('OptionValue', 'create', $params);
+        }
+
         
         $charityColumnExists = CRM_Core_DAO::checkFieldExists( 'civicrm_value_gift_aid_submission', 'charity' );
 
@@ -89,6 +109,7 @@ class GiftAid_Utils_Contribution {
                 $contributionsNotAdded[] = $contributionID;
                 continue;
             }
+
                 
             // get additional info
             // get contribution details from Contribution using contribution id
@@ -103,6 +124,7 @@ class GiftAid_Utils_Contribution {
                 
                 // get gift aid amount
                 $giftAidAmount = self::_calculateGiftAidAmt( $contribution['total_amount'] );
+
 
                 // FIXME: check if there is customTable method
                 $query = "
@@ -173,15 +195,17 @@ batch_name = %4
     return (( $basicRate * $contributionAmount ) / ( 100- $basicRate ));
   }
 
+
+
   /*
      * this function check contribution is valid for giftaid or not:
      * 1 - if contribution_id already inserted in batch_contribution
      * 2 - if contributions are not valid for gift aid
      */
   static function _validateContributionToBatch( &$contributionIDs )  {
-      $contributionsAdded        = array( );
+    $contributionsAdded        = array( );
     $contributionsAlreadyAdded = array( );
-        $contributionsNotValid     = array( );
+    $contributionsNotValid     = array( );
                 
         require_once "GiftAid/Utils/GiftAid.php";
         //require_once "CRM/Core/DAO/EntityBatch.php";
@@ -224,7 +248,7 @@ batch_name = %4
         $query = "SELECT * FROM civicrm_batch ORDER BY " . $orderBy;
         $dao   =& CRM_Core_DAO::executeQuery( $query);
        
-    $result = array();
+        $result = array();
         while ( $dao->fetch( ) ) {
             $result[$dao->id] = $dao->id." - ".$dao->title;
         }
