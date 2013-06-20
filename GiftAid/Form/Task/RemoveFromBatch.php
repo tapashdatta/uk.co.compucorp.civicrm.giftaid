@@ -37,9 +37,7 @@
 require_once 'CRM/Contribute/Form/Task.php';
 
 /**
- * This class provides the functionality to delete a group of
- * contacts. This class provides functionality for the actual
- * addition of contacts to groups.
+ * This class provides the functionality to delete a group of  contribution from batch.
  */
 
 require_once 'CRM/Utils/String.php';
@@ -58,23 +56,22 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
 
 		parent::preProcess( );
 		
-        require_once 'GiftAid/Utils/Contribution.php';
-		list( $total, $toRemove, $notInBatch, $alreadySubmited) = GiftAid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
+      require_once 'GiftAid/Utils/Contribution.php';
+	   	list( $total, $toRemove, $notInBatch, $alreadySubmited) = GiftAid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
 		
-        $this->assign('selectedContributions', $total); 
-		$this->assign('totalToRemoveContributions', count($toRemove));
-        $this->assign('notInBatchContributions', count($notInBatch));
-		$this->assign('alreadySubmitedContributions', count($alreadySubmited));
+      $this->assign('selectedContributions', $total); 
+		  $this->assign('totalToRemoveContributions', count($toRemove));
+      $this->assign('notInBatchContributions', count($notInBatch));
+	  	$this->assign('alreadySubmitedContributions', count($alreadySubmited));
 
-        $contributionsToRemoveRows = GiftAid_Utils_Contribution::getContributionDetails ( $toRemove );
-        $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows );
+      $contributionsToRemoveRows = GiftAid_Utils_Contribution::getContributionDetails ( $toRemove );
+      $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows );
          
+      $contributionsAlreadySubmitedRows = GiftAid_Utils_Contribution::getContributionDetails ( $alreadySubmited );
+      $this->assign( 'contributionsAlreadySubmitedRows', $contributionsAlreadySubmitedRows );
 
-        $contributionsAlreadySubmitedRows = GiftAid_Utils_Contribution::getContributionDetails ( $alreadySubmited );
-        $this->assign( 'contributionsAlreadySubmitedRows', $contributionsAlreadySubmitedRows );
-
-        $contributionsNotInBatchRows = GiftAid_Utils_Contribution::getContributionDetails ( $notInBatch );
-        $this->assign( 'contributionsNotInBatchRows', $contributionsNotInBatchRows );
+      $contributionsNotInBatchRows = GiftAid_Utils_Contribution::getContributionDetails ( $notInBatch );
+      $this->assign( 'contributionsNotInBatchRows', $contributionsNotInBatchRows );
 	}
 	
 	
@@ -97,28 +94,25 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
      * @return None
      */
     public function postProcess() {
-        require_once 'CRM/Core/Transaction.php';
-        $transaction = new CRM_Core_Transaction( );
+      require_once 'CRM/Core/Transaction.php';
+      $transaction = new CRM_Core_Transaction( );
 
-		//$params = $this->controller->exportValues( );
-		require_once 'GiftAid/Utils/Contribution.php';
-        list( $total, $removed, $notRemoved ) = GiftAid_Utils_Contribution::removeContributionFromBatch( $this->_contributionIds );
-        if ( $removed <= 0 ) {
-            // rollback since there were no contributions added, and we might not want to keep an empty batch
-            $transaction->rollback( );
-            $status = ts('Could not removed contribution from batchess, as there were no valid contribution(s) to be removed.');
-        } else {
-            $transaction->commit( );
-            $status = ts('Total Selected Contribution(s): %1', array(1 => $total));
-            CRM_Core_Session::setStatus( $status );
-            if ( $removed ) {
-                $status = ts('Total Contribution(s) removed from batches: %1', array(1 => $removed));
-            }
-            if ( $notRemoved ) {
-                $status = ts('Total Contribution(s) not removed from batches: %1', array(1 => $notRemoved));
-            }
-            CRM_Core_Session::setStatus( $status );
-
+		  require_once 'GiftAid/Utils/Contribution.php';
+      list( $total, $removed, $notRemoved ) = GiftAid_Utils_Contribution::removeContributionFromBatch( $this->_contributionIds );
+      if ( $removed <= 0 ) {
+        $transaction->rollback( );
+        $status = ts('Could not removed contribution from batchess, as there were no valid contribution(s) to be removed.');
+      } else {
+        $transaction->commit( );
+        $status = ts('Total Selected Contribution(s): %1', array(1 => $total));
+        CRM_Core_Session::setStatus( $status );
+        if ( $removed ) {
+          $status = ts('Total Contribution(s) removed from batches: %1', array(1 => $removed));
         }
+        if ( $notRemoved ) {
+          $status = ts('Total Contribution(s) not removed from batches: %1', array(1 => $notRemoved));
+        }
+      CRM_Core_Session::setStatus( $status );
+    }
 	}//end of function
 }

@@ -33,15 +33,11 @@
  * $Id$
  *
  */
-
 require_once 'CRM/Contribute/Form/Task.php';
 
 /**
- * This class provides the functionality to delete a group of
- * contacts. This class provides functionality for the actual
- * addition of contacts to groups.
+ * This class provides the functionality to add a group of contribution to a batch.
  */
-
 require_once 'CRM/Utils/String.php';
  
 class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
@@ -84,10 +80,6 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
         
 	}
 
-
-	
-	
-	
     /**
      * Build the form
      *
