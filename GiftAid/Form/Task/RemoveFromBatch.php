@@ -66,26 +66,16 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
         $this->assign('notInBatchContributions', count($notInBatch));
 		$this->assign('alreadySubmitedContributions', count($alreadySubmited));
 
-        dprint_r($contributionsAlreadySubmitedRows);
-
         $contributionsToRemoveRows = GiftAid_Utils_Contribution::getContributionDetails ( $toRemove );
         $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows );
          
 
         $contributionsAlreadySubmitedRows = GiftAid_Utils_Contribution::getContributionDetails ( $alreadySubmited );
-
         $this->assign( 'contributionsAlreadySubmitedRows', $contributionsAlreadySubmitedRows );
 
         $contributionsNotInBatchRows = GiftAid_Utils_Contribution::getContributionDetails ( $notInBatch );
         $this->assign( 'contributionsNotInBatchRows', $contributionsNotInBatchRows );
-
-
-        //$contributionNotInAnyBatch
-    
-
-        
 	}
-	
 	
 	
     /**
