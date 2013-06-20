@@ -382,7 +382,7 @@ batch_name = %4
      */
     static function isBatchAlreadySubmited( $pBatchId )   {
 
-      $bIsSubmitted = fales;
+      $bIsSubmitted = false;
       $cQuery = " SELECT submission.batch_id                    AS batch_id " .
                 " ,      submission.response_status             AS status   " .
                 " FROM   civicrm_gift_aid_submission submission             " .
