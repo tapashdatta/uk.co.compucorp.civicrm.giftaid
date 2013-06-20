@@ -162,7 +162,7 @@ class GiftAid_Utils_Contribution {
     }
 
 
-  static function removeContributionFromBatch($contributionIDs, $batchID){
+  static function removeContributionFromBatch($contributionIDs){
       $contributionRemoved = array();
       $contributionNotRemoved = array();
       
