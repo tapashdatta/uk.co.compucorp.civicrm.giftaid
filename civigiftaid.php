@@ -326,31 +326,3 @@ function _civigiftaid_civicrm_custom_get_address_and_postal_code_format_address 
     if (isset($contactAddress['state_province_id']) AND $contactAddress['state_province_id'])            $tempAddressArray[] = CRM_Core_PseudoConstant::stateProvince($contactAddress['state_province_id']);
     return @implode(', ' , $tempAddressArray);
 }
-
-/*function civigiftaid_civicrm_pageRun( &$page ) {
-    $name = $page->getVar( '_name' );
-    $batch_id = CRM_Utils_Request::retrieve( 'batch_id', 'String', $this );
-    $action = CRM_Utils_Array::value('action', $_GET, '');
-    
-    if ( $name == 'CRM_Contribute_Page_DashBoard' && $action == 'produce_pdf_file' && !empty($batch_id) ) {
-        $giftAidRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
-        $giftAidPdfFile = $giftAidRoot . DIRECTORY_SEPARATOR . 'r68-claim.pdf';
-        
-        $resultPDFFile = $giftAidRoot . DIRECTORY_SEPARATOR .'/r68forms/r68-claim-'.$batch_id.'.fdf';
-        
-        $postArray['name'] = 'Test'; 
-        require_once 'GiftAid/Utils/CreateFDF.php';
-        $resultPdf = GiftAid_Utils_CreateFDF::CreateFDF($giftAidPdfFile  , $postArray);
-        
-        // Create a file for later use
-        if( $fp = fopen($resultPDFFile,'w') ){
-            fwrite( $fp , $resultPdf , strlen($resultPdf));
-            $CREATED=TRUE;
-        }else{
-            echo 'Unable to create file: '.$resultPDFFile.'<br><br>';
-            $CREATED=FALSE;
-        }
-        fclose($fp);                                  
-    }
-    CRM_Utils_System::civiExit( );
-}*/
