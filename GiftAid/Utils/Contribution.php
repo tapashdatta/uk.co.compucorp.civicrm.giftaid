@@ -165,7 +165,8 @@ class GiftAid_Utils_Contribution {
   static function removeContributionFromBatch($contributionIDs, $batchID){
       $contributionRemoved = array();
       $contributionNotRemoved = array();
-      list( $total, $contributionsToRemove, $alreadySubmited) = self::_validationRemoveContributionFromBatch( $contributionIDs );
+      
+      list( $total, $contributionsToRemove, $notInBatch, $alreadySubmited) = self::_validationRemoveContributionFromBatch( $contributionIDs );
       require_once 'CRM/Batch/BAO/Batch.php';
 
       $contributions = self::getContributionDetails($contributionsToRemove);
