@@ -167,32 +167,35 @@ class GiftAid_Utils_Contribution {
       $contributionNotRemoved = array();
       
       list( $total, $contributionsToRemove, $notInBatch, $alreadySubmited) = self::_validationRemoveContributionFromBatch( $contributionIDs );
-      require_once 'CRM/Batch/BAO/Batch.php';
 
+      require_once 'CRM/Batch/BAO/Batch.php';
+      dprint_r('called before remove');
       $contributions = self::getContributionDetails($contributionsToRemove);
 
-      foreach($contributions  as $contribution){
+      if(!empty($contributions)){
+        foreach($contributions  as $contribution){
 
-        if(!empty($contribution['batch_id'])){
+          if(!empty($contribution['batch_id'])){
 
-          $batchContribution =& new CRM_Batch_DAO_EntityBatch();
-          $batchContribution->entity_table = 'civicrm_contribution';
-          $batchContribution->entity_id    = $contribution['contribution_id'];
-          $batchContribution->batch_id =  $contribution['batch_id'];
-          $batchContribution->delete( );
+            $batchContribution =& new CRM_Batch_DAO_EntityBatch();
+            $batchContribution->entity_table = 'civicrm_contribution';
+            $batchContribution->entity_id    = $contribution['contribution_id'];
+            $batchContribution->batch_id =  $contribution['batch_id'];
+            $batchContribution->delete( );
 
-          // FIXME: check if there API to user
-          $query = "DELETE FROM civicrm_value_gift_aid_submission
-                    WHERE entity_id = %1";
-          $sqlParams = array( 1 => array( $contribution['contribution_id']  , 'Integer' ),);
-          CRM_Core_DAO::executeQuery( $query, $sqlParams );
+            // FIXME: check if there API to user
+            $query = "DELETE FROM civicrm_value_gift_aid_submission
+                      WHERE entity_id = %1";
+            $sqlParams = array( 1 => array( $contribution['contribution_id']  , 'Integer' ),);
+            CRM_Core_DAO::executeQuery( $query, $sqlParams );
 
-          array_push($contributionRemoved, $contribution['contribution_id']);
+            array_push($contributionRemoved, $contribution['contribution_id']);
 
-        }else{
-          array_push($contributedNotRemoved, $contribution['contribution_id']);
+          }else{
+            array_push($contributedNotRemoved, $contribution['contribution_id']);
+          }
+              
         }
-            
       }
       return array( count($contributionIDs), 
                     count($contributionRemoved), 
@@ -349,10 +352,12 @@ class GiftAid_Utils_Contribution {
      * @param array  $contributionIDs an array of contribution ids
      * @return array $result an array of contributions
      */
-    static function getContributionDetails( $contributionIds ) {        
+    static function getContributionDetails( $contributionIds ) { 
+
         if ( empty( $contributionIds ) ) {
             return;
         } 
+
         $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, financial_type.name,
                           contribution.source, contribution.receive_date, batch.title, batch.id as batch_id FROM civicrm_contribution contribution
                    LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
@@ -360,7 +365,7 @@ class GiftAid_Utils_Contribution {
                    LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id ) 
                    LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id ) 
                    WHERE contribution.id IN (" . implode(',', $contributionIds ) . ")" ; 
-        
+
         $dao    = CRM_Core_DAO::executeQuery( $query );
         $result = array( );
         while ( $dao->fetch( ) ) {
@@ -374,6 +379,7 @@ class GiftAid_Utils_Contribution {
             $result[$dao->id]['batch']             = $dao->title;
             $result[$dao->id]['batch_id']          = $dao->batch_id;
         } 
+
         return $result;
     }
 
