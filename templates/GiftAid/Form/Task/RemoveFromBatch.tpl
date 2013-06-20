@@ -25,9 +25,9 @@
 *}
 <div class="crm-block crm-form-block crm-export-form-block">
 
-<h2>{ts}Add To Gift Aid{/ts}</h2>
+<h2>{ts}Remove contribution from Gift Aid batch{/ts}</h2>
 <div class="help">
-<p>{ts}TODO:: Add some{/ts}</p>
+<p>{ts}TODO:: Add help text{/ts}</p>
 </div>
 
 <h3>{ts}Summary{/ts}</h3>
