@@ -83,6 +83,8 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
 
         
 	}
+
+
 	
 	
 	
@@ -106,7 +108,10 @@ class GiftAid_Form_Task_AddToGiftAid extends CRM_Contribute_Form_Task {
 		$this->add( 'textarea', 'description', ts('Description:') . ' ', 
                     $attributes['description'] );
 
-        $defaults = array( 'title' =>	ts( 'Gift Aid Batch ' . date('d-m-Y H:i:s')));
+       
+        require_once 'CRM/Batch/BAO/Batch.php';
+        $batchName = CRM_Batch_BAO_Batch::generateBatchName();
+        $defaults = array( 'title' =>	ts('GiftAid ' . $batchName));
 
         $this->setDefaults( $defaults );
                            
