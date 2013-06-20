@@ -43,7 +43,44 @@
  */
 class GiftAid_Utils_Contribution {
 
+  static function removeContributionFromBatch($contributionIDs, $batchID){
+    $contributionRemoved = array();
+    $contributionNotRemoved = array();
+    list( $total, $contributionsToRemove, $alreadySubmited) = self::_validationRemoveContributionFromBatch( $contributionIDs );
+    require_once 'CRM/Batch/BAO/Batch.php';
 
+    $contributions = self::getContributionDetails($contributionsToRemove);
+
+    foreach($contributions  as $contribution){
+
+      if(!empty($contribution['batch_id'])){
+
+        $batchContribution =& new CRM_Batch_DAO_EntityBatch();
+        $batchContribution->entity_table = 'civicrm_contribution';
+        $batchContribution->entity_id    = $contribution['contribution_id'];
+        $batchContribution->batch_id =  $contribution['batch_id'];
+        $batchContribution->delete( );
+
+        // FIXME: check if there API to user
+        $query = "DELETE FROM civicrm_value_gift_aid_submission
+                  WHERE entity_id = %1";
+        $sqlParams = array( 1 => array( $contribution['contribution_id']  , 'Integer' ),);
+        CRM_Core_DAO::executeQuery( $query, $sqlParams );
+
+        array_push($contributionRemoved, $contribution['contribution_id']);
+
+      }else{
+        array_push($contributedNotRemoved, $contribution['contribution_id']);
+      }
+          
+    }
+
+    return array( count($contributionIDs), 
+                  count($contributionRemoved), 
+                  count($contributionNotRemoved) );
+
+
+  }
     
     /**
      * Given an array of contributionIDs, add them to a batch
@@ -147,7 +184,7 @@ batch_name = %4
                 $contributionsAdded[] = $contributionID;
             } else {
                 $contributionsNotAdded[] = $contributionID;
-      } 
+            } 
     }
 
         if ( ! empty( $contributionsAdded ) ) {
@@ -276,7 +313,7 @@ batch_name = %4
             return;
         } 
         $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, financial_type.name,
-                          contribution.source, contribution.receive_date, batch.title FROM civicrm_contribution contribution
+                          contribution.source, contribution.receive_date, batch.title, batch.id as batch_id FROM civicrm_contribution contribution
                    LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
                    LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
                    LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id ) 
@@ -287,12 +324,14 @@ batch_name = %4
         $result = array( );
         while ( $dao->fetch( ) ) {
             $result[$dao->id]['contact_id']        = $dao->contact_id;
+            $result[$dao->id]['contribution_id']   = $dao->id;
             $result[$dao->id]['display_name']      = $dao->display_name;
             $result[$dao->id]['total_amount']      = $dao->total_amount;
             $result[$dao->id]['financial_account'] = $dao->name;
             $result[$dao->id]['source']            = $dao->source;
             $result[$dao->id]['receive_date']      = $dao->receive_date;
             $result[$dao->id]['batch']             = $dao->title;
+            $result[$dao->id]['batch_id']          = $dao->batch_id;
         } 
         return $result;
     }
