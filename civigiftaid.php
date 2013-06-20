@@ -72,7 +72,7 @@ function civigiftaid_civicrm_searchTasks( $objectType, &$tasks ) {
         $tasks[CIVICRM_GIFTAID_ADD_TASKID] = array( 'title'  => ts( 'Add to Gift Aid batch' ),
                                                 'class'  => 'GiftAid_Form_Task_AddToGiftAid',
                                                 'result' => false );
-        $tasks[CIVICRM_GIFTAID_REMOVE_TASKID] = array( 'title'  => ts( 'Remove to Gift Aid batch' ),
+        $tasks[CIVICRM_GIFTAID_REMOVE_TASKID] = array( 'title'  => ts( 'Remove from Gift Aid batch' ),
                                                 'class'  => 'GiftAid_Form_Task_RemoveFromBatch',
                                                 'result' => false );
     }
