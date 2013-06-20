@@ -59,20 +59,25 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
 		parent::preProcess( );
 		
         require_once 'GiftAid/Utils/Contribution.php';
-		list( $total, $toRemove, $alreadySubmited) = GiftAid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
+		list( $total, $toRemove, $notInBatch, $alreadySubmited) = GiftAid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
 		
         $this->assign('selectedContributions', $total); 
 		$this->assign('totalToRemoveContributions', count($toRemove));
+        $this->assign('notInBatchContributions', count($notInBatch));
 		$this->assign('alreadySubmitedContributions', count($alreadySubmited));
 
+        dprint_r($contributionsAlreadySubmitedRows);
 
-        //$contributionsToRemoveRows = array( );    
         $contributionsToRemoveRows = GiftAid_Utils_Contribution::getContributionDetails ( $toRemove );
         $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows );
          
-        //$contributionsAlreadySubmitedRows = array( );
+
         $contributionsAlreadySubmitedRows = GiftAid_Utils_Contribution::getContributionDetails ( $alreadySubmited );
+
         $this->assign( 'contributionsAlreadySubmitedRows', $contributionsAlreadySubmitedRows );
+
+        $contributionsNotInBatchRows = GiftAid_Utils_Contribution::getContributionDetails ( $notInBatch );
+        $this->assign( 'contributionsNotInBatchRows', $contributionsNotInBatchRows );
 
 
         //$contributionNotInAnyBatch
@@ -111,18 +116,19 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
         if ( $removed <= 0 ) {
             // rollback since there were no contributions added, and we might not want to keep an empty batch
             $transaction->rollback( );
-            $status = ts('Could not removed contribution from batchs, as there were no valid contribution(s) to be removed.');
+            $status = ts('Could not removed contribution from batchess, as there were no valid contribution(s) to be removed.');
         } else {
+            $transaction->commit( );
             $status = ts('Total Selected Contribution(s): %1', array(1 => $total));
+            CRM_Core_Session::setStatus( $status );
             if ( $removed ) {
-                $status[] = ts('Total Contribution(s) removed from batched: %1', array(1 => $added));
+                $status = ts('Total Contribution(s) removed from batches: %1', array(1 => $removed));
             }
             if ( $notRemoved ) {
-                $status[] = ts('Total Contribution(s) already submited: %1', array(1 => $notRemoved));
+                $status = ts('Total Contribution(s) not removed from batches: %1', array(1 => $notRemoved));
             }
-            $status = implode( '<br/>', $status );
+            CRM_Core_Session::setStatus( $status );
+
         }
-        $transaction->commit( );
-        CRM_Core_Session::setStatus( $status );
 	}//end of function
 }

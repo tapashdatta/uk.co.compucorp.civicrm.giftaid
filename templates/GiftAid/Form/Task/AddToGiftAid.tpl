@@ -60,7 +60,7 @@
            <table class="selector">
            <thead >
 	      <tr>
-                 <th>{ts}Name{/ts}</th>
+           <th>{ts}Name{/ts}</th>
 	         <th>{ts}Amount{/ts}</th>
 	         <th>{ts}Type{/ts}</th>
 	         <th>{ts}Source{/ts}</th>
