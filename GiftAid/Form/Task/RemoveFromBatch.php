@@ -99,20 +99,24 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
 
 		  require_once 'GiftAid/Utils/Contribution.php';
       list( $total, $removed, $notRemoved ) = GiftAid_Utils_Contribution::removeContributionFromBatch( $this->_contributionIds );
+   
       if ( $removed <= 0 ) {
-        $transaction->rollback( );
-        $status = ts('Could not removed contribution from batchess, as there were no valid contribution(s) to be removed.');
+        //$transaction->rollback( );
+        $status = ts('Could not removed contribution from batch, as there were no valid contribution(s) to be removed.');
       } else {
         $transaction->commit( );
         $status = ts('Total Selected Contribution(s): %1', array(1 => $total));
         CRM_Core_Session::setStatus( $status );
+        
         if ( $removed ) {
-          $status = ts('Total Contribution(s) removed from batches: %1', array(1 => $removed));
+          $status = ts('Total Contribution(s) removed from batch: %1', array(1 => $removed));
         }
         if ( $notRemoved ) {
-          $status = ts('Total Contribution(s) not removed from batches: %1', array(1 => $notRemoved));
+          $status = ts('Total Contribution(s) not removed from batch: %1', array(1 => $notRemoved));
         }
-      CRM_Core_Session::setStatus( $status );
-    }
+
+     }
+     CRM_Core_Session::setStatus( $status );
+
 	}//end of function
 }
