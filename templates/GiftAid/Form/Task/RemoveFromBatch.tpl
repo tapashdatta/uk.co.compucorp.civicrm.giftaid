@@ -45,7 +45,7 @@
            <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
            <div class="crm-accordion-header">
            <div class="icon crm-accordion-pointer"></div>
-            Number of contributions that will be removed from batchs: {$totalToRemoveContributions}
+            Number of contributions that will be removed from batch: {$totalToRemoveContributions}
            </div><!-- /.crm-accordion-header -->
            <div class="crm-accordion-body">
            <table class="selector">
@@ -78,7 +78,7 @@
            {else}
              <td>
                  <div class="crm-accordion-header">
-                  Number of contributions that will be removed from batchs: {$totalToRemoveContributions}
+                  Number of contributions that will be removed from batch: {$totalToRemoveContributions}
                  </div>
              </td>
            {/if}

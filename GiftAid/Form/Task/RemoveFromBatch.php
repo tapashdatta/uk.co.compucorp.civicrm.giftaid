@@ -83,7 +83,7 @@ class GiftAid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
      */
     function buildQuickForm( ) {
 		$attributes	= CRM_Core_DAO::getAttribute( 'CRM_Batch_DAO_Batch' );
-        $this->addDefaultButtons( ts('Rmove from batch') );
+        $this->addDefaultButtons( ts('Remove from batch') );
 
     }
    
