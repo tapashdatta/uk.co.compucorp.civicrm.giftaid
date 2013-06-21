@@ -8,21 +8,22 @@
     The extension comprises a couple of custom data sets to hold all Gift Aid data, a profile to use on contribution forms to collect this data, a task to batch 'gift-aidable' contributions and a report to submit batches to HMRC.
   </description>
   <urls>
-    <url desc="Main Extension Page">http://civicrm.org</url>
-    <url desc="Documentation">https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid/wiki</url>
+    <url desc="Main Extension Page">http://civicrm.org/extensions/gift-aid-extension-uk</url>
+    <url desc="Documentation">https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid</url>
     <url desc="Support">http://forum.civicrm.org</url>
     <url desc="Licensing">http://civicrm.org/licensing</url>
   </urls>
   <license>AGPL</license>
   <maintainer>
     <author>Erawat Chamanont</author>
-    <email>erawat@gmail.com</email>
+    <email>erawat@compucorp.co.uk</email>
   </maintainer>
   <releaseDate>2013-06-13</releaseDate>
-  <version>1.1</version>
-  <develStage>Development</develStage>
+  <version>2.0</version>
+  <develStage>Beta</develStage>
   <compatibility>
     <ver>4.3</ver>
   </compatibility>
-  <comments>For support, please contact project team on the forums. (http://forum.civicrm.org)</comments>
+  <comments>For support, please contact project team on the forums. (http://forum.civicrm.org) or create a new issue on https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid/issues
+  </comments>
 </extension>
