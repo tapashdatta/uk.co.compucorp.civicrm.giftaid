@@ -184,8 +184,12 @@ class GiftAid_Utils_Contribution {
             $batchContribution->delete( );
 
             // FIXME: check if there API to user
-            $query = "DELETE FROM civicrm_value_gift_aid_submission
-                      WHERE entity_id = %1";
+            $query = "UPDATE civicrm_value_gift_aid_submission
+                      SET gift_aid_amount = NULL,
+                          amount = NULL,
+                          batch_name = NULL
+                      WHERE entity_id = %1"
+
             $sqlParams = array( 1 => array( $contribution['contribution_id']  , 'Integer' ),);
             CRM_Core_DAO::executeQuery( $query, $sqlParams );
 
