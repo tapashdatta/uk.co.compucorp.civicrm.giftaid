@@ -188,9 +188,9 @@ class GiftAid_Utils_Contribution {
                       SET gift_aid_amount = NULL,
                           amount = NULL,
                           batch_name = NULL
-                      WHERE entity_id = %1"
+                      WHERE entity_id = %1";
 
-            $sqlParams = array( 1 => array( $contribution['contribution_id']  , 'Integer' ),);
+            $sqlParams = array( 1 => array( $contribution['contribution_id']  , 'Integer' ));
             CRM_Core_DAO::executeQuery( $query, $sqlParams );
 
             array_push($contributionRemoved, $contribution['contribution_id']);
