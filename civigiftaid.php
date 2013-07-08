@@ -24,10 +24,7 @@ function civigiftaid_civicrm_install( ) {
 }
 
 function civigiftaid_civicrm_uninstall( ){
-    $getResult = civicrm_api('OptionGroup', 'getsingle', array(
-      'version' => 3,
-      'name' => 'giftaid_basic_rate_tax',
-   ));
+  
   if($getResult['id']){
     $ovResult = civicrm_api('OptionValue', 'get', array(
             'version' => 3,
@@ -43,8 +40,25 @@ function civigiftaid_civicrm_uninstall( ){
        }
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
   } 
+
+
 }
 
+/**
+ * Implementation of hook_civicrm_enable
+ */
+function civigiftaid_civicrm_enable() {
+  _setCustomGroupStatus('Gift_Aid', 1);
+  _setCustomGroupStatus('Gift_Aid_Declaration', 1);
+}
+
+/**
+ * Implementation of hook_civicrm_disable
+ */
+function civigiftaid_civicrm_disable() {
+  _setCustomGroupStatus('Gift_Aid', 0);
+  _setCustomGroupStatus('Gift_Aid_Declaration', 0);
+}
 
 
 function civigiftaid_civicrm_config( &$config ) {
@@ -278,6 +292,32 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
         return $errors;
     }
 }
+
+
+/*
+*  Set Custom group active/in active
+*/
+function _setCustomGroupStatus($name, $isActive){
+  
+   $result = civicrm_api('CustomGroup', 'getsingle', array(
+      'version' => 3,
+      'sequential' => 1,
+      'name' => $name,
+    ));
+
+   if($result['id']){
+      $params = array(
+        'version' => 3,
+        'sequential' => 1,
+        'id' => $result['id'],
+        'is_active' => $isActive,
+      );
+      $result = civicrm_api('CustomGroup', 'update', $params);
+    }
+
+}
+
+
 
 /*
 * Function to get full address and postal code for a contact
