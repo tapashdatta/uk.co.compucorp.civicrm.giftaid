@@ -25,27 +25,11 @@ function civigiftaid_civicrm_install( ) {
 }
 
 function civigiftaid_civicrm_uninstall( ){
-  
-  $getResult = civicrm_api('OptionGroup', 'getsingle', array(
-      'version' => 3,
-      'name' => 'giftaid_basic_rate_tax',
-  ));
 
-  if($getResult['id']){
-    $ovResult = civicrm_api('OptionValue', 'get', array(
-            'version' => 3,
-            'option_group_id' =>  $getResult['id'],
-          ));
-      if($ovResult['values']){
-        foreach ($ovResult['values'] as $ov) {
-          $delResult = civicrm_api('OptionValue', 'delete', array(
-           'version' => 3,
-           'id' => $ov['id'],
-          ));
-        }
-       }
-    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
-  } 
+  _deleteOptionGroup('giftaid_basic_rate_tax');
+  _deleteOptionGroup('reason_ended');
+  _deleteOptionGroup('giftaid_batch_name');
+
 
   _deleteCustomData('Gift_Aid', 'CustomGroup');
   _deleteCustomData('Gift_Aid_Declaration', 'CustomGroup');
@@ -305,8 +289,38 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
     }
 }
 
+
 /*
-*  Function to delete custom group
+*  Function to delete option group group
+*
+*/
+function _deleteOptionGroup($name){
+
+  $getResult = civicrm_api('OptionGroup', 'getsingle', array(
+      'version' => 3,
+      'name' => $name,
+  ));
+
+  if($getResult['id']){
+    $ovResult = civicrm_api('OptionValue', 'get', array(
+            'version' => 3,
+            'option_group_id' =>  $getResult['id'],
+          ));
+      if($ovResult['values']){
+        foreach ($ovResult['values'] as $ov) {
+          $delResult = civicrm_api('OptionValue', 'delete', array(
+           'version' => 3,
+           'id' => $ov['id'],
+          ));
+        }
+       }
+    CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
+  } 
+
+}
+
+/*
+*  Function to delete custom data
 *
 */
 function _deleteCustomData($name, $type){
@@ -325,8 +339,6 @@ function _deleteCustomData($name, $type){
       );
       $result = civicrm_api($type, 'delete', $params);
     }
-
-
 }
 
 /*
