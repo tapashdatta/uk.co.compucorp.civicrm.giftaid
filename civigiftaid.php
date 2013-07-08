@@ -25,6 +25,11 @@ function civigiftaid_civicrm_install( ) {
 
 function civigiftaid_civicrm_uninstall( ){
   
+  $getResult = civicrm_api('OptionGroup', 'getsingle', array(
+      'version' => 3,
+      'name' => 'giftaid_basic_rate_tax',
+  ));
+
   if($getResult['id']){
     $ovResult = civicrm_api('OptionValue', 'get', array(
             'version' => 3,
@@ -40,6 +45,8 @@ function civigiftaid_civicrm_uninstall( ){
        }
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
   } 
+  _deleteCustomGroup('Gift_Aid');
+  _deleteCustomGroup('Gift_Aid_Declaration');
 
 
 }
@@ -293,6 +300,29 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
     }
 }
 
+/*
+*  Function to delete custom group
+*
+*/
+function _deleteCustomGroup($name){
+
+  $result = civicrm_api('CustomGroup', 'getsingle', array(
+      'version' => 3,
+      'sequential' => 1,
+      'name' => $name,
+    ));
+
+  if($result['id']){
+      $params = array(
+        'version' => 3,
+        'sequential' => 1,
+        'id' => $result['id'],
+      );
+      $result = civicrm_api('CustomGroup', 'delete', $params);
+    }
+
+
+}
 
 /*
 *  Set Custom group active/in active
