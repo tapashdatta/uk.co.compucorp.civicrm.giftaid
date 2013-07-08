@@ -21,6 +21,7 @@ function civigiftaid_civicrm_install( ) {
     // rebuild the menu so our path is picked up
     require_once 'CRM/Core/Invoke.php';
     CRM_Core_Invoke::rebuildMenuAndCaches( );
+
 }
 
 function civigiftaid_civicrm_uninstall( ){
@@ -45,9 +46,25 @@ function civigiftaid_civicrm_uninstall( ){
        }
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
   } 
-  _deleteCustomGroup('Gift_Aid');
-  _deleteCustomGroup('Gift_Aid_Declaration');
 
+  $result = civicrm_api('CustomGroup', 'getsingle', array(
+      'version' => 3,
+      'sequential' => 1,
+      'name' => $name,
+    ));
+
+  if($result['id']){
+      $params = array(
+        'version' => 3,
+        'sequential' => 1,
+        'id' => $result['id'],
+      );
+      $result = civicrm_api('CustomGroup', 'delete', $params);
+  }
+
+  _deleteCustomData('Gift_Aid', 'CustomGroup');
+  _deleteCustomData('Gift_Aid_Declaration', 'CustomGroup');
+  _deleteCustomData('Gift_Aid', 'UFGroup');
 
 }
 
@@ -55,16 +72,19 @@ function civigiftaid_civicrm_uninstall( ){
  * Implementation of hook_civicrm_enable
  */
 function civigiftaid_civicrm_enable() {
-  _setCustomGroupStatus('Gift_Aid', 1);
-  _setCustomGroupStatus('Gift_Aid_Declaration', 1);
+  _setCustomDataStatus('Gift_Aid','CustomGroup', 1);
+  _setCustomDataStatus('Gift_Aid_Declaration', 'CustomGroup', 1);
+  _setCustomDataStatus('Gift_Aid', 'UFGroup', 1);
 }
 
 /**
  * Implementation of hook_civicrm_disable
  */
 function civigiftaid_civicrm_disable() {
-  _setCustomGroupStatus('Gift_Aid', 0);
-  _setCustomGroupStatus('Gift_Aid_Declaration', 0);
+  _setCustomDataStatus('Gift_Aid','CustomGroup', 0);
+  _setCustomDataStatus('Gift_Aid_Declaration','CustomGroup', 0);
+  _setCustomDataStatus('Gift_Aid','CustomGroup', 0);
+
 }
 
 
@@ -304,9 +324,9 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
 *  Function to delete custom group
 *
 */
-function _deleteCustomGroup($name){
+function _deleteCustomData($name, $type){
 
-  $result = civicrm_api('CustomGroup', 'getsingle', array(
+  $result = civicrm_api($type, 'getsingle', array(
       'version' => 3,
       'sequential' => 1,
       'name' => $name,
@@ -318,7 +338,7 @@ function _deleteCustomGroup($name){
         'sequential' => 1,
         'id' => $result['id'],
       );
-      $result = civicrm_api('CustomGroup', 'delete', $params);
+      $result = civicrm_api($type, 'delete', $params);
     }
 
 
@@ -327,9 +347,9 @@ function _deleteCustomGroup($name){
 /*
 *  Set Custom group active/in active
 */
-function _setCustomGroupStatus($name, $isActive){
+function _setCustomDataStatus($name, $type, $isActive){
   
-   $result = civicrm_api('CustomGroup', 'getsingle', array(
+   $result = civicrm_api($type, 'getsingle', array(
       'version' => 3,
       'sequential' => 1,
       'name' => $name,
@@ -342,7 +362,7 @@ function _setCustomGroupStatus($name, $isActive){
         'id' => $result['id'],
         'is_active' => $isActive,
       );
-      $result = civicrm_api('CustomGroup', 'update', $params);
+      $result = civicrm_api($type, 'update', $params);
     }
 
 }
