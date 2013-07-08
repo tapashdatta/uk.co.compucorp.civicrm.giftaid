@@ -27,7 +27,7 @@
 
 <h2>{ts}Add To Gift Aid{/ts}</h2>
 <div class="help">
-<p>{ts}Use this form to submit Gift Aid contributions.  Note that this action is irreversible, i.e. you cannot take contributions out of a batch once they have been added.{/ts}</p>
+<p>{ts}Use this form to submit Gift Aid contributions.{/ts}</p>
 </div>
 <table class="form-layout">
      <tr>

@@ -27,7 +27,7 @@
 
 <h2>{ts}Remove contribution from Gift Aid batch{/ts}</h2>
 <div class="help">
-<p>{ts}TODO:: Add help text{/ts}</p>
+<p>{ts}Use this form to remove Gift Aid contributions from the batch. You can remove multiple contributions from different batches. All gift aid field values including the amount of gift aid will be removed from the contribution record. If you are using the online gift aid submission module and the batch has been submitted, the form below will state the contibution has been submitted and you cannot remove this from the batch.{/ts}</p>
 </div>
 
 <h3>{ts}Summary{/ts}</h3>
