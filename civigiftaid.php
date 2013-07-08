@@ -47,21 +47,6 @@ function civigiftaid_civicrm_uninstall( ){
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
   } 
 
-  $result = civicrm_api('CustomGroup', 'getsingle', array(
-      'version' => 3,
-      'sequential' => 1,
-      'name' => $name,
-    ));
-
-  if($result['id']){
-      $params = array(
-        'version' => 3,
-        'sequential' => 1,
-        'id' => $result['id'],
-      );
-      $result = civicrm_api('CustomGroup', 'delete', $params);
-  }
-
   _deleteCustomData('Gift_Aid', 'CustomGroup');
   _deleteCustomData('Gift_Aid_Declaration', 'CustomGroup');
   _deleteCustomData('Gift_Aid', 'UFGroup');
