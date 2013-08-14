@@ -379,7 +379,6 @@ function _civigiftaid_civicrm_custom_get_address_and_postal_code ( $contactId , 
     require_once 'api/api.php';
     require_once 'CRM/Utils/Address.php';
     $address = civicrm_api("Address","get", array ('version' =>'3' , 'contact_id' => $contactId , 'location_type_id' => $location_type_id ));
-    dprint_r($address);
     if ($address['count'] > 0) {
 
       if(!isset($address['id'])){ //check if the contact has more than one home address so use the first one
