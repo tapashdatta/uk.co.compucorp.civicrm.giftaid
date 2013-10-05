@@ -7,7 +7,59 @@
       <label>giftaid_batch_name</label>
       <is_active>1</is_active>
     </OptionGroup>
-  </OptionGroups>
+    <OptionGroup>
+      <title>Reason ended</title>
+      <name>reason_ended</name>
+      <label>Reason Ended</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+    </OptionGroups>
+    <OptionGroups>
+    <OptionGroup>
+      <title>The GiftAid basic rate tax</title>
+      <name>giftaid_basic_rate_tax</name>
+      <label>GiftAid basic rate tax</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+    </OptionGroups>
+    <OptionValues>
+      <OptionValue>
+        <label>Contact Declined</label>
+        <value>Contact Declined</value>
+        <name>Contact_Declined</name>
+        <is_default>0</is_default>
+        <weight>2</weight>
+        <is_optgroup>0</is_optgroup>
+        <is_reserved>0</is_reserved>
+        <is_active>1</is_active>
+        <option_group_name>reason_ended</option_group_name>
+      </OptionValue>
+      <OptionValue>
+        <label>HMRC Declined</label>
+        <value>HMRC Declined</value>
+        <name>HMRC_Declined</name>
+        <is_default>0</is_default>
+        <weight>1</weight>
+        <is_optgroup>0</is_optgroup>
+        <is_reserved>0</is_reserved>
+        <is_active>1</is_active>
+        <option_group_name>reason_ended</option_group_name>
+      </OptionValue>
+    </OptionValues>
+    <OptionValues>
+      <OptionValue>
+        <label>The basic rate tax</label>
+        <value>20</value>
+        <name>basic_rate_tax</name>
+        <is_default>0</is_default>
+        <description>The GiftAid Basic Tax Rate (%)</description>
+        <weight>2</weight>
+        <is_optgroup>0</is_optgroup>
+        <is_reserved>1</is_reserved>
+        <is_active>1</is_active>
+        <option_group_name>giftaid_basic_rate_tax</option_group_name>
+      </OptionValue>
+    </OptionValues>
   <CustomGroups>
     <CustomGroup>
       <name>Gift_Aid_Declaration</name>
@@ -271,60 +323,6 @@
       <custom_group_name>Gift_Aid</custom_group_name>
     </CustomField>
   </CustomFields>
-  <OptionGroups>
-    <OptionGroup>
-      <title>Reason ended</title>
-      <name>reason_ended</name>
-      <label>Reason Ended</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-  </OptionGroups>
-  <OptionGroups>
-    <OptionGroup>
-      <title>The GiftAid basic rate tax</title>
-      <name>giftaid_basic_rate_tax</name>
-      <label>GiftAid basic rate tax</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-  </OptionGroups>
-  <OptionValues>
-    <OptionValue>
-      <label>Contact Declined</label>
-      <value>Contact Declined</value>
-      <name>Contact_Declined</name>
-      <is_default>0</is_default>
-      <weight>2</weight>
-      <is_optgroup>0</is_optgroup>
-      <is_reserved>0</is_reserved>
-      <is_active>1</is_active>
-      <option_group_name>reason_ended</option_group_name>
-    </OptionValue>
-    <OptionValue>
-      <label>HMRC Declined</label>
-      <value>HMRC Declined</value>
-      <name>HMRC_Declined</name>
-      <is_default>0</is_default>
-      <weight>1</weight>
-      <is_optgroup>0</is_optgroup>
-      <is_reserved>0</is_reserved>
-      <is_active>1</is_active>
-      <option_group_name>reason_ended</option_group_name>
-    </OptionValue>
-  </OptionValues>
-  <OptionValues>
-    <OptionValue>
-      <label>The basic rate tax</label>
-      <value>20</value>
-      <name>basic_rate_tax</name>
-      <is_default>0</is_default>
-      <description>The GiftAid Basic Tax Rate (%)</description>
-      <weight>2</weight>
-      <is_optgroup>0</is_optgroup>
-      <is_reserved>1</is_reserved>
-      <is_active>1</is_active>
-      <option_group_name>giftaid_basic_rate_tax</option_group_name>
-    </OptionValue>
-  </OptionValues>
   <ProfileGroups>
     <ProfileGroup>
       <is_active>1</is_active>
