@@ -1,4 +1,4 @@
-<?php     
+<?php
 
 // Set the GiftAid Basic Tax Rate (%)
 //define( 'CIVICRM_GIFTAID_PERCENTAGE', 20);
@@ -10,14 +10,21 @@ define( 'CIVICRM_GIFTAID_REMOVE_TASKID', 1436 );
 function civigiftaid_civicrm_install( ) {
 
     $giftAidRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
-  
+
     $giftAidXMLFile = $giftAidRoot . DIRECTORY_SEPARATOR . 'CustomGroupData.xml';
-  
+
     //CRM_Utils_File::sourceSQLFile( CIVICRM_DSN, $cividiscountSQL );
     require_once 'CRM/Utils/Migrate/Import.php';
     $import = new CRM_Utils_Migrate_Import( );
     $import->run( $giftAidXMLFile );
-  
+
+    //alter batch_name field
+    //it is matter for upgrading from version 1 - version 2
+    CRM_Utils_File::sourceSQLFile(
+      CIVICRM_DSN,
+      $giftAidRoot . '/sql/install.sql'
+    );
+
     // rebuild the menu so our path is picked up
     require_once 'CRM/Core/Invoke.php';
     CRM_Core_Invoke::rebuildMenuAndCaches( );
@@ -25,16 +32,12 @@ function civigiftaid_civicrm_install( ) {
 }
 
 function civigiftaid_civicrm_uninstall( ){
-
   _deleteOptionGroup('giftaid_basic_rate_tax');
   _deleteOptionGroup('reason_ended');
   _deleteOptionGroup('giftaid_batch_name');
-
-
   _deleteCustomData('Gift_Aid', 'CustomGroup');
   _deleteCustomData('Gift_Aid_Declaration', 'CustomGroup');
   _deleteCustomData('Gift_Aid', 'UFGroup');
-
 }
 
 /**
@@ -53,27 +56,26 @@ function civigiftaid_civicrm_disable() {
   _setCustomDataStatus('Gift_Aid','CustomGroup', 0);
   _setCustomDataStatus('Gift_Aid_Declaration','CustomGroup', 0);
   _setCustomDataStatus('Gift_Aid','CustomGroup', 0);
-
 }
 
 
 function civigiftaid_civicrm_config( &$config ) {
-    
+
     $template =& CRM_Core_Smarty::singleton( );
-   
+
     $giftAidRoot = dirname( __FILE__ );
-    
-    $giftAidDir = $giftAidRoot . DIRECTORY_SEPARATOR . 'templates';  
-    
+
+    $giftAidDir = $giftAidRoot . DIRECTORY_SEPARATOR . 'templates';
+
     if ( is_array( $template->template_dir ) ) {
         array_unshift( $template->template_dir, $giftAidDir );
     } else {
         $template->template_dir = array( $giftAidDir, $template->template_dir );
     }
-    
+
     // also fix php include path
     $include_path = $giftAidRoot . PATH_SEPARATOR . get_include_path( );
-  
+
     set_include_path( $include_path );
 }
 
@@ -97,26 +99,26 @@ function civigiftaid_civicrm_postProcess( $formName, &$form ) {
 
     if ($formName != 'CRM_Contact_Form_CustomData') {
         return;
-    }        
-     
+    }
+
     $groupID = $form->getVar('_groupID');
     $contactId = $form->getVar('_entityId');
     $tableName = CRM_Core_DAO::getFieldValue( 'CRM_Core_DAO_CustomGroup', $groupID, 'table_name', 'id' );
-    if ( $tableName == 'civicrm_value_gift_aid_declaration' ) 
+    if ( $tableName == 'civicrm_value_gift_aid_declaration' )
     {
         //FIXME: dirty hack to get the latest declaration for the contact
         $sql = "
 SELECT MAX(id) FROM civicrm_value_gift_aid_declaration
 WHERE entity_id = %1";
-                
+
         $params = array( 1 => array( $contactId, 'Integer' ) );
         $rowId = CRM_Core_DAO::singleValueQuery( $sql, $params );
-      
+
         // Get the home address of the contact
         $addressDetails = _civigiftaid_civicrm_custom_get_address_and_postal_code ( $contactId , 1 );
         $sql = "
 UPDATE civicrm_value_gift_aid_declaration
-SET  address = %1, 
+SET  address = %1,
 post_code = %2
 WHERE  id = %3";
         print_r($addressDetails);
@@ -137,12 +139,12 @@ function civigiftaid_civicrm_custom( $op, $groupID, $entityID, &$params ) {
     if ( $op != 'create' /* TODO && $op != 'edit' */ ) {
         return;
     }
-    
-     //Do this only for online contributions     
+
+     //Do this only for online contributions
      if ($_GET['q'] != 'civicrm/contribute/transact' OR empty($_GET['q'])){
         return;
-     }  
-    
+     }
+
     require_once 'CRM/Core/DAO.php';
     $tableName = CRM_Core_DAO::getFieldValue( 'CRM_Core_DAO_CustomGroup', $groupID, 'table_name', 'id' );
     if ( $tableName == 'civicrm_value_gift_aid_submission' ) {
@@ -179,7 +181,7 @@ function civigiftaid_civicrm_custom( $op, $groupID, $entityID, &$params ) {
                           'eligible_for_gift_aid' => $newStatus,
                           'start_date'            => $contributionDate,
                           'address'               => $addressDetails[0],
-                          'post_code'             => $addressDetails[1],    
+                          'post_code'             => $addressDetails[1],
                       );
             GiftAid_Utils_GiftAid::setDeclaration( $params );
         }
@@ -212,7 +214,7 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
             while ( $dao->fetch() ) {
                 $columnNames[$dao->id] = $dao->column_name;
             }
-            
+
             $declarations = array();
             foreach ( $fields as $name => $value ) {
                 if ( preg_match('/^custom_(\d+)_(-?\d+)$/', $name, $matches ) ) {
@@ -223,7 +225,7 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
                     }
                 }
             }
-            
+
             require_once 'CRM/Utils/Date.php';
             // Iterate through each distinct pair of declarations, checking for overlap.
             foreach ( $declarations as $id1 => $values1 ) {
@@ -272,14 +274,14 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
                     }
                 }
             }
-            
+
             // Check if the contact has a home address
             foreach ( $declarations as $id3 => $values3 ) {
                 require_once 'api/api.php';
                 $address = civicrm_api("Address","get", array ('version' =>'3' , 'contact_id' => $contactID , 'location_type_id' => 1 ));
                 if ($address['count'] == 0) {
                     $errors[$values3['eligible_for_gift_aid']['name']] = ts('You will not be able to create giftaid declaration because there is no home address recorded for this contact. If you want to create a declaration, please add home address for this contact.');
-                }    
+                }
             }
         }
     }
@@ -315,7 +317,7 @@ function _deleteOptionGroup($name){
         }
        }
     CRM_Core_DAO::executeQuery('DELETE FROM civicrm_option_group WHERE id = ' . $getResult['id']);
-  } 
+  }
 
 }
 
@@ -345,7 +347,7 @@ function _deleteCustomData($name, $type){
 *  Set Custom group active/in active
 */
 function _setCustomDataStatus($name, $type, $isActive){
-  
+
    $result = civicrm_api($type, 'getsingle', array(
       'version' => 3,
       'sequential' => 1,
@@ -372,7 +374,7 @@ function _setCustomDataStatus($name, $type, $isActive){
 function _civigiftaid_civicrm_custom_get_address_and_postal_code ( $contactId , $location_type_id = 1) {
     if (empty($contactId)) {
         return;
-    } 
+    }
     $fullFormatedAddress = 'NULL';
     $postalCode = 'NULL';
     // get Address & Postal Code of the contact
@@ -383,16 +385,16 @@ function _civigiftaid_civicrm_custom_get_address_and_postal_code ( $contactId , 
 
       if(!isset($address['id'])){ //check if the contact has more than one home address so use the first one
         $addressValue = array_shift(array_values($address['values']));
-        $postalCode = $addressValue['postal_code']; 
+        $postalCode = $addressValue['postal_code'];
 
       }else{
         $addressValue = $address['values'][$address['id']];
-        $postalCode = $address['values'][$address['id']]['postal_code']; 
+        $postalCode = $address['values'][$address['id']]['postal_code'];
       }
       $fullFormatedAddress = _civigiftaid_civicrm_custom_get_address_and_postal_code_format_address($addressValue);
 
     }
-    return array($fullFormatedAddress , $postalCode );    
+    return array($fullFormatedAddress , $postalCode );
 }
 
 /*
