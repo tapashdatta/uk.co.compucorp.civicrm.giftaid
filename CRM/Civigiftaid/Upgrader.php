@@ -13,27 +13,121 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
    *
   public function install() {
     $this->executeSqlFile('sql/myinstall.sql');
-  }
+  }*/
 
   /**
    * Example: Run an external SQL script when the module is uninstalled
    *
+   */
   public function uninstall() {
-   $this->executeSqlFile('sql/myuninstall.sql');
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_group WHERE name = 'giftaid_batch_name'");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_group WHERE name = 'giftaid_basic_rate_tax'");
+    CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_group WHERE name = 'reason_ended'");
+
+    civicrm_api('CustomGroup', 'delete', array(
+      'version' => 3,
+      'id' => CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid')
+      )),
+    ));
+
+    civicrm_api('CustomGroup', 'delete', array(
+      'version' => 3,
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid_Declaration')
+      )),
+    ));
+
+    civicrm_api('UFGroup', 'delete', array(
+      'version' => 3,
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api('UFGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid_Declaration')
+      )),
+    ));
+
+
   }
 
   /**
    * Example: Run a simple query when a module is enabled
    *
+  */
   public function enable() {
-    CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
+
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 1  WHERE name = 'giftaid_batch_name'");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 1  WHERE name = 'giftaid_basic_rate_tax'");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 1  WHERE name = 'reason_ended'");
+
+    civicrm_api('CustomGroup', 'update', array(
+      'version' => 3,
+      'is_active' => 1,
+      'id' => CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid')
+      )),
+    ));
+
+    civicrm_api('CustomGroup', 'update', array(
+      'version' => 3,
+      'is_active' => 1,
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid_Declaration')
+      )),
+    ));
+
+    civicrm_api('UFGroup', 'update', array(
+      'version' => 3,
+      'is_active' => 1,
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api('UFGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid_Declaration')
+      )),
+    ));
+
+   // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
   }
 
   /**
    * Example: Run a simple query when a module is disabled
    *
+   */
   public function disable() {
-    CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
+
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 0 WHERE name = 'giftaid_batch_name'");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 0 WHERE name = 'giftaid_basic_rate_tax'");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 0 WHERE name = 'reason_ended'");
+
+     civicrm_api('CustomGroup', 'update', array(
+      'version' => 3,
+      'is_active' => 0,
+      'id' => CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid')
+      )),
+    ));
+
+    civicrm_api('CustomGroup', 'update', array(
+      'version' => 3,
+      'is_active' => 0,
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid_Declaration')
+      )),
+    ));
+
+    civicrm_api('UFGroup', 'update', array(
+      'version' => 3,
+      'is_active' => 0,
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api('UFGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'Gift_Aid_Declaration')
+      )),
+    ));
+   // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
   }
 
   /**
