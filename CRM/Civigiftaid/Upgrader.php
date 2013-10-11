@@ -5,15 +5,60 @@
  */
 class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
 
+  const REPORT_CLASS = 'CRM_Civigiftaid_Report_Form_Contribute_GiftAid';
+  const REPORT_URL = 'civicrm/contribute/report/uk-giftaid';
+
   // By convention, functions that look like "function upgrade_NNNN()" are
   // upgrade tasks. They are executed in order (like Drupal's hook_update_N).
 
   /**
    * Example: Run an external SQL script when the module is installed
    *
+   */
   public function install() {
-    $this->executeSqlFile('sql/myinstall.sql');
-  }*/
+    self::removeLegacyRegisteredReport();
+    $ogId = self::getReportTemplateGroupId();
+    if($ogId){
+      $className = self::REPORT_CLASS;
+      $reportUrl = new CRM_Core_DAO_OptionValue();
+      $reportUrl->option_group_id = $ogId;
+      $reportUrl->value = self::REPORT_URL;
+      $dupeURL = $dupeClass = FALSE;
+      if ($reportUrl->find(TRUE)) {
+        //if url exist
+        $dupeURL = TRUE;
+        if ($reportUrl->name == $className) {
+          $dupeClass = TRUE;
+        }
+      }
+      if (!$dupeClass) {
+        $reportClass = new CRM_Core_DAO_OptionValue();
+        $reportClass->option_group_id = $ogId;
+        $reportClass->name = $className;
+        if ($reportClass->find(TRUE)) {
+          $dupeClass = TRUE;
+        }
+      }
+
+      if (!$dupeClass && !$dupeURL) {
+        $params = array(
+          'version' => 3,
+          'option_group_id' => $ogId,
+          'label' => 'Gift Aid Report',
+          'name' => self::REPORT_CLASS,
+          'value' => 'civicrm/contribute/uk-giftaid',
+          'description' => 'For submitting Gift Aid reports to HMRC treasury.',
+          'component_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Component',
+            'CRM_Contribute',
+            'id',
+            'namespace'
+          ),
+          'is_active' => 1
+        );
+        $result = civicrm_api('OptionValue', 'create', $params);
+      }
+    }
+  }
 
   /**
    * Example: Run an external SQL script when the module is uninstalled
@@ -48,6 +93,21 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
       )),
     ));
 
+    $reportUrl = new CRM_Core_DAO_OptionValue();
+    $reportUrl->option_group_id = self::getReportTemplateGroupId();;
+    $reportUrl->value = self::REPORT_URL;
+    if ($reportUrl->find(TRUE)) {
+      if ($reportUrl->name == $className) {
+        $reportUrl->delete();
+      }
+    }
+
+    $reportClass = new CRM_Core_DAO_OptionValue();
+    $reportClass->option_group_id = self::getReportTemplateGroupId();;
+    $reportClass->name = self::REPORT_CLASS;
+    if ($reportClass->find(TRUE)) {
+      $reportClass->delete();
+    }
 
   }
 
@@ -87,8 +147,14 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         'name' => 'Gift_Aid_Declaration')
       )),
     ));
+    /*
+    civicrm_api('OptionValue', 'update', array(
+      'version' => 3,
+      'is_active' => 1,
+      'name' => self::REPORT_CLASS,
+      'option_group_id' => self::getReportTemplateGroupId()
+    ));*/
 
-   // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 1 WHERE bar = "whiz"');
   }
 
   /**
@@ -127,21 +193,32 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         'name' => 'Gift_Aid_Declaration')
       )),
     ));
-   // CRM_Core_DAO::executeQuery('UPDATE foo SET is_active = 0 WHERE bar = "whiz"');
+    $gid = self::getReportTemplateGroupId();
+    $className = self::REPORT_CLASS;
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET is_active = 0 WHERE option_group_id = $gid AND name = '$className'");
+
+    /*
+    civicrm_api('OptionValue', 'update', array(
+      'version' => 3,
+      'is_active' => 0,
+      'name' => self::REPORT_CLASS,
+      'option_group_id' => self::getReportTemplateGroupId()
+    ));*/
+
   }
 
   /**
-   * Example: Run a couple simple queries
+   * Run a update schema
    *
    * @return TRUE on success
    * @throws Exception
-   *
-  public function upgrade_4200() {
-    $this->ctx->log->info('Applying update 4200');
-    CRM_Core_DAO::executeQuery('UPDATE foo SET bar = "whiz"');
-    CRM_Core_DAO::executeQuery('DELETE FROM bang WHERE willy = wonka(2)');
+   */
+  public function upgrade_2100() {
+    $this->ctx->log->info('Applying update 2100');
+    self::removeLegacyRegisteredReport();
     return TRUE;
-  } // */
+  }
+
 
 
   /**
@@ -204,6 +281,30 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
       $this->addTask($title, 'executeSql', $sql, $params);
     }
     return TRUE;
-  } // */
+  } //
+  */
+
+  /**  Remove all the report that registerd on GiftAid 1.0beta and 2.0beta
+  **/
+  static function removeLegacyRegisteredReport(){
+    $reportClass = new CRM_Core_DAO_OptionValue();
+    $reportClass->option_group_id = self::getReportTemplateGroupId();
+    $reportClass->name = 'GiftAid_Report_Form_Contribute_GiftAid';
+    if ($reportClass->find(TRUE)) {
+      $reportClass->delete();
+    }
+  }
+
+  static function getReportTemplateGroupId(){
+    $params = array(
+      'version' => 3,
+      'name' => 'report_template',
+    );
+    $og = civicrm_api('OptionGroup', 'getsingle', $params);
+    $ogId = CRM_Utils_Array::value('id', $og);
+    return $ogId;
+  }
+
+
 
 }
