@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
  +--------------------------------------------------------------------+
@@ -34,7 +34,7 @@
  *
  */
 
-abstract class GiftAid_Utils_Hook {
+abstract class CRM_Civigifaid_Utils_Hook {
 
 	static $_nullObject = null;
 
@@ -47,7 +47,7 @@ abstract class GiftAid_Utils_Hook {
      */
     static private $_singleton = null;
 
-    
+
     /**
      * Constructor and getter for the singleton instance
      * @return instance of $config->userHookClass
@@ -61,7 +61,7 @@ abstract class GiftAid_Utils_Hook {
         }
         return self::$_singleton;
     }
-    
+
     abstract function invoke( $numParams,
                               &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
                               $fnSuffix );
@@ -69,19 +69,19 @@ abstract class GiftAid_Utils_Hook {
     /**
      * This hook allows filtering contributions for gift-aid
      * @param bool    $isEligible eligibilty already detected if getDeclaration() method.
-     * @param integer $contactID  contact being checked 
-     * @param date    $date  date gift-aid declaration was made on 
-     * @param $contributionID  contribution id if any being referred  
+     * @param integer $contactID  contact being checked
+     * @param date    $date  date gift-aid declaration was made on
+     * @param $contributionID  contribution id if any being referred
      *
      * @access public
      */
     static function giftAidEligible( &$isEligible, $contactID, $date = null, $contributionID = null ) {
-		return self::singleton( )->invoke( 4, $isEligible, $contactID, $date, $contributionID, self::$_nullObject, 'civicrm_giftAidEligible' );       
+		return self::singleton( )->invoke( 4, $isEligible, $contactID, $date, $contributionID, self::$_nullObject, 'civicrm_giftAidEligible' );
     }
 
     /**
      * This hook allows doing any extra processing for contributions that are added to a batch.
-     * @param $contributionsAdded  contribution ids that have been batched  
+     * @param $contributionsAdded  contribution ids that have been batched
      *
      * @access public
      */

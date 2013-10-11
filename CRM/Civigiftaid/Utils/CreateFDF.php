@@ -33,11 +33,11 @@
  * $Id$
  *
  */
-                           
-class GiftAid_Utils_CreateFDF {
+
+class CRM_Civigifaid_Utils_CreateFDF {
 
     static function CreateFDF($file,$info){
-        $data="%FDF-1.2\n%‚„œ”\n1 0 obj\n<< \n/FDF << /Fields [ ";
+        $data="%FDF-1.2\n%????\n1 0 obj\n<< \n/FDF << /Fields [ ";
         foreach($info as $field => $val){
         	if(is_array($val)){
             	$data.='<</T('.$field.')/V[';
@@ -53,6 +53,6 @@ class GiftAid_Utils_CreateFDF {
             "<<\n/Root 1 0 R \n\n>>\n%%EOF\n";
         return $data;
     }
-    
+
 }
 
