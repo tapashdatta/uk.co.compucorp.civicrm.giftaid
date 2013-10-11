@@ -5,30 +5,6 @@ require_once 'civigiftaid.civix.php';
 define( 'CIVICRM_GIFTAID_ADD_TASKID', 1435 );
 define( 'CIVICRM_GIFTAID_REMOVE_TASKID', 1436 );
 
-function civigiftaid_civicrm_install( ) {
-
-    $giftAidRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
-
-    $giftAidXMLFile = $giftAidRoot . DIRECTORY_SEPARATOR . 'CustomGroupData.xml';
-
-    require_once 'CRM/Utils/Migrate/Import.php';
-    $import = new CRM_Utils_Migrate_Import( );
-    $import->run( $giftAidXMLFile );
-
-    //alter batch_name field
-    //it is matter for upgrading from version 1 - version 2
-    /*
-    CRM_Utils_File::sourceSQLFile(
-      CIVICRM_DSN,
-      $giftAidRoot . '/sql/install.sql'
-    );*/
-
-    // rebuild the menu so our path is picked up
-    require_once 'CRM/Core/Invoke.php';
-    CRM_Core_Invoke::rebuildMenuAndCaches( );
-
-}
-
 /**
  * Implementation of hook_civicrm_config
  */
@@ -49,6 +25,14 @@ function civigiftaid_civicrm_xmlMenu(&$files) {
  * Implementation of hook_civicrm_install
  */
 function civigiftaid_civicrm_install() {
+  require_once 'CRM/Utils/Migrate/Import.php';
+  $import = new CRM_Utils_Migrate_Import( );
+  $extRoot = dirname( __FILE__ ) . DIRECTORY_SEPARATOR;
+  $op = $extRoot  . 'xml' . DIRECTORY_SEPARATOR . 'data' . DIRECTORY_SEPARATOR . 'CustomGroupData.xml';
+  $import->run( $op );
+  // rebuild the menu so our path is picked up
+  require_once 'CRM/Core/Invoke.php';
+  CRM_Core_Invoke::rebuildMenuAndCaches( );
   return _civigiftaid_civix_civicrm_install();
 }
 
@@ -99,10 +83,10 @@ function civigiftaid_civicrm_managed(&$entities) {
 function civigiftaid_civicrm_searchTasks( $objectType, &$tasks ) {
   if ( $objectType == 'contribution' ) {
         $tasks[CIVICRM_GIFTAID_ADD_TASKID] = array( 'title'  => ts( 'Add to Gift Aid batch' ),
-                                                'class'  => 'GiftAid_Form_Task_AddToGiftAid',
+                                                'class'  => 'CRM_Civigiftaid_Form_Task_AddToBatch',
                                                 'result' => false );
         $tasks[CIVICRM_GIFTAID_REMOVE_TASKID] = array( 'title'  => ts( 'Remove from Gift Aid batch' ),
-                                                'class'  => 'GiftAid_Form_Task_RemoveFromBatch',
+                                                'class'  => 'CRM_CivigiftaidForm_Task_RemoveFromBatch',
                                                 'result' => false );
   }
 }
@@ -139,7 +123,6 @@ UPDATE civicrm_value_gift_aid_declaration
 SET  address = %1,
 post_code = %2
 WHERE  id = %3";
-        print_r($addressDetails);
         $dao = CRM_Core_DAO::executeQuery( $sql, array(
             1 => array($addressDetails[0], 'String'),
             2 => array($addressDetails[1], 'String'),
@@ -194,7 +177,7 @@ function civigiftaid_civicrm_custom( $op, $groupID, $entityID, &$params ) {
 
         if ( $contactID ) {
             $addressDetails = _civigiftaid_civicrm_custom_get_address_and_postal_code ( $contactID , 1 );
-            require_once 'GiftAid/Utils/GiftAid.php';
+            require_once 'CRM/Civigiftaid/Utils/GiftAid.php';
             $params = array(
                           'entity_id'             => $contactID,
                           'eligible_for_gift_aid' => $newStatus,
@@ -202,7 +185,7 @@ function civigiftaid_civicrm_custom( $op, $groupID, $entityID, &$params ) {
                           'address'               => $addressDetails[0],
                           'post_code'             => $addressDetails[1],
                       );
-            GiftAid_Utils_GiftAid::setDeclaration( $params );
+            CRM_Civigiftaid_Utils_GiftAid::setDeclaration( $params );
         }
     }
 }
@@ -309,6 +292,63 @@ function civigiftaid_civicrm_validate( $formName, &$fields, &$files, &$form ) {
         return $errors;
     }
 }
+
+
+/**
+ * Add navigation for civigiftaid under "Administer" menu
+ *
+ * @param $params associated array of navigation menus
+ */
+function civigiftaid_civicrm_navigationMenu( &$params ) {
+   $result = civicrm_api('OptionValue', 'getsingle', array(
+      'version' => 3,
+      'name' => 'basic_rate_tax',
+   ));
+   if($result['id']){
+      $ovId = $result['id'];
+      $ogId = $result['values']['option_group_id'];
+   }
+
+  // get the id of Administer Menu
+  $administerMenuId = CRM_Core_DAO::getFieldValue('CRM_Core_BAO_Navigation', 'Administer', 'id', 'name');
+  // skip adding menu if there is no administer menu
+  if ($administerMenuId) {
+    // get the maximum key under administer menu
+    $maxAdminMenuKey = max( array_keys($params[$administerMenuId]['child']));
+    $nextAdminMenuKey = $maxAdminMenuKey+1;
+    $params[$administerMenuId]['child'][$nextAdminMenuKey] =  array(
+        'attributes' => array(
+          'label' => ts('CiviGiftAid'),
+          'name' => 'admin_giftaid',
+          'permission' => null,
+          'operator' => null,
+          'separator' => 1,
+          'parentID' => $administerMenuId,
+          'navID' => $nextAdminMenuKey,
+          'active' => 1
+        ),
+        'child' =>  array(
+        1 => array(
+          'attributes' => array(
+            'label' => ts('GiftAid Basic Rate Tax'),
+            'name' => 'giftaid_basic_rate_tax',
+            'url' => "civicrm/admin/optionValue?action=update&id=$ovId&gid=$ogId&reset=1",
+            'permission' => null,
+            'operator' => null,
+            'separator' => 0,
+            'parentID' => $nextAdminMenuKey,
+            'navID' => 2,
+            'active' => 1
+          ),
+         'child' => null
+        ),
+      )
+    );
+  }
+}
+
+
+
 
 
 

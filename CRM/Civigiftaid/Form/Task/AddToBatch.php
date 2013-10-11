@@ -40,7 +40,7 @@ require_once 'CRM/Contribute/Form/Task.php';
  */
 require_once 'CRM/Utils/String.php';
 
-class CRM_Civigifaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
+class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
 
     protected $_id     = null;
 
@@ -54,8 +54,8 @@ class CRM_Civigifaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
 
         parent::preProcess( );
 
-        require_once 'GiftAid/Utils/Contribution.php';
-        list( $total, $added, $alreadyAdded, $notValid ) = GiftAid_Utils_Contribution::_validateContributionToBatch( $this->_contributionIds );
+        require_once 'CRM/Civigiftaid/Utils/Contribution.php';
+        list( $total, $added, $alreadyAdded, $notValid ) = CRM_Civigiftaid_Utils_Contribution::_validateContributionToBatch( $this->_contributionIds );
         $this->assign('selectedContributions', $total);
         $this->assign('totalAddedContributions', count($added));
         $this->assign('alreadyAddedContributions', count($alreadyAdded));
@@ -63,17 +63,17 @@ class CRM_Civigifaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
 
         // get details of contribution that will be added to this batch.
         $contributionsAddedRows = array( );
-        $contributionsAddedRows = GiftAid_Utils_Contribution::getContributionDetails ( $added );
+        $contributionsAddedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $added );
         $this->assign('contributionsAddedRows', $contributionsAddedRows );
 
         // get details of contribution thatare already added to this batch.
         $contributionsAlreadyAddedRows = array( );
-        $contributionsAlreadyAddedRows = GiftAid_Utils_Contribution::getContributionDetails ( $alreadyAdded );
+        $contributionsAlreadyAddedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $alreadyAdded );
         $this->assign( 'contributionsAlreadyAddedRows', $contributionsAlreadyAddedRows );
 
         // get details of contribution that are not valid for giftaid
         $contributionsNotValid = array( );
-        $contributionsNotValid = GiftAid_Utils_Contribution::getContributionDetails ( $notValid );
+        $contributionsNotValid = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $notValid );
         $this->assign( 'contributionsNotValid', $contributionsNotValid );
 
 

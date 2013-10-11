@@ -34,7 +34,7 @@
  *
  */
 
-abstract class CRM_Civigifaid_Utils_Hook {
+abstract class CRM_Civigiftaid_Utils_Hook {
 
 	static $_nullObject = null;
 

@@ -56,7 +56,7 @@ class CRM_Civigifaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task 
 
     parent::preProcess( );
 
-      require_once 'GiftAid/Utils/Contribution.php';
+      require_once 'CRM_Civigiftaid/Utils/Contribution.php';
       list( $total, $toRemove, $notInBatch, $alreadySubmited) = CRM_Civigifaid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
 
       $this->assign('selectedContributions', $total);

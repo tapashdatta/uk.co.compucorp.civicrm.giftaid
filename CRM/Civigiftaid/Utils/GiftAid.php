@@ -38,9 +38,9 @@ require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Core/Error.php';
 require_once 'CRM/Utils/Array.php';
 require_once 'CRM/Utils/Date.php';
-require_once 'CRM/Civigifaid/Utils/Hook.php';
+require_once 'CRM/Civigiftaid/Utils/Hook.php';
 
-class CRM_Civigifaid_Utils_GiftAid {
+class CRM_Civigiftaid_Utils_GiftAid {
 
     /**
      * How long a positive Gift Aid declaration is valid for under HMRC rules (years).
@@ -86,7 +86,7 @@ class CRM_Civigifaid_Utils_GiftAid {
                             2 => array(CRM_Utils_Date::isoToMysql($date), 'Timestamp'),
                             );
         // allow query to be modified via hook
-        CRM_Civigifaid_Utils_Hook::alterDeclarationQuery( $sql, $sqlParams );
+        CRM_Civigiftaid_Utils_Hook::alterDeclarationQuery( $sql, $sqlParams );
 
         $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
         if ( $dao->fetch() ) {
@@ -116,7 +116,7 @@ class CRM_Civigifaid_Utils_GiftAid {
 			$isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 );
 
         // hook can alter the eligibility if needed
-        CRM_Civigifaid_Utils_Hook::giftAidEligible( $isEligible, $contactID, $date, $contributionID );
+        CRM_Civigiftaid_Utils_Hook::giftAidEligible( $isEligible, $contactID, $date, $contributionID );
 
         return $isEligible;
     }
@@ -149,7 +149,7 @@ class CRM_Civigifaid_Utils_GiftAid {
         $charity = CRM_Utils_Array::value('charity', $params);
 
         // Retrieve existing declarations for this user.
-        $currentDeclaration = CRM_Civigifaid_Utils_GiftAid::getDeclaration($params['entity_id'],
+        $currentDeclaration = CRM_Civigiftaid_Utils_GiftAid::getDeclaration($params['entity_id'],
                                                                     $params['start_date'],
                                                                     $charity);
 
@@ -207,7 +207,7 @@ class CRM_Civigifaid_Utils_GiftAid {
 
             if ( !$currentDeclaration ) {
                 // There is no current declaration so create new.
-               CRM_Civigifaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
+               CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
 
             } else if ( $currentDeclaration['eligible_for_gift_aid'] == 1 && $endTimestamp ) {
                 //   - if current positive, extend its end_date to new_end_date.
@@ -215,7 +215,7 @@ class CRM_Civigifaid_Utils_GiftAid {
                                       'id' => $currentDeclaration['id'],
                                       'end_date' => date('YmdHis', $endTimestamp),
                                       );
-                CRM_Civigifaid_Utils_GiftAid::_updateDeclaration( $updateParams );
+                CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
 
             } else if ( $currentDeclaration['eligible_for_gift_aid'] == 0 ) {
                 //   - if current negative, set its end_date to now and create new ending new_end_date.
@@ -223,15 +223,15 @@ class CRM_Civigifaid_Utils_GiftAid {
                                       'id' => $currentDeclaration['id'],
                                       'end_date' => CRM_Utils_Date::isoToMysql($params['start_date']),
                                       );
-                CRM_Civigifaid_GiftAid::_updateDeclaration( $updateParams );
-                CRM_Civigifaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
+                CRM_Civigiftaid_GiftAid::_updateDeclaration( $updateParams );
+                CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
             }
 
         } else if ( $params['eligible_for_gift_aid'] == 0 ) {
 
             if ( !$currentDeclaration ) {
                 // There is no current declaration so create new.
-                CRM_Civigifaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
+                CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
 
             } else if ( $currentDeclaration['eligible_for_gift_aid'] == 1 ) {
                 //   - if current positive, set its end_date to now and create new ending new_end_date.
@@ -239,8 +239,8 @@ class CRM_Civigifaid_Utils_GiftAid {
                                       'id' => $currentDeclaration['id'],
                                       'end_date' => CRM_Utils_Date::isoToMysql($params['start_date']),
                                       );
-                CRM_Civigifaid_Utils_GiftAid::_updateDeclaration( $updateParams );
-                CRM_Civigifaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
+                CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
+                CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
             }
             //   - if current negative, leave as is.
         }

@@ -41,7 +41,7 @@
  * $Id$
  *
  */
-class CRM_Civigifaid_Utils_Contribution {
+class CRM_Civigiftaid_Utils_Contribution {
 
 
 
@@ -60,9 +60,8 @@ class CRM_Civigifaid_Utils_Contribution {
         $contributionsAdded    = array( );
         $contributionsNotAdded = array( );
 
-        require_once "CRM/Civigifaid/Utils/GiftAid.php";
+        require_once "CRM/Civigiftaid/Utils/GiftAid.php";
         require_once "CRM/Contribute/BAO/Contribution.php";
-        //require_once 'CRM/Core/DAO/EntityBatch.php';
         require_once 'CRM/Batch/DAO/EntityBatch.php';
         require_once "CRM/Core/BAO/Address.php";
         require_once "CRM/Contact/BAO/Contact.php";
@@ -118,7 +117,7 @@ class CRM_Civigifaid_Utils_Contribution {
             $contactId = $contribution['contact_id'];
 
             // check if contribution is valid for gift aid
-            if ( CRM_Civigifaid_Utils_GiftAid::isEligibleForGiftAid( $contactId, $contribution['receive_date'], $contributionID ) ) {
+            if ( CRM_Civigiftaid_Utils_GiftAid::isEligibleForGiftAid( $contactId, $contribution['receive_date'], $contributionID ) ) {
                 $batchContribution->batch_id = $batchID;
                 $batchContribution->save( );
 
@@ -153,7 +152,7 @@ class CRM_Civigifaid_Utils_Contribution {
         if ( ! empty( $contributionsAdded ) ) {
             // if there is any extra work required to be done for contributions that are batched,
             // should be done via hook
-            CRM_Civigifaid_Utils_Hook::batchContributions( $batchID, $contributionsAdded );
+            CRM_Civigiftaid_Utils_Hook::batchContributions( $batchID, $contributionsAdded );
         }
 
         return array( count($contributionIDs),
@@ -303,7 +302,7 @@ class CRM_Civigifaid_Utils_Contribution {
     $contributionsAlreadyAdded = array( );
     $contributionsNotValid     = array( );
 
-        require_once "CRM/Civigifaid/Utils/GiftAid.php";
+        require_once "CRM/Civigiftaid/Utils/GiftAid.php";
         //require_once "CRM/Core/DAO/EntityBatch.php";
         require_once "CRM/Batch/DAO/EntityBatch.php";
         require_once "CRM/Contribute/BAO/Contribution.php";
@@ -321,7 +320,7 @@ class CRM_Civigifaid_Utils_Contribution {
                 CRM_Contribute_BAO_Contribution::retrieve( $params, $defaults, $ids );
 
                 // check if contribution is not valid for gift aid, increment $numContributionsNotValid
-                if ( CRM_Civigifaid_Utils_GiftAid::isEligibleForGiftAid( $defaults['contact_id'], $defaults['receive_date'], $contributionID ) AND $defaults['contribution_status_id'] == 1 ) {
+                if ( CRM_Civigiftaid_Utils_GiftAid::isEligibleForGiftAid( $defaults['contact_id'], $defaults['receive_date'], $contributionID ) AND $defaults['contribution_status_id'] == 1 ) {
                     $contributionsAdded[] = $contributionID;
                 } else {
                     $contributionsNotValid[] = $contributionID;
