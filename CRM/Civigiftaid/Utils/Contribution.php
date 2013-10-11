@@ -168,7 +168,6 @@ class CRM_Civigiftaid_Utils_Contribution {
       list( $total, $contributionsToRemove, $notInBatch, $alreadySubmited) = self::_validationRemoveContributionFromBatch( $contributionIDs );
 
       require_once 'CRM/Batch/BAO/Batch.php';
-      dprint_r('called before remove');
       $contributions = self::getContributionDetails($contributionsToRemove);
 
       if(!empty($contributions)){

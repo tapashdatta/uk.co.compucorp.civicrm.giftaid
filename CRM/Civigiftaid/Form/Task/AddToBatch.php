@@ -141,9 +141,9 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
         $batchID        = $createdBatch->id;
         $batchLabel     = $batchParams['title'];
 
-        require_once 'GiftAid/Utils/Contribution.php';
+        require_once 'CRM/Civigiftaid/Utils/Contribution.php';
         list( $total, $added, $notAdded ) =
-            GiftAid_Utils_Contribution::addContributionToBatch( $this->_contributionIds, $batchID );
+            CRM_Civigiftaid_Utils_Contribution::addContributionToBatch( $this->_contributionIds, $batchID );
 
         if ( $added <= 0 ) {
             // rollback since there were no contributions added, and we might not want to keep an empty batch

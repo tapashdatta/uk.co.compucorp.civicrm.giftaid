@@ -42,7 +42,7 @@ require_once 'CRM/Contribute/Form/Task.php';
 
 require_once 'CRM/Utils/String.php';
 
-class CRM_Civigifaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
+class CRM_Civigiftaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
 
   protected $_id = null;
 
@@ -56,21 +56,21 @@ class CRM_Civigifaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task 
 
     parent::preProcess( );
 
-      require_once 'CRM_Civigiftaid/Utils/Contribution.php';
-      list( $total, $toRemove, $notInBatch, $alreadySubmited) = CRM_Civigifaid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
+      require_once 'CRM/Civigiftaid/Utils/Contribution.php';
+      list( $total, $toRemove, $notInBatch, $alreadySubmited) = CRM_Civigiftaid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
 
       $this->assign('selectedContributions', $total);
       $this->assign('totalToRemoveContributions', count($toRemove));
       $this->assign('notInBatchContributions', count($notInBatch));
       $this->assign('alreadySubmitedContributions', count($alreadySubmited));
 
-      $contributionsToRemoveRows = GiftAid_Utils_Contribution::getContributionDetails ( $toRemove );
+      $contributionsToRemoveRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $toRemove );
       $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows );
 
-      $contributionsAlreadySubmitedRows = GiftAid_Utils_Contribution::getContributionDetails ( $alreadySubmited );
+      $contributionsAlreadySubmitedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $alreadySubmited );
       $this->assign( 'contributionsAlreadySubmitedRows', $contributionsAlreadySubmitedRows );
 
-      $contributionsNotInBatchRows = GiftAid_Utils_Contribution::getContributionDetails ( $notInBatch );
+      $contributionsNotInBatchRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $notInBatch );
       $this->assign( 'contributionsNotInBatchRows', $contributionsNotInBatchRows );
   }
 
@@ -97,8 +97,8 @@ class CRM_Civigifaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task 
       require_once 'CRM/Core/Transaction.php';
       $transaction = new CRM_Core_Transaction( );
 
-      require_once 'CRM/Civigifaid/Utils/Contribution.php';
-      list( $total, $removed, $notRemoved ) = CRM_Civigifaid_Utils_Contribution::removeContributionFromBatch( $this->_contributionIds );
+      require_once 'CRM/Civigiftaid/Utils/Contribution.php';
+      list( $total, $removed, $notRemoved ) = CRM_Civigiftaid_Utils_Contribution::removeContributionFromBatch( $this->_contributionIds );
 
       if ( $removed <= 0 ) {
         //$transaction->rollback( );
