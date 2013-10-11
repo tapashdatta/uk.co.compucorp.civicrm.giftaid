@@ -154,6 +154,9 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
       'name' => self::REPORT_CLASS,
       'option_group_id' => self::getReportTemplateGroupId()
     ));*/
+    $gid = self::getReportTemplateGroupId();
+    $className = self::REPORT_CLASS;
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET is_active = 1 WHERE option_group_id = $gid AND name = '$className'");
 
   }
 
