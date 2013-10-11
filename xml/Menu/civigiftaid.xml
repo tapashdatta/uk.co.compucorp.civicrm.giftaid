@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <menu>
   <item>
-     <path>contribute/uk-giftaid</path>
+     <path>civicrm/contribute/uk-giftaid</path>
      <title>Gift Aid</title>
      <page_callback>CRM_Civigiftaid_Report_Form_Contribute_GiftAid</page_callback>
-     <access_callback>1</access_callback>
   </item>
 </menu>
