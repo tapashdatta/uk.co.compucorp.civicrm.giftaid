@@ -34,7 +34,7 @@
  *
  */
 require_once 'CRM/Report/Form.php';
-require_once 'GiftAid/Utils/Contribution.php';
+require_once 'CRM/Civigiftaid/Utils/Contribution.php';
 
 class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
@@ -50,7 +50,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
                                 'batch_id' =>
                                 array( 'title' => 'Batch',
                                        'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                       'options'      => GiftAid_Utils_Contribution::getBatchIdTitle( 'id desc' ),
+                                       'options'      => CRM_Civigiftaid_Utils_Contribution::getBatchIdTitle( 'id desc' ),
                                        ), ), ),
                    'civicrm_contribution' =>
                    array( 'dao'     => 'CRM_Contribute_DAO_Contribution',
