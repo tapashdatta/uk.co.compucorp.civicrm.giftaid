@@ -16,7 +16,12 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
    *
    */
   public function install() {
+    //only for vesion 1.0 to 2.1
+    //To remove the future
     self::removeLegacyRegisteredReport();
+    self::migrateOneToTwo($this);
+    //end step for upgrading version 1.0 t0 2.1
+
     $ogId = self::getReportTemplateGroupId();
     if($ogId){
       $className = self::REPORT_CLASS;
@@ -147,17 +152,9 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         'name' => 'Gift_Aid_Declaration')
       )),
     ));
-    /*
-    civicrm_api('OptionValue', 'update', array(
-      'version' => 3,
-      'is_active' => 1,
-      'name' => self::REPORT_CLASS,
-      'option_group_id' => self::getReportTemplateGroupId()
-    ));*/
     $gid = self::getReportTemplateGroupId();
     $className = self::REPORT_CLASS;
     CRM_Core_DAO::executeQuery("UPDATE civicrm_option_value SET is_active = 1 WHERE option_group_id = $gid AND name = '$className'");
-
   }
 
   /**
@@ -308,6 +305,33 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     return $ogId;
   }
 
-
+  static function migrateOneToTwo($ctx){
+    $ctx->executeSqlFile('sql/upgrade_20.sql');
+    $query = "SELECT DISTINCT batch_name
+              FROM civicrm_value_gift_aid_submission
+             ";
+    $batchNames = array();
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      array_push($batchNames, $dao->batch_name);
+    }
+    $gId = CRM_Utils_Array::value('id',civicrm_api('OptionGroup', 'getsingle', array(
+        'version' => 3,
+        'name' => 'giftaid_batch_name')
+    ));
+    if($gId){
+      foreach ($batchNames as $name) {
+        $params = array(
+          'version' => 3,
+          'option_group_id' => $gId,
+          'label' => $name,
+          'name' => $name,
+          'value' => $name,
+          'is_active' => 1
+        );
+        $result = civicrm_api('OptionValue', 'create', $params);
+      }
+    }
+  }
 
 }
