@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
  <extension key="uk.co.compucorp.civicrm.giftaid" type="module">
-  <downloadUrl>https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid</downloadUrl>
+  <downloadUrl>https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid/archive/v2.1.zip</downloadUrl>
   <file>civigiftaid</file>
   <name>CiviCRM UK GiftAid</name>
   <description>
