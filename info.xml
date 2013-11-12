@@ -20,7 +20,7 @@
   </maintainer>
   <releaseDate>2013-11-12</releaseDate>
   <version>2.2</version>
-  <develStage>Stable</develStage>
+  <develStage>stable</develStage>
   <compatibility>
     <ver>4.3</ver>
     <ver>4.4</ver>
