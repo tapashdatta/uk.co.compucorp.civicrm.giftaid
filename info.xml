@@ -15,11 +15,11 @@
   </urls>
   <license>AGPL</license>
   <maintainer>
-    <author>Erawat Chamanont</author>
-    <email>erawat@compucorp.co.uk</email>
+    <author>Erawat Chamanont, Jamie Novick</author>
+    <email>erawat@compucorp.co.uk, jamie@compucorp.co.uk</email>
   </maintainer>
-  <releaseDate>2013-10-11</releaseDate>
-  <version>2.1</version>
+  <releaseDate>2013-11-12</releaseDate>
+  <version>2.2</version>
   <develStage>Stable</develStage>
   <compatibility>
     <ver>4.3</ver>
