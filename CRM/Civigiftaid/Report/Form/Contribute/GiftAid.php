@@ -42,43 +42,57 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
     protected $_customGroupExtends = array( 'Contribution' );
 
     function __construct( ) {
-        $this->_columns =
-            array( 'civicrm_entity_batch'      =>
-                   array( 'dao'     => 'CRM_Batch_DAO_EntityBatch',
-                          'filters' =>
-                          array(
-                                'batch_id' =>
-                                array( 'title' => 'Batch',
-                                       'operatorType' => CRM_Report_Form::OP_MULTISELECT,
-                                       'options'      => CRM_Civigiftaid_Utils_Contribution::getBatchIdTitle( 'id desc' ),
-                                       ), ), ),
-                   'civicrm_contribution' =>
-                   array( 'dao'     => 'CRM_Contribute_DAO_Contribution',
-                          'fields'  =>
-                          array(
-                                 'contribution_id' =>
-                                 array(
-                                       'name'       => 'id',
-                                       'title'      => 'Contribution ID',
-                                       'no_display' => true,
-                                       'required'   => true,
-                                        ),
-                                'contact_id' =>
-                                 array(
-                                       'name'       => 'contact_id',
-                                       'title'      => 'Name of Donor',
-                                       'no_display' => false,
-                                       'required'   => true,
-                                        ),
-                                'receive_date' =>
-                                 array(
-                                       'name'       => 'receive_date',
-                                       'title'      => 'Contribution Date',
-                                       'no_display' => false,
-                                       'required'   => true,
-                                        ),
-                                ), ),
-                   );
+      $this->_columns =
+        array(
+          'civicrm_entity_batch' => array(
+            'dao' => 'CRM_Batch_DAO_EntityBatch',
+            'filters' =>
+            array(
+              'batch_id' => array(
+                'title' => 'Batch',
+                'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+                'options'      => CRM_Civigiftaid_Utils_Contribution::getBatchIdTitle( 'id desc' ),
+              ),
+            ),
+          ),
+          'civicrm_contribution' =>
+            array(
+              'dao' => 'CRM_Contribute_DAO_Contribution',
+              'fields' => array(
+                'contribution_id' => array(
+                  'name'       => 'id',
+                  'title'      => 'Contribution ID',
+                  'no_display' => true,
+                  'required'   => true,
+                ),
+                'contact_id' => array(
+                  'name' => 'contact_id',
+                  'title'  => 'Name of Donor',
+                  'no_display' => false,
+                  'required'   => true,
+                ),
+                'receive_date' => array(
+                  'name'  => 'receive_date',
+                  'title'      => 'Contribution Date',
+                  'no_display' => false,
+                  'required'   => true,
+                ),
+              ),
+            ),
+          'civicrm_address' =>
+            array(
+              'dao' => 'CRM_Core_DAO_Address',
+              'grouping' => 'contact-fields',
+              'fields' =>
+              array(
+                'street_address' => NULL,
+                'city' => NULL,
+                'state_province_id' => array('title' => ts('State/Province'),),
+                'country_id' => array('title' => ts('Country'),),
+                'postal_code' => NULL,
+              ),
+            ),
+        );
 
         parent::__construct( );
 
@@ -146,11 +160,15 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
     function from( ) {
         $this->_from = "
-FROM civicrm_entity_batch {$this->_aliases['civicrm_entity_batch']}
-INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
-        ON {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_contribution' AND
-           {$this->_aliases['civicrm_entity_batch']}.entity_id = {$this->_aliases['civicrm_contribution']}.id";
-    }
+          FROM civicrm_entity_batch {$this->_aliases['civicrm_entity_batch']}
+          INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
+                  ON {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_contribution' AND
+                     {$this->_aliases['civicrm_entity_batch']}.entity_id = {$this->_aliases['civicrm_contribution']}.id
+
+          LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']}
+          ON ({$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_address']}.contact_id
+             AND {$this->_aliases['civicrm_address']}.is_primary = 1 )";
+        }
 
     function where( ) {
         parent::where( );
