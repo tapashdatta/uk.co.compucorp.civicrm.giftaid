@@ -26,8 +26,3 @@
 
 {include file="CRM/Report/Form.tpl"}
 <div class="crm-block crm-content-block crm-report-form-block"><div class="crm-tasks">
-<table><tr><td>
-        <span>Press the button to download 'R68(i) - Gift Aid and tax repayment claims form' from HMRC website (Opens in new window)</span><br />
-        <a class="button" target="_blank" href="http://www.hmrc.gov.uk/charities/r68-claim.pdf"><span>Download R68(i) form</span></a>
-</td></tr></table>
-</div></div>
