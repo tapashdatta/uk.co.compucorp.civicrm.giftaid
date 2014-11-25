@@ -117,7 +117,7 @@ class CRM_Civigiftaid_Utils_Contribution {
             $contactId = $contribution['contact_id'];
 
             // check if contribution is valid for gift aid
-            if ( CRM_Civigiftaid_Utils_GiftAid::isEligibleForGiftAid( $contactId, $contribution['receive_date'], $contributionID ) ) {
+            if ( CRM_Civigiftaid_Utils_GiftAid::isEligibleForGiftAid( $contactId, $contribution['receive_date'], $contributionID ) AND $contribution['contribution_status_id'] == 1 ) {
                 $batchContribution->batch_id = $batchID;
                 $batchContribution->save( );
 
