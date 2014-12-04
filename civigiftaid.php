@@ -306,7 +306,7 @@ function civigiftaid_civicrm_navigationMenu( &$params ) {
    ));
    if($result['id']){
       $ovId = $result['id'];
-      $ogId = $result['values']['option_group_id'];
+      $ogId = $result['option_group_id'];
    }
 
   // get the id of Administer Menu
@@ -332,7 +332,7 @@ function civigiftaid_civicrm_navigationMenu( &$params ) {
           'attributes' => array(
             'label' => ts('GiftAid Basic Rate Tax'),
             'name' => 'giftaid_basic_rate_tax',
-            'url' => "civicrm/admin/optionValue?action=update&id=$ovId&gid=$ogId&reset=1",
+            'url' => "civicrm/admin/options?action=update&id=$ovId&gid=$ogId&reset=1",
             'permission' => null,
             'operator' => null,
             'separator' => 0,

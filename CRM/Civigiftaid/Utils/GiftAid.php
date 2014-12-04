@@ -87,7 +87,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
                             );
         // allow query to be modified via hook
         CRM_Civigiftaid_Utils_Hook::alterDeclarationQuery( $sql, $sqlParams );
-
         $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
         if ( $dao->fetch() ) {
             $currentDeclaration['id'] = $dao->id;
