@@ -130,6 +130,13 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
         $session =& CRM_Core_Session::singleton( );
         $batchParams['created_id' ] = $session->get( 'userID' );
         $batchParams['created_date'] = date("YmdHis");
+        $batchParams['status_id'] = 0;
+        
+        $batchMode = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'mode_id', array('labelColumn' => 'name'));
+        $batchParams['mode_id'] = CRM_Utils_Array::key('Manual Batch', $batchMode);
+        
+        $batchParams['modified_date'] = date('YmdHis');
+        $batchParams['modified_id'] = $session->get('userID');
 
         require_once 'CRM/Core/Transaction.php';
         $transaction = new CRM_Core_Transaction( );
