@@ -25,4 +25,3 @@
 *}
 
 {include file="CRM/Report/Form.tpl"}
-<div class="crm-block crm-content-block crm-report-form-block"><div class="crm-tasks">
