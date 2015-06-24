@@ -266,9 +266,7 @@ class CRM_Civigiftaid_Utils_Contribution {
       // check if the selected contribution id is in a batch
       if (  $batchContribution->find( true ) ) {
         if(self::_isOnlineSubmissionExtensionInstalled()){
-          //require_once 'CRM/Giftaidonline/Page/OnlineSubmission.php';
-          //$onlineSubmission = new CRM_Giftaidonline_Page_OnlineSubmission();
-          //$isSubmited = $onlineSubmission->is_submitted($batchContribution->batch_id);
+          
           if(self::isBatchAlreadySubmited($batchContribution->batch_id)){
             $contributionsAlreadySubmited[] = $contributionID;
           }else{
@@ -392,17 +390,10 @@ class CRM_Civigiftaid_Utils_Contribution {
      */
     static function isBatchAlreadySubmited( $pBatchId )   {
 
-      $bIsSubmitted = false;
-      $cQuery = " SELECT submission.batch_id                    AS batch_id " .
-                " ,      submission.response_status             AS status   " .
-                " FROM   civicrm_gift_aid_submission submission             " .
-                " WHERE  submission.batch_id = %1                           " .
-                " AND    submission.response_status IS NOT NULL             ";
-      $queryParam = array( 1 => array( $pBatchId, 'Integer' ) );
-      $oDao     = CRM_Core_DAO::executeQuery( $cQuery, $queryParam );
-      while ( $oDao->fetch() ) {
-          return true;
-      }
-     return $bIsSubmitted;
+      require_once 'CRM/Giftaidonline/Page/OnlineSubmission.php';
+      $onlineSubmission = new CRM_Giftaidonline_Page_OnlineSubmission();
+      $bIsSubmitted = $onlineSubmission->is_submitted($pBatchId);
+
+      return $bIsSubmitted;
   }
 }
