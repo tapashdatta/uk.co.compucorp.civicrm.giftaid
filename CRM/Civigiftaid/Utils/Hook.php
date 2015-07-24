@@ -104,10 +104,10 @@ abstract class CRM_Civigiftaid_Utils_Hook {
       preg_match('/4\.[0-9]\.[0-9]/', $version, $matches);
       $versionNum = str_replace(".","",array_pop($matches));
       if ($versionNum >= 450){
-        return self::singleton()->invoke($numParams, &$arg1, &$arg2, &$arg3, &$arg4, &$arg5, &$arg6, $fnSuffix);
+        return self::singleton()->invoke($numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
       }
       else {
-        return self::singleton()->invoke($numParams, &$arg1, &$arg2, &$arg3, &$arg4, &$arg6, $fnSuffix);
+        return self::singleton()->invoke($numParams, $arg1, $arg2, $arg3, $arg4, $arg6, $fnSuffix);
       }
       
     }
