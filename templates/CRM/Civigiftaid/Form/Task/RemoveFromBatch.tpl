@@ -23,8 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-export-form-block">
 
+{crmStyle ext=uk.co.compucorp.civicrm.giftaid file=resources/css/dist.css}
+
+<div id="gift-aid-remove" class="crm-block crm-form-block crm-export-form-block gift-aid">
     <h2>{ts}Remove contribution from Gift Aid batch{/ts}</h2>
 
     <div class="help">
@@ -32,6 +34,7 @@
     </div>
 
     <h3>{ts}Summary{/ts}</h3>
+
     <table class="report" style="width: 100%">
         <tr>
             <td>
@@ -40,12 +43,12 @@
                 </div>
             </td>
         </tr>
+
         <tr>
             {if $totalToRemoveContributions}
                 <td>
                     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                         <div class="crm-accordion-header">
-                            <div class="icon crm-accordion-pointer"></div>
                             Number of contributions that will be removed from batch: {$totalToRemoveContributions}
                         </div>
                         <!-- /.crm-accordion-header -->
@@ -59,11 +62,10 @@
                                     <th>{ts}Source{/ts}</th>
                                     <th>{ts}Recieved{/ts}</th>
                                     <th>{ts}Batch name{/ts}</th>
-
                                 </tr>
                                 </thead>
                                 {foreach from=$contributionsToRemoveRows item=row}
-                                    <tr>
+                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
                                         <td>
                                             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                                         </td>
@@ -72,8 +74,33 @@
                                         <td>{$row.source}</td>
                                         <td>{$row.receive_date}</td>
                                         <td>{$row.batch}</td>
-
                                     </tr>
+                                    {if $row.line_items}
+                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
+                                            <td colspan="6">
+                                                <table>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Quantity</th>
+                                                        <th>Type</th>
+                                                        <th>Description</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                    {assign var="count" value=0}
+                                                    {foreach from=$row.line_items item=item}
+                                                        <tr {if $count % 2 !== 0 }class="odd"{/if}>
+                                                            <td>{$item.item}</td>
+                                                            <td>{$item.qty}</td>
+                                                            <td>{$row.financial_account}</td>
+                                                            <td>{$item.description}</td>
+                                                            <td>{$item.amount}</td>
+                                                        </tr>
+                                                        {assign var="count" value=$count+1}
+                                                    {/foreach}
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    {/if}
                                 {/foreach}
                             </table>
                         </div>
@@ -94,7 +121,6 @@
                 <td>
                     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                         <div class="crm-accordion-header">
-                            <div class="icon crm-accordion-pointer"></div>
                             Number of contributions already submited to HMRC: {$alreadySubmitedContributions}
                         </div>
                         <!-- /.crm-accordion-header -->
@@ -137,13 +163,11 @@
             {/if}
         </tr>
 
-
         <tr>
             {if $notInBatchContributions}
                 <td>
                     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                         <div class="crm-accordion-header">
-                            <div class="icon crm-accordion-pointer"></div>
                             Number of contributions that not in any batch: {$notInBatchContributions}
                         </div>
                         <!-- /.crm-accordion-header -->
@@ -183,17 +207,22 @@
                 </td>
             {/if}
         </tr>
-
     </table>
 
-
     {$form.buttons.html}
-
 </div>
+
 {literal}
     <script type="text/javascript">
         cj(function () {
-            cj().crmaccordions();
+            cj('.contribution').on('click', function () {
+                var contribution = cj(this);
+                var contributionId = contribution.data('contribution-id');
+                var financialItems = cj('#financial-items-' + contributionId);
+
+                contribution.toggleClass('collapsed');
+                financialItems.toggle();
+            });
         });
     </script>
 {/literal}
