@@ -92,26 +92,7 @@
                                     {if $row.line_items}
                                         <tr class="financial-items" id="financial-items-{$row.contribution_id}">
                                             <td colspan="5">
-                                                <table>
-                                                    <tr>
-                                                        <th>Item</th>
-                                                        <th>Quantity</th>
-                                                        <th>Type</th>
-                                                        <th>Description</th>
-                                                        <th>Amount</th>
-                                                    </tr>
-                                                    {assign var="count" value=0}
-                                                    {foreach from=$row.line_items item=item}
-                                                        <tr {if $count % 2 !== 0 }class="odd"{/if}>
-                                                            <td>{$item.item}</td>
-                                                            <td>{$item.qty}</td>
-                                                            <td>{$row.financial_account}</td>
-                                                            <td>{$item.description}</td>
-                                                            <td>{$item.amount}</td>
-                                                        </tr>
-                                                        {assign var="count" value=$count+1}
-                                                    {/foreach}
-                                                </table>
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
                                             </td>
                                         </tr>
                                     {/if}
@@ -140,7 +121,7 @@
                         <!-- /.crm-accordion-header -->
                         <div class="crm-accordion-body">
                             <table class="selector">
-                                <thead class="crm-accordion-header">
+                                <thead>
                                 <tr>
                                     <th>{ts}Name{/ts}</th>
                                     <th>{ts}Amount{/ts}</th>
@@ -151,7 +132,7 @@
                                 </tr>
                                 </thead>
                                 {foreach from=$contributionsAlreadyAddedRows item=row}
-                                    <tr>
+                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
                                         <td>
                                             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                                         </td>
@@ -161,6 +142,13 @@
                                         <td>{$row.receive_date}</td>
                                         <td>{$row.batch}</td>
                                     </tr>
+                                    {if $row.line_items}
+                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
+                                            <td colspan="6">
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                            </td>
+                                        </tr>
+                                    {/if}
                                 {/foreach}
                             </table>
                         </div>
@@ -186,7 +174,7 @@
                         <!-- /.crm-accordion-header -->
                         <div class="crm-accordion-body">
                             <table class="selector">
-                                <thead class="crm-accordion-header">
+                                <thead>
                                 <tr>
                                     <th>{ts}Name{/ts}</th>
                                     <th>{ts}Amount{/ts}</th>
@@ -205,6 +193,13 @@
                                         <td>{$row.source}</td>
                                         <td>{$row.receive_date}</td>
                                     </tr>
+                                    {if $row.line_items}
+                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
+                                            <td colspan="5">
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                            </td>
+                                        </tr>
+                                    {/if}
                                 {/foreach}
                             </table>
                         </div>
