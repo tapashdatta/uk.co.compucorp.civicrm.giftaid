@@ -25,6 +25,7 @@
 *}
 
 {crmStyle ext=uk.co.compucorp.civicrm.giftaid file=resources/css/dist.css}
+{crmScript ext=uk.co.compucorp.civicrm.giftaid file=resources/js/script.js}
 
 <div id="gift-aid-remove" class="crm-block crm-form-block crm-export-form-block gift-aid">
     <h2>{ts}Remove contribution from Gift Aid batch{/ts}</h2>
@@ -211,18 +212,3 @@
 
     {$form.buttons.html}
 </div>
-
-{literal}
-    <script type="text/javascript">
-        cj(function () {
-            cj('.contribution').on('click', function () {
-                var contribution = cj(this);
-                var contributionId = contribution.data('contribution-id');
-                var financialItems = cj('#financial-items-' + contributionId);
-
-                contribution.toggleClass('collapsed');
-                financialItems.toggle();
-            });
-        });
-    </script>
-{/literal}
