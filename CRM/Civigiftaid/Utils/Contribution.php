@@ -385,14 +385,15 @@ class CRM_Civigiftaid_Utils_Contribution {
       return;
     }
 
+    $contributionIdStr = implode(',', $contributionIds);
+
     $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, financial_type.name,
                           contribution.source, contribution.receive_date, batch.title, batch.id as batch_id FROM civicrm_contribution contribution
                    LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
                    LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
                    LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id )
                    LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id )
-                   WHERE contribution.id IN (" . implode(',', $contributionIds)
-      . ")";
+                   WHERE contribution.id IN ({$contributionIdStr})";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = array();
@@ -406,6 +407,42 @@ class CRM_Civigiftaid_Utils_Contribution {
       $result[$dao->id]['receive_date'] = $dao->receive_date;
       $result[$dao->id]['batch'] = $dao->title;
       $result[$dao->id]['batch_id'] = $dao->batch_id;
+    }
+
+    $query = "
+      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty
+      FROM civicrm_contribution c
+
+      LEFT JOIN civicrm_line_item i
+      ON c.id = i.contribution_id
+
+      WHERE c.id IN ($contributionIdStr)";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      if (isset($result[$dao->id])) {
+        $item = $dao->entity_table;
+        if ($item === 'civicrm_participant') {
+          $item = 'Event';
+        }
+        elseif ($item === 'civicrm_membership') {
+          $item = 'Membership';
+        }
+        elseif ($item === 'civicrm_contribution') {
+          $item = 'Contribution';
+        }
+        elseif ($item === 'civicrm_participation') {
+          $item = 'Participation';
+        }
+
+        $financialItem = [
+          'item' => $item,
+          'description' => $dao->label,
+          'amount' => $dao->line_total,
+          'qty' => (int) $dao->qty,
+        ];
+        $result[$dao->id]['line_items'][] = $financialItem;
+      }
     }
 
     return $result;

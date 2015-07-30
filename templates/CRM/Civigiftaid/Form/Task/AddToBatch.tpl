@@ -23,13 +23,14 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="crm-block crm-form-block crm-export-form-block">
 
+{crmStyle ext=uk.co.compucorp.civicrm.giftaid file=resources/css/dist.css}
+
+<div id="gift-aid-add" class="crm-block crm-form-block crm-export-form-block gift-aid">
     <h2>{ts}Add To Gift Aid{/ts}</h2>
 
-    <div class="help">
-        <p>{ts}Use this form to submit Gift Aid contributions.{/ts}</p>
-    </div>
+    <div class="help"><p>{ts}Use this form to submit Gift Aid contributions.{/ts}</p></div>
+
     <table class="form-layout">
         <tr>
             <td>
@@ -46,7 +47,9 @@
             </td>
         </tr>
     </table>
+
     <h3>{ts}Summary{/ts}</h3>
+
     <table class="report" style="width: 100%">
         <tr>
             <td>
@@ -55,6 +58,37 @@
                 </div>
             </td>
         </tr>
+
+        <tr>
+            <td>
+                <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
+                    <div class="td div crm-accordion-header">New items to be added: 123</div>
+                    <div class="crm-accordion-body">
+                        <table class="selector">
+                            <thead>
+                            <tr>
+                                <th>{ts}Name{/ts}</th>
+                                <th>{ts}Amount{/ts}</th>
+                                <th>{ts}Type{/ts}</th>
+                                <th>{ts}Item{/ts}</th>
+                                <th>{ts}Description{/ts}</th>
+                                <th>{ts}Recieved{/ts}</th>
+                            </tr>
+                            <tr>
+                                <td>Robin M</td>
+                                <td>$10</td>
+                                <td>Donation</td>
+                                <td>Event</td>
+                                <td>Member Ticket</td>
+                                <td>2015-06-01 13:20:20</td>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </td>
+        </tr>
+
         <tr>
             {if $totalAddedContributions}
                 <td>
@@ -76,7 +110,7 @@
                                 </tr>
                                 </thead>
                                 {foreach from=$contributionsAddedRows item=row}
-                                    <tr>
+                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
                                         <td>
                                             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                                         </td>
@@ -85,6 +119,33 @@
                                         <td>{$row.source}</td>
                                         <td>{$row.receive_date}</td>
                                     </tr>
+                                    {if $row.line_items}
+                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}"
+                                            class="expandable">
+                                            <td colspan="5">
+                                                <table>
+                                                    <tr>
+                                                        <th>Item</th>
+                                                        <th>Quantity</th>
+                                                        <th>Type</th>
+                                                        <th>Description</th>
+                                                        <th>Amount</th>
+                                                    </tr>
+                                                    {assign var="count" value=0}
+                                                    {foreach from=$row.line_items item=item}
+                                                        <tr {if $count % 2 !== 0 }class="odd"{/if}>
+                                                            <td>{$item.item}</td>
+                                                            <td>{$item.qty}</td>
+                                                            <td>{$row.financial_account}</td>
+                                                            <td>{$item.description}</td>
+                                                            <td>{$item.amount}</td>
+                                                        </tr>
+                                                        {assign var="count" value=$count+1}
+                                                    {/foreach}
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    {/if}
                                 {/foreach}
                             </table>
                         </div>
@@ -217,12 +278,19 @@
     </table>
 
     {$form.buttons.html}
-
 </div>
+
 {literal}
     <script type="text/javascript">
         cj(function () {
-            cj().crmaccordions();
+            cj('.contribution').on('click', function () {
+                var contribution = cj(this);
+                var contributionId = contribution.data('contribution-id');
+                var financialItems = cj('#financial-items-' + contributionId);
+
+                contribution.toggleClass('collapsed');
+                financialItems.toggle();
+            });
         });
     </script>
 {/literal}

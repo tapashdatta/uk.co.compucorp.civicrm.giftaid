@@ -1,0 +1,80 @@
+#crm-container .gift-aid {
+  .contribution {
+    border-color: #e3e3e3;
+    border-style: solid;
+    border-width: 1px 0 3px 0;
+    cursor: pointer;
+    background-color: #fff;
+
+    &.collapsed {
+      background-color: #f1f1f1;
+    }
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    > td {
+      border-color: #ddd;
+      border-style: solid;
+      border-width: 0 0 0 1px;
+      background-color: transparent;
+
+      &:first-child {
+        border-width: 0;
+      }
+    }
+
+    > td:first-child::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      margin-right: 5px;
+      display: inline-block;
+      background: url("/sites/all/modules/civicrm/i/icons/jquery-ui-3E3E3E.png") no-repeat -68px -20px;
+    }
+
+    &.collapsed > td:first-child::before {
+      background-position: -37px -20px;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .financial-items {
+    > td {
+      padding: 0;
+      border: none;
+    }
+
+    table {
+      padding: 0;
+      margin: 0;
+
+      tr {
+        background-color: #f8f8f8;
+        border-bottom: 1px dotted #d8d8d8;
+      }
+
+      th {
+        padding: 5px 10px;
+        font-size: 0.7rem;
+      }
+
+      .odd {
+        background-color: white;
+      }
+
+      td {
+        padding: 5px 10px;
+        font-size: 0.75rem;
+        border: 1px solid #ddd;
+        border: none;
+        background: transparent;
+        color: #707070;
+      }
+    }
+  }
+}
