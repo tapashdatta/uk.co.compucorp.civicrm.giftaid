@@ -60,41 +60,10 @@
         </tr>
 
         <tr>
-            <td>
-                <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
-                    <div class="td div crm-accordion-header">New items to be added: 123</div>
-                    <div class="crm-accordion-body">
-                        <table class="selector">
-                            <thead>
-                            <tr>
-                                <th>{ts}Name{/ts}</th>
-                                <th>{ts}Amount{/ts}</th>
-                                <th>{ts}Type{/ts}</th>
-                                <th>{ts}Item{/ts}</th>
-                                <th>{ts}Description{/ts}</th>
-                                <th>{ts}Recieved{/ts}</th>
-                            </tr>
-                            <tr>
-                                <td>Robin M</td>
-                                <td>$10</td>
-                                <td>Donation</td>
-                                <td>Event</td>
-                                <td>Member Ticket</td>
-                                <td>2015-06-01 13:20:20</td>
-                            </tr>
-                            </thead>
-                        </table>
-                    </div>
-                </div>
-            </td>
-        </tr>
-
-        <tr>
             {if $totalAddedContributions}
                 <td>
                     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                         <div class="crm-accordion-header">
-                            <div class="icon crm-accordion-pointer"></div>
                             Number of contributions that will be added to this batch: {$totalAddedContributions}
                         </div>
                         <!-- /.crm-accordion-header -->
@@ -120,8 +89,7 @@
                                         <td>{$row.receive_date}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}"
-                                            class="expandable">
+                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
                                             <td colspan="5">
                                                 <table>
                                                     <tr>
@@ -166,7 +134,6 @@
                 <td>
                     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                         <div class="crm-accordion-header">
-                            <div class="icon crm-accordion-pointer"></div>
                             Number of contributions already in a batch: {$alreadyAddedContributions}
                         </div>
                         <!-- /.crm-accordion-header -->
@@ -213,7 +180,6 @@
                 <td>
                     <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                         <div class="crm-accordion-header">
-                            <div class="icon crm-accordion-pointer"></div>
                             Number of contributions not valid for gift aid: {$notValidContributions}
                         </div>
                         <!-- /.crm-accordion-header -->
@@ -261,7 +227,6 @@
             <td>
                 <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
                     <div class="crm-accordion-header">
-                        <div class="icon crm-accordion-pointer"></div>
                         Possible reasons for the contributions not valid for gift aid
                     </div>
                     <!-- /.crm-accordion-header -->
