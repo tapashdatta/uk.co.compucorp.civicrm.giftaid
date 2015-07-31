@@ -56,19 +56,23 @@
       width: 98%;
       padding: 0;
       margin: 0 auto 1%;
+      box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.15);
 
       tr {
         background-color: #eee;
         border-bottom: 1px dotted #d8d8d8;
+
+        &.odd {
+          background-color: white;
+        }
+
+        &:hover {
+        }
       }
 
       th {
         padding: 5px 10px;
         font-size: 0.7rem;
-      }
-
-      .odd {
-        background-color: white;
       }
 
       td {

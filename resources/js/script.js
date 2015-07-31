@@ -8,6 +8,11 @@ cj(function () {
         var financialItems = cj('#financial-items-' + contributionId);
 
         contribution.toggleClass('collapsed');
-        financialItems.toggle();
+
+        if (contribution.hasClass('collapsed')) {
+            financialItems.fadeOut(100);
+        } else {
+            financialItems.fadeIn(100);
+        }
     });
 });
