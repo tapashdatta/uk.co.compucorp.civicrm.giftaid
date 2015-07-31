@@ -442,9 +442,6 @@ class CRM_Civigiftaid_Utils_Contribution {
           'qty' => (int) $dao->qty,
         ];
         $result[$dao->id]['line_items'][] = $financialItem;
-        $result[$dao->id]['line_items'][] = $financialItem;
-        $result[$dao->id]['line_items'][] = $financialItem;
-        $result[$dao->id]['line_items'][] = $financialItem;
       }
     }
 
