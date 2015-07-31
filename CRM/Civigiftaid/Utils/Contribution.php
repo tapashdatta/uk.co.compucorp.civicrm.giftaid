@@ -387,13 +387,15 @@ class CRM_Civigiftaid_Utils_Contribution {
 
     $contributionIdStr = implode(',', $contributionIds);
 
-    $query = " SELECT contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, financial_type.name,
-                          contribution.source, contribution.receive_date, batch.title, batch.id as batch_id FROM civicrm_contribution contribution
-                   LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
-                   LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
-                   LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id )
-                   LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id )
-                   WHERE contribution.id IN ({$contributionIdStr})";
+    $query = "
+      SELECT  contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, contribution.currency,
+              financial_type.name, contribution.source, contribution.receive_date, batch.title, batch.id as batch_id
+      FROM civicrm_contribution contribution
+      LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
+      LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
+      LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id )
+      LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id )
+      WHERE contribution.id IN ({$contributionIdStr})";
 
     $dao = CRM_Core_DAO::executeQuery($query);
     $result = array();
@@ -401,7 +403,7 @@ class CRM_Civigiftaid_Utils_Contribution {
       $result[$dao->id]['contact_id'] = $dao->contact_id;
       $result[$dao->id]['contribution_id'] = $dao->id;
       $result[$dao->id]['display_name'] = $dao->display_name;
-      $result[$dao->id]['total_amount'] = $dao->total_amount;
+      $result[$dao->id]['total_amount'] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
       $result[$dao->id]['financial_account'] = $dao->name;
       $result[$dao->id]['source'] = $dao->source;
       $result[$dao->id]['receive_date'] = $dao->receive_date;
@@ -410,12 +412,10 @@ class CRM_Civigiftaid_Utils_Contribution {
     }
 
     $query = "
-      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty
+      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency
       FROM civicrm_contribution c
-
       LEFT JOIN civicrm_line_item i
       ON c.id = i.contribution_id
-
       WHERE c.id IN ($contributionIdStr)";
 
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -438,9 +438,12 @@ class CRM_Civigiftaid_Utils_Contribution {
         $financialItem = [
           'item' => $item,
           'description' => $dao->label,
-          'amount' => $dao->line_total,
+          'amount' => CRM_Utils_Money::format($dao->line_total, $dao->currency),
           'qty' => (int) $dao->qty,
         ];
+        $result[$dao->id]['line_items'][] = $financialItem;
+        $result[$dao->id]['line_items'][] = $financialItem;
+        $result[$dao->id]['line_items'][] = $financialItem;
         $result[$dao->id]['line_items'][] = $financialItem;
       }
     }
