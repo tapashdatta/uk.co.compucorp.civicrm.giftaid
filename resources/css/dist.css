@@ -37,28 +37,28 @@
 #crm-container .gift-aid .contribution a:hover {
   text-decoration: underline;
 }
-#crm-container .gift-aid .line-items > td {
+#crm-container .gift-aid .line-items-container > td {
   padding: 0;
   border: none;
 }
-#crm-container .gift-aid .line-items table {
+#crm-container .gift-aid .line-items-container table.line-items {
   width: 98%;
   padding: 0;
   margin: 0 auto 1%;
   box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.15);
 }
-#crm-container .gift-aid .line-items table tr {
+#crm-container .gift-aid .line-items-container table.line-items tr {
   background-color: #eee;
   border-bottom: 1px dotted #d8d8d8;
 }
-#crm-container .gift-aid .line-items table tr.odd {
+#crm-container .gift-aid .line-items-container table.line-items tr.odd {
   background-color: white;
 }
-#crm-container .gift-aid .line-items table th {
+#crm-container .gift-aid .line-items-container table.line-items th {
   padding: 5px 10px;
   font-size: 0.7rem;
 }
-#crm-container .gift-aid .line-items table td {
+#crm-container .gift-aid .line-items-container table.line-items td {
   padding: 5px 10px;
   font-size: 0.75rem;
   border: 1px solid #ddd;

@@ -77,9 +77,9 @@
                                         <td>{$row.batch}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
+                                        <tr class="line-items-container">
                                             <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                             </td>
                                         </tr>
                                     {/if}
@@ -130,9 +130,9 @@
                                         <td>{$row.batch}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
+                                        <tr class="line-items-container">
                                             <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                             </td>
                                         </tr>
                                     {/if}
@@ -182,9 +182,9 @@
                                         <td>{$row.receive_date}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
+                                        <tr class="line-items-container">
                                             <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                             </td>
                                         </tr>
                                     {/if}

@@ -1,4 +1,4 @@
-<table>
+<table class="line-items" id="line-items-{$contributionId}">
     <tr>
         <th>Item</th>
         <th>Quantity</th>

@@ -90,9 +90,9 @@
                                         <td>{$row.receive_date}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
+                                        <tr class="line-items-container">
                                             <td colspan="5">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                             </td>
                                         </tr>
                                     {/if}
@@ -143,9 +143,9 @@
                                         <td>{$row.batch}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
+                                        <tr class="line-items-container">
                                             <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                             </td>
                                         </tr>
                                     {/if}
@@ -184,7 +184,7 @@
                                 </tr>
                                 </thead>
                                 {foreach from=$contributionsNotValid item=row}
-                                    <tr>
+                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
                                         <td>
                                             <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                                         </td>
@@ -194,9 +194,9 @@
                                         <td>{$row.receive_date}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
+                                        <tr class="line-items-container">
                                             <td colspan="5">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
+                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                             </td>
                                         </tr>
                                     {/if}
