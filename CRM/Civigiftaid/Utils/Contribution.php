@@ -435,13 +435,13 @@ class CRM_Civigiftaid_Utils_Contribution {
           $item = 'Participation';
         }
 
-        $financialItem = [
+        $lineItem = [
           'item' => $item,
           'description' => $dao->label,
           'amount' => CRM_Utils_Money::format($dao->line_total, $dao->currency),
           'qty' => (int) $dao->qty,
         ];
-        $result[$dao->id]['line_items'][] = $financialItem;
+        $result[$dao->id]['line_items'][] = $lineItem;
       }
     }
 
