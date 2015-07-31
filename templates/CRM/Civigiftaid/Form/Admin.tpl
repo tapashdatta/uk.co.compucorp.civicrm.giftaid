@@ -19,3 +19,9 @@
 <div class="crm-submit-buttons">
     {include file="CRM/common/formButtons.tpl" location="bottom"}
 </div>
+
+{literal}
+    <script type="text/javascript">
+        cj('#financial_types_enabled').crmSelect2();
+    </script>
+{/literal}
