@@ -1,11 +1,11 @@
 cj(function () {
     cj('.contribution').addClass('collapsed');
-    cj('.financial-items').toggle();
+    cj('.line-items').toggle();
 
     cj('.contribution').on('click', function () {
         var contribution = cj(this);
         var contributionId = contribution.data('contribution-id');
-        var financialItems = cj('#financial-items-' + contributionId);
+        var financialItems = cj('#line-items-' + contributionId);
 
         contribution.toggleClass('collapsed');
 

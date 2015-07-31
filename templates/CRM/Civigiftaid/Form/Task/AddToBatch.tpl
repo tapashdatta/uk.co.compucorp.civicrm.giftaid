@@ -90,7 +90,7 @@
                                         <td>{$row.receive_date}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
+                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
                                             <td colspan="5">
                                                 {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
                                             </td>
@@ -143,7 +143,7 @@
                                         <td>{$row.batch}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
+                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
                                             <td colspan="6">
                                                 {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
                                             </td>
@@ -194,7 +194,7 @@
                                         <td>{$row.receive_date}</td>
                                     </tr>
                                     {if $row.line_items}
-                                        <tr class="financial-items" id="financial-items-{$row.contribution_id}">
+                                        <tr class="line-items" id="line-items-{$row.contribution_id}">
                                             <td colspan="5">
                                                 {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl"}
                                             </td>
