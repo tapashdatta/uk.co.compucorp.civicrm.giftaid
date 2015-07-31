@@ -227,7 +227,7 @@ class CRM_Civigiftaid_Utils_Contribution {
    *
    * @return float
    */
-  function _calculateGiftAidAmt($contributionAmount) {
+  public static function _calculateGiftAidAmt($contributionAmount) {
     $gResult = civicrm_api(
       'OptionGroup',
       'getsingle',
