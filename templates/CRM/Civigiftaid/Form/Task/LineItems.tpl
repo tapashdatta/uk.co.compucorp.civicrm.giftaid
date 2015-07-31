@@ -4,7 +4,7 @@
         <th>Quantity</th>
         <th>Type</th>
         <th>Description</th>
-        <th>Amount</th>
+        <th>Total Amount</th>
     </tr>
     {assign var="count" value=0}
     {foreach from=$row.line_items item=item}
