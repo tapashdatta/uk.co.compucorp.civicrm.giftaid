@@ -1,15 +1,72 @@
 #crm-container .gift-aid {
+  padding: 20px;
+
+  h2 {
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+  h2:first-child {
+    margin-top: 0;
+  }
+
+  h3 {
+    margin: 1rem 0;
+    padding: 0;
+  }
+
+  ol {
+    padding-left: 20px;
+
+    li {
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  .crm-accordion-wrapper {
+    margin: 1rem 0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .crm-accordion-header {
+  }
+
+  .crm-accordion-body {
+    background-color: #f6f6f6;
+    padding: 0;
+    border-color: #ddd;
+
+    p {
+      padding: 10px;
+      margin: 0;
+    }
+
+    > table {
+      margin: 0;
+
+      > thead {
+        th {
+          padding: 10px;
+          border-style: solid;
+          border-width: 0 0 1px 0;
+          border-color: #e3e3e3;
+        }
+      }
+    }
+  }
+
   .contribution {
     border-color: #e3e3e3;
     border-style: solid;
-    border-width: 1px 0 3px 0;
+    border-width: 0 0 3px 0;
     cursor: pointer;
     background-color: #fff;
 
     &.collapsed {
       background-color: #f1f1f1;
       background-color: transparent;
-      border-width: 1px 0 2px 0;
+      border-width: 0 0 1px 0;
     }
 
     &:hover {
@@ -22,6 +79,7 @@
       border-style: solid;
       border-width: 0 0 0 1px;
       background-color: transparent;
+      padding: 10px;
 
       &:first-child {
         border-width: 0;

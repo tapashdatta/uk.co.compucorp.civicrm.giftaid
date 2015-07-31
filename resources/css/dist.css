@@ -1,14 +1,57 @@
+#crm-container .gift-aid {
+  padding: 20px;
+}
+#crm-container .gift-aid h2 {
+  margin: 1rem 0;
+  padding: 0;
+}
+#crm-container .gift-aid h2:first-child {
+  margin-top: 0;
+}
+#crm-container .gift-aid h3 {
+  margin: 1rem 0;
+  padding: 0;
+}
+#crm-container .gift-aid ol {
+  padding-left: 20px;
+}
+#crm-container .gift-aid ol li {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+#crm-container .gift-aid .crm-accordion-wrapper {
+  margin: 1rem 0;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+#crm-container .gift-aid .crm-accordion-body {
+  background-color: #f6f6f6;
+  padding: 0;
+  border-color: #ddd;
+}
+#crm-container .gift-aid .crm-accordion-body p {
+  padding: 10px;
+  margin: 0;
+}
+#crm-container .gift-aid .crm-accordion-body > table {
+  margin: 0;
+}
+#crm-container .gift-aid .crm-accordion-body > table > thead th {
+  padding: 10px;
+  border-style: solid;
+  border-width: 0 0 1px 0;
+  border-color: #e3e3e3;
+}
 #crm-container .gift-aid .contribution {
   border-color: #e3e3e3;
   border-style: solid;
-  border-width: 1px 0 3px 0;
+  border-width: 0 0 3px 0;
   cursor: pointer;
   background-color: #fff;
 }
 #crm-container .gift-aid .contribution.collapsed {
   background-color: #f1f1f1;
   background-color: transparent;
-  border-width: 1px 0 2px 0;
+  border-width: 0 0 1px 0;
 }
 #crm-container .gift-aid .contribution:hover {
   background-color: #f5f5f5;
@@ -19,6 +62,7 @@
   border-style: solid;
   border-width: 0 0 0 1px;
   background-color: transparent;
+  padding: 10px;
 }
 #crm-container .gift-aid .contribution > td:first-child {
   border-width: 0;

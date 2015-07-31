@@ -36,174 +36,142 @@
 
     <h3>{ts}Summary{/ts}</h3>
 
-    <table class="report" style="width: 100%">
-        <tr>
-            <td>
-                <div class="crm-accordion-header">
-                    Number of selected contributions: {$selectedContributions}
-                </div>
-            </td>
-        </tr>
+    <p>Number of selected contributions: {$selectedContributions}</p>
 
-        <tr>
-            {if $totalToRemoveContributions}
-                <td>
-                    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
-                        <div class="crm-accordion-header">
-                            Number of contributions that will be removed from batch: {$totalToRemoveContributions}
-                        </div>
-                        <!-- /.crm-accordion-header -->
-                        <div class="crm-accordion-body">
-                            <table class="selector">
-                                <thead>
-                                <tr>
-                                    <th>{ts}Name{/ts}</th>
-                                    <th>{ts}Amount{/ts}</th>
-                                    <th>{ts}Type{/ts}</th>
-                                    <th>{ts}Source{/ts}</th>
-                                    <th>{ts}Recieved{/ts}</th>
-                                    <th>{ts}Batch name{/ts}</th>
-                                </tr>
-                                </thead>
-                                {foreach from=$contributionsToRemoveRows item=row}
-                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
-                                        <td>
-                                            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
-                                        </td>
-                                        <td>{$row.total_amount}</td>
-                                        <td>{$row.financial_account}</td>
-                                        <td>{$row.source}</td>
-                                        <td>{$row.receive_date}</td>
-                                        <td>{$row.batch}</td>
-                                    </tr>
-                                    {if $row.line_items}
-                                        <tr class="line-items-container">
-                                            <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
-                                            </td>
-                                        </tr>
-                                    {/if}
-                                {/foreach}
-                            </table>
-                        </div>
-                        <!-- /.crm-accordion-body -->
-                    </div>
-                    <!-- /.crm-accordion-wrapper -->
-                </td>
-            {else}
-                <td>
-                    <div class="crm-accordion-header">
-                        Number of contributions that will be removed from batch: {$totalToRemoveContributions}
-                    </div>
-                </td>
-            {/if}
-        </tr>
-        <tr>
-            {if $alreadySubmitedContributions}
-                <td>
-                    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
-                        <div class="crm-accordion-header">
-                            Number of contributions already submited to HMRC: {$alreadySubmitedContributions}
-                        </div>
-                        <!-- /.crm-accordion-header -->
-                        <div class="crm-accordion-body">
-                            <table class="selector">
-                                <thead>
-                                <tr>
-                                    <th>{ts}Name{/ts}</th>
-                                    <th>{ts}Amount{/ts}</th>
-                                    <th>{ts}Type{/ts}</th>
-                                    <th>{ts}Source{/ts}</th>
-                                    <th>{ts}Recieved{/ts}</th>
-                                    <th>{ts}Batch name{/ts}</th>
-                                </tr>
-                                </thead>
-                                {foreach from=$contributionsAlreadySubmitedRows item=row}
-                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
-                                        <td>
-                                            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
-                                        </td>
-                                        <td>{$row.total_amount}</td>
-                                        <td>{$row.financial_account}</td>
-                                        <td>{$row.source}</td>
-                                        <td>{$row.receive_date}</td>
-                                        <td>{$row.batch}</td>
-                                    </tr>
-                                    {if $row.line_items}
-                                        <tr class="line-items-container">
-                                            <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
-                                            </td>
-                                        </tr>
-                                    {/if}
-                                {/foreach}
-                            </table>
-                        </div>
-                        <!-- /.crm-accordion-body -->
-                    </div>
-                    <!-- /.crm-accordion-wrapper -->
-                </td>
-            {else}
-                <td>
-                    <div class="crm-accordion-header">
-                        Number of contributions already submited to HMRC: {$alreadySubmitedContributions}
-                    </div>
-                </td>
-            {/if}
-        </tr>
+    {if $totalToRemoveContributions}
+        <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
+            <div class="crm-accordion-header">
+                Number of contributions that will be removed from batch: {$totalToRemoveContributions}
+            </div>
+            <!-- /.crm-accordion-header -->
+            <div class="crm-accordion-body">
+                <table class="selector">
+                    <thead>
+                    <tr>
+                        <th>{ts}Name{/ts}</th>
+                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Type{/ts}</th>
+                        <th>{ts}Source{/ts}</th>
+                        <th>{ts}Recieved{/ts}</th>
+                        <th>{ts}Batch name{/ts}</th>
+                    </tr>
+                    </thead>
+                    {foreach from=$contributionsToRemoveRows item=row}
+                        <tr class="contribution" data-contribution-id="{$row.contribution_id}">
+                            <td>
+                                <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
+                            </td>
+                            <td>{$row.total_amount}</td>
+                            <td>{$row.financial_account}</td>
+                            <td>{$row.source}</td>
+                            <td>{$row.receive_date}</td>
+                            <td>{$row.batch}</td>
+                        </tr>
+                        {if $row.line_items}
+                            <tr class="line-items-container">
+                                <td colspan="6">
+                                    {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
+                                </td>
+                            </tr>
+                        {/if}
+                    {/foreach}
+                </table>
+            </div>
+            <!-- /.crm-accordion-body -->
+        </div>
+        <!-- /.crm-accordion-wrapper -->
+    {else}
+        {include file="CRM/Civigiftaid/Form/Task/EmptyAccordion.tpl" content="Number of contributions that will be removed from batch: $totalToRemoveContributions"}
+    {/if}
+    {if $alreadySubmitedContributions}
+        <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
+            <div class="crm-accordion-header">
+                Number of contributions already submited to HMRC: {$alreadySubmitedContributions}
+            </div>
+            <!-- /.crm-accordion-header -->
+            <div class="crm-accordion-body">
+                <table class="selector">
+                    <thead>
+                    <tr>
+                        <th>{ts}Name{/ts}</th>
+                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Type{/ts}</th>
+                        <th>{ts}Source{/ts}</th>
+                        <th>{ts}Recieved{/ts}</th>
+                        <th>{ts}Batch name{/ts}</th>
+                    </tr>
+                    </thead>
+                    {foreach from=$contributionsAlreadySubmitedRows item=row}
+                        <tr class="contribution" data-contribution-id="{$row.contribution_id}">
+                            <td>
+                                <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
+                            </td>
+                            <td>{$row.total_amount}</td>
+                            <td>{$row.financial_account}</td>
+                            <td>{$row.source}</td>
+                            <td>{$row.receive_date}</td>
+                            <td>{$row.batch}</td>
+                        </tr>
+                        {if $row.line_items}
+                            <tr class="line-items-container">
+                                <td colspan="6">
+                                    {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
+                                </td>
+                            </tr>
+                        {/if}
+                    {/foreach}
+                </table>
+            </div>
+            <!-- /.crm-accordion-body -->
+        </div>
+        <!-- /.crm-accordion-wrapper -->
+    {else}
+        {include file="CRM/Civigiftaid/Form/Task/EmptyAccordion.tpl" content="Number of contributions already submited to HMRC: $alreadySubmitedContributions"}
+    {/if}
 
-        <tr>
-            {if $notInBatchContributions}
-                <td>
-                    <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
-                        <div class="crm-accordion-header">
-                            Number of contributions that not in any batch: {$notInBatchContributions}
-                        </div>
-                        <!-- /.crm-accordion-header -->
-                        <div class="crm-accordion-body">
-                            <table class="selector">
-                                <thead>
-                                <tr>
-                                    <th>{ts}Name{/ts}</th>
-                                    <th>{ts}Amount{/ts}</th>
-                                    <th>{ts}Type{/ts}</th>
-                                    <th>{ts}Source{/ts}</th>
-                                    <th>{ts}Recieved{/ts}</th>
-                                </tr>
-                                </thead>
-                                {foreach from=$contributionsNotInBatchRows item=row}
-                                    <tr class="contribution" data-contribution-id="{$row.contribution_id}">
-                                        <td>
-                                            <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
-                                        </td>
-                                        <td>{$row.total_amount}</td>
-                                        <td>{$row.financial_account}</td>
-                                        <td>{$row.source}</td>
-                                        <td>{$row.receive_date}</td>
-                                    </tr>
-                                    {if $row.line_items}
-                                        <tr class="line-items-container">
-                                            <td colspan="6">
-                                                {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
-                                            </td>
-                                        </tr>
-                                    {/if}
-                                {/foreach}
-                            </table>
-                        </div>
-                        <!-- /.crm-accordion-body -->
-                    </div>
-                    <!-- /.crm-accordion-wrapper -->
-                </td>
-            {else}
-                <td>
-                    <div class="crm-accordion-header">
-                        Number of contributions that not in any batch: {$notInBatchContributions}
-                    </div>
-                </td>
-            {/if}
-        </tr>
-    </table>
+    {if $notInBatchContributions}
+        <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
+            <div class="crm-accordion-header">
+                Number of contributions that not in any batch: {$notInBatchContributions}
+            </div>
+            <!-- /.crm-accordion-header -->
+            <div class="crm-accordion-body">
+                <table class="selector">
+                    <thead>
+                    <tr>
+                        <th>{ts}Name{/ts}</th>
+                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Type{/ts}</th>
+                        <th>{ts}Source{/ts}</th>
+                        <th>{ts}Recieved{/ts}</th>
+                    </tr>
+                    </thead>
+                    {foreach from=$contributionsNotInBatchRows item=row}
+                        <tr class="contribution" data-contribution-id="{$row.contribution_id}">
+                            <td>
+                                <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
+                            </td>
+                            <td>{$row.total_amount}</td>
+                            <td>{$row.financial_account}</td>
+                            <td>{$row.source}</td>
+                            <td>{$row.receive_date}</td>
+                        </tr>
+                        {if $row.line_items}
+                            <tr class="line-items-container">
+                                <td colspan="6">
+                                    {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
+                                </td>
+                            </tr>
+                        {/if}
+                    {/foreach}
+                </table>
+            </div>
+            <!-- /.crm-accordion-body -->
+        </div>
+        <!-- /.crm-accordion-wrapper -->
+    {else}
+        {include file="CRM/Civigiftaid/Form/Task/EmptyAccordion.tpl" content="Number of contributions that not in any batch: $notInBatchContributions"}
+    {/if}
 
     {$form.buttons.html}
 </div>
