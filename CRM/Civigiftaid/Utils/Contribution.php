@@ -403,7 +403,9 @@ class CRM_Civigiftaid_Utils_Contribution {
       $result[$dao->id]['contact_id'] = $dao->contact_id;
       $result[$dao->id]['contribution_id'] = $dao->id;
       $result[$dao->id]['display_name'] = $dao->display_name;
-      $result[$dao->id]['total_amount'] = CRM_Utils_Money::format($dao->total_amount, $dao->currency);
+      $result[$dao->id]['total_amount'] = CRM_Utils_Money::format(
+        $dao->total_amount, $dao->currency
+      );
       $result[$dao->id]['financial_account'] = $dao->name;
       $result[$dao->id]['source'] = $dao->source;
       $result[$dao->id]['receive_date'] = $dao->receive_date;
@@ -421,25 +423,15 @@ class CRM_Civigiftaid_Utils_Contribution {
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       if (isset($result[$dao->id])) {
-        $item = $dao->entity_table;
-        if ($item === 'civicrm_participant') {
-          $item = 'Event';
-        }
-        elseif ($item === 'civicrm_membership') {
-          $item = 'Membership';
-        }
-        elseif ($item === 'civicrm_contribution') {
-          $item = 'Contribution';
-        }
-        elseif ($item === 'civicrm_participation') {
-          $item = 'Participation';
-        }
+        $item = static::getLineItemName($dao->entity_table);
 
         $lineItem = [
-          'item' => $item,
+          'item'        => $item,
           'description' => $dao->label,
-          'amount' => CRM_Utils_Money::format($dao->line_total, $dao->currency),
-          'qty' => (int) $dao->qty,
+          'amount'      => CRM_Utils_Money::format(
+            $dao->line_total, $dao->currency
+          ),
+          'qty'         => (int) $dao->qty,
         ];
         $result[$dao->id]['line_items'][] = $lineItem;
       }
@@ -460,5 +452,29 @@ class CRM_Civigiftaid_Utils_Contribution {
     $bIsSubmitted = $onlineSubmission->is_submitted($pBatchId);
 
     return $bIsSubmitted;
+  }
+
+  /**
+   * @param string $entityTable Entity table name
+   *
+   * @return string
+   */
+  public static function getLineItemName($entityTable) {
+    switch ($entityTable) {
+      case 'civicrm_participant':
+        return 'Event';
+
+      case 'civicrm_membership':
+        return 'Membership';
+
+      case 'civicrm_contribution':
+        return 'Donation';
+
+      case 'civicrm_participation':
+        return 'Participation';
+
+      default:
+        return $entityTable;
+    }
   }
 }
