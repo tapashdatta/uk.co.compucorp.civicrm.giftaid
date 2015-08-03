@@ -69,9 +69,7 @@ class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
       'uk.co.compucorp.civicrm.giftaid:settings'
     );
 
-    $defaults = (array) $settings;
-
-    return $defaults;
+    return (array) $settings;
   }
 
 
