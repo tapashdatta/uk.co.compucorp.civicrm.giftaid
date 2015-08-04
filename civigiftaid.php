@@ -423,6 +423,20 @@ function civigiftaid_civicrm_navigationMenu(&$params) {
           ),
           'child'      => NULL
         ),
+        2 => array(
+          'attributes' => array(
+            'label'      => ts('Settings'),
+            'name'       => 'settings',
+            'url'        => "civicrm/admin/gift-aid",
+            'permission' => NULL,
+            'operator'   => NULL,
+            'separator'  => 0,
+            'parentID'   => $nextAdminMenuKey,
+            'navID'      => 3,
+            'active'     => 1
+          ),
+          'child'      => NULL
+        ),
       )
     );
   }
