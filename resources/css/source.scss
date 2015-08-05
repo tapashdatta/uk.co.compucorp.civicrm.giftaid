@@ -6,7 +6,8 @@
     padding: 0;
   }
 
-  h2:first-child {
+  h2:first-child,
+  h3:first-child {
     margin-top: 0;
   }
 
@@ -21,6 +22,12 @@
     li {
       margin-top: 0.5rem;
       margin-bottom: 0.5rem;
+    }
+  }
+
+  .select2-container {
+    .select2-choices {
+      border-radius: 3px;
     }
   }
 
@@ -141,6 +148,12 @@
       border: none;
       background: transparent;
       color: #707070;
+    }
+  }
+
+  &.settings {
+    .select2-container {
+      min-width: 20rem;
     }
   }
 }
