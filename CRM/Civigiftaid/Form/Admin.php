@@ -9,6 +9,18 @@ require_once 'CRM/Core/Form.php';
  */
 class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
   /**
+   * Maintains a cache of settings in order to avoid hitting the database on
+   * subsequent requests.
+   *
+   * @var null|array
+   */
+  private static $settings;
+
+  ////////////////////
+  // Public Methods //
+  ////////////////////
+
+  /**
    * {@inheritdoc}
    */
   public function buildQuickForm() {
@@ -64,32 +76,8 @@ class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
    * {@inheritdoc}
    */
   public function setDefaultValues() {
-    $settings = CRM_Core_BAO_Setting::getItem(
-      'Extension',
-      'uk.co.compucorp.civicrm.giftaid:settings'
-    );
-
-    return (array) $settings;
+    return static::getSettings();
   }
-
-
-  /**
-   * Get an array of financial types
-   *
-   * @return array
-   * @throws \CiviCRM_API3_Exception
-   */
-  private function getFinancialTypes() {
-    $result = civicrm_api3('FinancialType', 'get', array('sequential' => 1));
-
-    $types = array();
-    foreach ($result['values'] as $type) {
-      $types[$type['id']] = $type['name'];
-    }
-
-    return $types;
-  }
-
 
   /**
    * Get the fields/elements defined in this form.
@@ -111,5 +99,62 @@ class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
     }
 
     return $elementNames;
+  }
+
+  ///////////////////////////
+  // Public Static Methods //
+  ///////////////////////////
+
+  /**
+   * @return array
+   */
+  public static function getSettings() {
+    if (is_null(static::$settings)) {
+      static::$settings = (array) CRM_Core_BAO_Setting::getItem(
+        'Extension',
+        'uk.co.compucorp.civicrm.giftaid:settings'
+      );
+    }
+
+    return static::$settings;
+  }
+
+  /**
+   * @return bool
+   */
+  public static function isGloballyEnabled() {
+    $settings = static::getSettings();
+
+    return (bool) $settings['globally_enabled'];
+  }
+
+  /**
+   * @return array
+   */
+  public static function getFinancialTypesEnabled() {
+    $settings = static::getSettings();
+
+    return (array) $settings['financial_types_enabled'];
+  }
+
+  /////////////////////
+  // Private Methods //
+  /////////////////////
+
+  /**
+   * Get an array of financial types
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  private function getFinancialTypes() {
+    $result = civicrm_api3('FinancialType', 'get', array('sequential' => 1));
+
+    $types = array();
+    foreach ($result['values'] as $type) {
+      $types[$type['id']] = $type['name'];
+    }
+
+    return $types;
   }
 }
