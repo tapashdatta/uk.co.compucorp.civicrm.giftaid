@@ -86,7 +86,7 @@
     {if $alreadySubmitedContributions}
         <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
             <div class="crm-accordion-header">
-                Number of contributions already submited to HMRC: {$alreadySubmitedContributions}
+                Number of contributions already submitted to HMRC: {$alreadySubmitedContributions}
             </div>
             <!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
@@ -125,14 +125,14 @@
             <!-- /.crm-accordion-body -->
         </div>
         <!-- /.crm-accordion-wrapper -->
-    {else}
+    {elseif $onlineSubmissionExtensionInstalled}
         {include file="CRM/Civigiftaid/Form/Task/EmptyAccordion.tpl" content="Number of contributions already submited to HMRC: $alreadySubmitedContributions"}
     {/if}
 
     {if $notInBatchContributions}
         <div class="crm-accordion-wrapper crm-accordion_title-accordion crm-accordion-closed">
             <div class="crm-accordion-header">
-                Number of contributions that not in any batch: {$notInBatchContributions}
+                Number of contributions that are not in any batch: {$notInBatchContributions}
             </div>
             <!-- /.crm-accordion-header -->
             <div class="crm-accordion-body">
@@ -162,7 +162,7 @@
                                     {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                 </td>
                             </tr>
-                        {/if}
+                       {/if}
                     {/foreach}
                 </table>
             </div>
