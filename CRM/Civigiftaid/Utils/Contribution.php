@@ -124,10 +124,12 @@ class CRM_Civigiftaid_Utils_Contribution {
         $batchContribution->batch_id = $batchID;
         $batchContribution->save();
 
+        $giftAidableContribAmt = CRM_Civigiftaid_Form_Admin::isGloballyEnabled()
+          ? $contributionID['amount']
+          : static::getContribAmtForEnabledFinanceTypes($contributionID);
+
         // get gift aid amount
-        $giftAidAmount = self::_calculateGiftAidAmt(
-          $contribution['total_amount']
-        );
+        $giftAidAmount = static::_calculateGiftAidAmt($giftAidableContribAmt);
 
         // FIXME: check if there is customTable method
         $query = "
@@ -217,6 +219,41 @@ class CRM_Civigiftaid_Utils_Contribution {
       count($contributionRemoved),
       count($contributionNotRemoved)
     );
+  }
+
+  /**
+   * Get the total amount for line items, for a contribution given by its ID,
+   * having financial type which have been enabled in Gift Aid extension's
+   * settings.
+   *
+   * @param $contributionId
+   *
+   * @return float|int
+   */
+  public static function getContribAmtForEnabledFinanceTypes($contributionId) {
+    $enabledTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled();
+    $enabledTypesStr = implode(', ', $enabledTypes);
+
+    $sql = "
+      SELECT SUM(line_total) total
+      FROM civicrm_line_item
+      WHERE contribution_id = {$contributionId}";
+
+    if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+      // if no financial types are selected, don't return anything from query
+      $sql .= $enabledTypesStr
+        ? " AND financial_type_id IN ({$enabledTypesStr})"
+        : " AND 0";
+    }
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    $contributionAmount = 0;
+    while ($dao->fetch()) {
+      $contributionAmount = (float) $dao->total;
+    }
+
+    return $contributionAmount;
   }
 
   /**
