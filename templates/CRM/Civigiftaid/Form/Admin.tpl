@@ -1,23 +1,43 @@
-<h3>Gift Aid Financial Types</h3>
+{crmStyle ext=uk.co.compucorp.civicrm.giftaid file=resources/css/dist.css}
+{crmScript ext=uk.co.compucorp.civicrm.giftaid file=resources/js/script.js}
 
-{foreach from=$elementNames item=elementName}
+<div id="gift-aid-settings" class="crm-block crm-form-block crm-export-form-block gift-aid settings">
+    <h3>Gift Aid Financial Types</h3>
+
     <div class="crm-section">
-        <div class="label">{$form.$elementName.label}</div>
-        <div class="content">{$form.$elementName.html}</div>
+        <div class="label">{$form.globally_enabled.label}</div>
+        <div class="content">{$form.globally_enabled.html}</div>
         <div class="clear"></div>
     </div>
-{/foreach}
 
-{* FIELD EXAMPLE: OPTION 2 (MANUAL LAYOUT)
+    <div id="financial-types-container" class="crm-section">
+        <div class="label">{$form.financial_types_enabled.label}</div>
+        <div class="content">{$form.financial_types_enabled.html}</div>
+        <div class="clear"></div>
+    </div>
 
-  <div>
-    <span>{$form.favorite_color.label}</span>
-    <span>{$form.favorite_color.html}</span>
-  </div>
+    {* FIELD EXAMPLE: OPTION 1 (AUTOMATIC LAYOUT)
 
-{* FOOTER *}
-<div class="crm-submit-buttons">
-    {include file="CRM/common/formButtons.tpl" location="bottom"}
+    {foreach from=$elementNames item=elementName}
+        <div class="crm-section">
+            <div class="label">{$form.$elementName.label}</div>
+            <div class="content">{$form.$elementName.html}</div>
+            <div class="clear"></div>
+        </div>
+    {/foreach}
+
+    {* FIELD EXAMPLE: OPTION 2 (MANUAL LAYOUT)
+
+      <div>
+        <span>{$form.favorite_color.label}</span>
+        <span>{$form.favorite_color.html}</span>
+      </div>
+
+    {* FOOTER *}
+
+    <div class="crm-submit-buttons">
+        {include file="CRM/common/formButtons.tpl" location="bottom"}
+    </div>
 </div>
 
 {literal}
