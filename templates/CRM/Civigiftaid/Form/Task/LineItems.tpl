@@ -11,7 +11,7 @@
         <tr {if $count % 2 !== 0 }class="odd"{/if}>
             <td>{$item.item}</td>
             <td>{$item.qty}</td>
-            <td>{$row.financial_account}</td>
+            <td>{$item.financial_type}</td>
             <td>{$item.description}</td>
             <td>{$item.amount}</td>
         </tr>

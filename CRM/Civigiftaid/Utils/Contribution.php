@@ -525,10 +525,12 @@ class CRM_Civigiftaid_Utils_Contribution {
     array &$result
   ) {
     $query = "
-      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency
+      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency, t.name
       FROM civicrm_contribution c
       LEFT JOIN civicrm_line_item i
       ON c.id = i.contribution_id
+      LEFT JOIN civicrm_financial_type t
+      ON i.financial_type_id = t.id
       WHERE c.id IN ($contributionIdStr)";
 
     $dao = CRM_Core_DAO::executeQuery($query);
@@ -537,12 +539,13 @@ class CRM_Civigiftaid_Utils_Contribution {
         $item = static::getLineItemName($dao->entity_table);
 
         $lineItem = [
-          'item'        => $item,
-          'description' => $dao->label,
-          'amount'      => CRM_Utils_Money::format(
+          'item'           => $item,
+          'description'    => $dao->label,
+          'financial_type' => $dao->name,
+          'amount'         => CRM_Utils_Money::format(
             $dao->line_total, $dao->currency
           ),
-          'qty'         => (int) $dao->qty,
+          'qty'            => (int) $dao->qty,
         ];
         $result[$dao->id]['line_items'][] = $lineItem;
       }
