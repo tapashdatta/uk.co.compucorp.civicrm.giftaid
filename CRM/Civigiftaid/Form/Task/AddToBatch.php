@@ -151,7 +151,7 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
 
     //require_once 'CRM/Core/BAO/Batch.php'; //version 4.2
     require_once 'CRM/Batch/BAO/Batch.php';
-    $createdBatch =& CRM_Batch_BAO_Batch::create($batchParams);
+    $createdBatch = CRM_Batch_BAO_Batch::create($batchParams);
 
     $batchID = $createdBatch->id;
     $batchLabel = $batchParams['title'];
