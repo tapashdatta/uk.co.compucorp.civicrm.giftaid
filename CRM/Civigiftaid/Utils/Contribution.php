@@ -53,7 +53,7 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @access public
    * @static
    */
-  static function addContributionToBatch($contributionIDs, $batchID) {
+  public static function addContributionToBatch($contributionIDs, $batchID) {
     $date = date('YmdHis');
     $contributionsAdded = array();
     $contributionsNotAdded = array();
@@ -173,12 +173,12 @@ class CRM_Civigiftaid_Utils_Contribution {
     );
   }
 
-  static function removeContributionFromBatch($contributionIDs) {
+  public static function removeContributionFromBatch($contributionIDs) {
     $contributionRemoved = array();
     $contributionNotRemoved = array();
 
     list($total, $contributionsToRemove, $notInBatch, $alreadySubmited) =
-      self::_validationRemoveContributionFromBatch($contributionIDs);
+      self::validationRemoveContributionFromBatch($contributionIDs);
 
     require_once 'CRM/Batch/BAO/Batch.php';
     $contributions = self::getContributionDetails($contributionsToRemove);
@@ -293,7 +293,10 @@ class CRM_Civigiftaid_Utils_Contribution {
     return (($basicRate * $contributionAmount) / (100 - $basicRate));
   }
 
-  static function _isOnlineSubmissionExtensionInstalled() {
+  /**
+   * @return bool
+   */
+  public static function isOnlineSubmissionExtensionInstalled() {
     $extensions = CRM_Core_PseudoConstant::getModuleExtensions();
     foreach ($extensions as $key => $extension) {
       if ($extension['prefix'] == 'giftaidonline') {
@@ -303,7 +306,12 @@ class CRM_Civigiftaid_Utils_Contribution {
     return FALSE;
   }
 
-  static function _validationRemoveContributionFromBatch(&$contributionIDs) {
+  /**
+   * @param $contributionIDs
+   *
+   * @return array
+   */
+  public static function validationRemoveContributionFromBatch(&$contributionIDs) {
     $contributionsAlreadySubmited = array();
     $contributionsNotInBatch = array();
     $contributionsToRemove = array();
@@ -316,7 +324,7 @@ class CRM_Civigiftaid_Utils_Contribution {
 
       // check if the selected contribution id is in a batch
       if ($batchContribution->find(TRUE)) {
-        if (self::_isOnlineSubmissionExtensionInstalled()) {
+        if (self::isOnlineSubmissionExtensionInstalled()) {
 
           if (self::isBatchAlreadySubmited($batchContribution->batch_id)) {
             $contributionsAlreadySubmited[] = $contributionID;
@@ -351,7 +359,7 @@ class CRM_Civigiftaid_Utils_Contribution {
    *
    * @return array
    */
-  static function _validateContributionToBatch(&$contributionIDs) {
+  public static function validateContributionToBatch(&$contributionIDs) {
     $contributionsAdded = array();
     $contributionsAlreadyAdded = array();
     $contributionsNotValid = array();
@@ -401,7 +409,7 @@ class CRM_Civigiftaid_Utils_Contribution {
   /*
      * this function returns the array of batchID & title
      */
-  static function getBatchIdTitle($orderBy = 'id') {
+  public static function getBatchIdTitle($orderBy = 'id') {
     $query = "SELECT * FROM civicrm_batch ORDER BY " . $orderBy;
     $dao =& CRM_Core_DAO::executeQuery($query);
 
@@ -417,7 +425,7 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @param array  $contributionIDs an array of contribution ids
    * @return array $result an array of contributions
    */
-  static function getContributionDetails($contributionIds) {
+  public static function getContributionDetails($contributionIds) {
     $result = array();
 
     if (empty($contributionIds)) {
@@ -440,7 +448,7 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @param integer  $batchId a batchId
    * @return true if already submited and if not
    */
-  static function isBatchAlreadySubmited($pBatchId) {
+  public static function isBatchAlreadySubmited($pBatchId) {
     require_once 'CRM/Giftaidonline/Page/OnlineSubmission.php';
 
     $onlineSubmission = new CRM_Giftaidonline_Page_OnlineSubmission();
@@ -472,6 +480,10 @@ class CRM_Civigiftaid_Utils_Contribution {
         return $entityTable;
     }
   }
+
+  /////////////////////
+  // Private Methods //
+  /////////////////////
 
   /**
    * @param       $contributionIdStr

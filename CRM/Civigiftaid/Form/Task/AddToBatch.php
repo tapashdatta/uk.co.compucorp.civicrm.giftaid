@@ -55,7 +55,7 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
 
     require_once 'CRM/Civigiftaid/Utils/Contribution.php';
     list($total, $added, $alreadyAdded, $notValid) =
-      CRM_Civigiftaid_Utils_Contribution::_validateContributionToBatch($this->_contributionIds);
+      CRM_Civigiftaid_Utils_Contribution::validateContributionToBatch($this->_contributionIds);
     $this->assign('selectedContributions', $total);
     $this->assign('totalAddedContributions', count($added));
     $this->assign('alreadyAddedContributions', count($alreadyAdded));
