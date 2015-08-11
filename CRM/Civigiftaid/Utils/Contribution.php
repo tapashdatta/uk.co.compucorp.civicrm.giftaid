@@ -418,61 +418,16 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @return array $result an array of contributions
    */
   static function getContributionDetails($contributionIds) {
+    $result = array();
+
     if (empty($contributionIds)) {
-      return;
+      return $result;
     }
 
     $contributionIdStr = implode(',', $contributionIds);
 
-    $query = "
-      SELECT  contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, contribution.currency,
-              financial_type.name, contribution.source, contribution.receive_date, batch.title, batch.id as batch_id
-      FROM civicrm_contribution contribution
-      LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
-      LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
-      LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id )
-      LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id )
-      WHERE contribution.id IN ({$contributionIdStr})";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    $result = array();
-    while ($dao->fetch()) {
-      $result[$dao->id]['contact_id'] = $dao->contact_id;
-      $result[$dao->id]['contribution_id'] = $dao->id;
-      $result[$dao->id]['display_name'] = $dao->display_name;
-      $result[$dao->id]['total_amount'] = CRM_Utils_Money::format(
-        $dao->total_amount, $dao->currency
-      );
-      $result[$dao->id]['financial_account'] = $dao->name;
-      $result[$dao->id]['source'] = $dao->source;
-      $result[$dao->id]['receive_date'] = $dao->receive_date;
-      $result[$dao->id]['batch'] = $dao->title;
-      $result[$dao->id]['batch_id'] = $dao->batch_id;
-    }
-
-    $query = "
-      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency
-      FROM civicrm_contribution c
-      LEFT JOIN civicrm_line_item i
-      ON c.id = i.contribution_id
-      WHERE c.id IN ($contributionIdStr)";
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      if (isset($result[$dao->id])) {
-        $item = static::getLineItemName($dao->entity_table);
-
-        $lineItem = [
-          'item'        => $item,
-          'description' => $dao->label,
-          'amount'      => CRM_Utils_Money::format(
-            $dao->line_total, $dao->currency
-          ),
-          'qty'         => (int) $dao->qty,
-        ];
-        $result[$dao->id]['line_items'][] = $lineItem;
-      }
-    }
+    self::addContributionDetails($contributionIdStr, $result);
+    self::addLineItemDetails($contributionIdStr, $result);
 
     return $result;
   }
@@ -512,6 +467,73 @@ class CRM_Civigiftaid_Utils_Contribution {
 
       default:
         return $entityTable;
+    }
+  }
+
+  /**
+   * @param $contributionIdStr
+   *
+   * @param $result
+   *
+   * @return array
+   */
+  private static function addContributionDetails($contributionIdStr, &$result) {
+    $query = "
+      SELECT  contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, contribution.currency,
+              financial_type.name, contribution.source, contribution.receive_date, batch.title, batch.id as batch_id
+      FROM civicrm_contribution contribution
+      LEFT JOIN civicrm_contact contact ON ( contribution.contact_id = contact.id )
+      LEFT JOIN civicrm_financial_type financial_type ON ( financial_type.id = contribution.financial_type_id  )
+      LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id )
+      LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id )
+      WHERE contribution.id IN ({$contributionIdStr})";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+
+    while ($dao->fetch()) {
+      $result[$dao->id]['contact_id'] = $dao->contact_id;
+      $result[$dao->id]['contribution_id'] = $dao->id;
+      $result[$dao->id]['display_name'] = $dao->display_name;
+      $result[$dao->id]['total_amount'] = CRM_Utils_Money::format(
+        $dao->total_amount, $dao->currency
+      );
+      $result[$dao->id]['financial_account'] = $dao->name;
+      $result[$dao->id]['source'] = $dao->source;
+      $result[$dao->id]['receive_date'] = $dao->receive_date;
+      $result[$dao->id]['batch'] = $dao->title;
+      $result[$dao->id]['batch_id'] = $dao->batch_id;
+    }
+  }
+
+  /**
+   * @param $contributionIdStr
+   * @param $result
+   *
+   * @return mixed
+   */
+  private static function addLineItemDetails($contributionIdStr, &$result) {
+    $query = "
+      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency
+      FROM civicrm_contribution c
+      LEFT JOIN civicrm_line_item i
+      ON c.id = i.contribution_id
+      WHERE c.id IN ($contributionIdStr)";
+
+    $dao = CRM_Core_DAO::executeQuery($query);
+    while ($dao->fetch()) {
+      if (isset($result[$dao->id])) {
+        $item = static::getLineItemName($dao->entity_table);
+
+        $lineItem = [
+          'item'        => $item,
+          'description' => $dao->label,
+          'amount'      => CRM_Utils_Money::format(
+            $dao->line_total, $dao->currency
+          ),
+          'qty'         => (int) $dao->qty,
+        ];
+        $result[$dao->id]['line_items'][] = $lineItem;
+      }
     }
   }
 }
