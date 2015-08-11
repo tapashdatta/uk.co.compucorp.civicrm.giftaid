@@ -129,7 +129,7 @@ class CRM_Civigiftaid_Utils_Contribution {
         );
 
         // get gift aid amount
-        $giftAidAmount = static::_calculateGiftAidAmt($giftAidableContribAmt);
+        $giftAidAmount = static::calculateGiftAidAmt($giftAidableContribAmt);
 
         // FIXME: check if there is customTable method
         $query = "
@@ -264,7 +264,7 @@ class CRM_Civigiftaid_Utils_Contribution {
    *
    * @return float
    */
-  public static function _calculateGiftAidAmt($contributionAmount) {
+  public static function calculateGiftAidAmt($contributionAmount) {
     $gResult = civicrm_api(
       'OptionGroup',
       'getsingle',
