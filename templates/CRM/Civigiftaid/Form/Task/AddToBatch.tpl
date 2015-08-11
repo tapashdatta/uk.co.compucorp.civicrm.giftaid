@@ -65,10 +65,10 @@
                     <tr>
                         <th>{ts}Name{/ts}</th>
                         <th>{ts}Gift Aidable Amount{/ts}</th>
-                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Total Amount{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
-                        <th>{ts}Recieved{/ts}</th>
+                        <th>{ts}Received{/ts}</th>
                     </tr>
                     </thead>
                     {foreach from=$contributionsAddedRows item=row}
@@ -84,7 +84,7 @@
                         </tr>
                         {if $row.line_items}
                             <tr class="line-items-container">
-                                <td colspan="5">
+                                <td colspan="6">
                                     {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                 </td>
                             </tr>
@@ -109,10 +109,11 @@
                     <thead>
                     <tr>
                         <th>{ts}Name{/ts}</th>
-                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Gift Aidable Amount{/ts}</th>
+                        <th>{ts}Total Amount{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
-                        <th>{ts}Recieved{/ts}</th>
+                        <th>{ts}Received{/ts}</th>
                         <th>{ts}Batch{/ts}</th>
                     </tr>
                     </thead>
@@ -121,6 +122,7 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                             </td>
+                            <td>{$row.gift_aidable_amount}</td>
                             <td>{$row.total_amount}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
@@ -154,10 +156,11 @@
                     <thead>
                     <tr>
                         <th>{ts}Name{/ts}</th>
-                        <th>{ts}Amount{/ts}</th>
+                        <th>{ts}Gift Aidable Amount{/ts}</th>
+                        <th>{ts}Total Amount{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
-                        <th>{ts}Recieved{/ts}</th>
+                        <th>{ts}Received{/ts}</th>
                     </tr>
                     </thead>
                     {foreach from=$contributionsNotValid item=row}
@@ -165,6 +168,7 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                             </td>
+                            <td>{$row.gift_aidable_amount}</td>
                             <td>{$row.total_amount}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
@@ -172,7 +176,7 @@
                         </tr>
                         {if $row.line_items}
                             <tr class="line-items-container">
-                                <td colspan="5">
+                                <td colspan="6">
                                     {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                 </td>
                             </tr>
