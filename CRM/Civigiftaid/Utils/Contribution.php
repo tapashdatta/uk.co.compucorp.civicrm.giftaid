@@ -124,9 +124,9 @@ class CRM_Civigiftaid_Utils_Contribution {
         $batchContribution->batch_id = $batchID;
         $batchContribution->save();
 
-        $giftAidableContribAmt = CRM_Civigiftaid_Form_Admin::isGloballyEnabled()
-          ? $contributionID['amount']
-          : static::getContribAmtForEnabledFinanceTypes($contributionID);
+        $giftAidableContribAmt = self::getGiftAidableContribAmt(
+          $contribution['total_amount'], $contributionID
+        );
 
         // get gift aid amount
         $giftAidAmount = static::_calculateGiftAidAmt($giftAidableContribAmt);
@@ -427,7 +427,10 @@ class CRM_Civigiftaid_Utils_Contribution {
     $contributionIdStr = implode(',', $contributionIds);
 
     self::addContributionDetails($contributionIdStr, $result);
-    self::addLineItemDetails($contributionIdStr, $result);
+
+    if (count($result)) {
+      self::addLineItemDetails($contributionIdStr, $result);
+    }
 
     return $result;
   }
@@ -471,13 +474,15 @@ class CRM_Civigiftaid_Utils_Contribution {
   }
 
   /**
-   * @param $contributionIdStr
-   *
-   * @param $result
+   * @param       $contributionIdStr
+   * @param array $result
    *
    * @return array
    */
-  private static function addContributionDetails($contributionIdStr, &$result) {
+  private static function addContributionDetails(
+    $contributionIdStr,
+    array &$result
+  ) {
     $query = "
       SELECT  contribution.id, contact.id contact_id, contact.display_name, contribution.total_amount, contribution.currency,
               financial_type.name, contribution.source, contribution.receive_date, batch.title, batch.id as batch_id
@@ -494,6 +499,10 @@ class CRM_Civigiftaid_Utils_Contribution {
       $result[$dao->id]['contact_id'] = $dao->contact_id;
       $result[$dao->id]['contribution_id'] = $dao->id;
       $result[$dao->id]['display_name'] = $dao->display_name;
+      $result[$dao->id]['gift_aidable_amount'] = CRM_Utils_Money::format(
+        static::getGiftAidableContribAmt($dao->total_amount, $dao->id),
+        $dao->currency
+      );
       $result[$dao->id]['total_amount'] = CRM_Utils_Money::format(
         $dao->total_amount, $dao->currency
       );
@@ -506,12 +515,15 @@ class CRM_Civigiftaid_Utils_Contribution {
   }
 
   /**
-   * @param $contributionIdStr
-   * @param $result
+   * @param       $contributionIdStr
+   * @param array $result
    *
    * @return mixed
    */
-  private static function addLineItemDetails($contributionIdStr, &$result) {
+  private static function addLineItemDetails(
+    $contributionIdStr,
+    array &$result
+  ) {
     $query = "
       SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency
       FROM civicrm_contribution c
@@ -535,5 +547,20 @@ class CRM_Civigiftaid_Utils_Contribution {
         $result[$dao->id]['line_items'][] = $lineItem;
       }
     }
+  }
+
+  /**
+   * @param float|int $contributionAmt
+   * @param int       $contributionID
+   *
+   * @return float|int
+   */
+  private static function getGiftAidableContribAmt(
+    $contributionAmt,
+    $contributionID
+  ) {
+    return CRM_Civigiftaid_Form_Admin::isGloballyEnabled()
+      ? $contributionAmt
+      : static::getContribAmtForEnabledFinanceTypes($contributionID);
   }
 }

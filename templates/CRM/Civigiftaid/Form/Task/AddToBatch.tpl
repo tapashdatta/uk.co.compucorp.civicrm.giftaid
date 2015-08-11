@@ -64,6 +64,7 @@
                     <thead>
                     <tr>
                         <th>{ts}Name{/ts}</th>
+                        <th>{ts}Gift Aidable Amount{/ts}</th>
                         <th>{ts}Amount{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
@@ -75,6 +76,7 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                             </td>
+                            <td>{$row.gift_aidable_amount}</td>
                             <td>{$row.total_amount}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
