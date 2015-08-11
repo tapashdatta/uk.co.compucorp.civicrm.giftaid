@@ -66,6 +66,7 @@
                         <th>{ts}Name{/ts}</th>
                         <th>{ts}Gift Aidable Amount{/ts}</th>
                         <th>{ts}Total Amount{/ts}</th>
+                        <th>{ts}No of items{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
                         <th>{ts}Received{/ts}</th>
@@ -78,13 +79,14 @@
                             </td>
                             <td>{$row.gift_aidable_amount}</td>
                             <td>{$row.total_amount}</td>
+                            <td>{$row.line_items|@count}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
                         </tr>
                         {if $row.line_items}
                             <tr class="line-items-container">
-                                <td colspan="6">
+                                <td colspan="7">
                                     {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                 </td>
                             </tr>
@@ -111,6 +113,7 @@
                         <th>{ts}Name{/ts}</th>
                         <th>{ts}Gift Aidable Amount{/ts}</th>
                         <th>{ts}Total Amount{/ts}</th>
+                        <th>{ts}No of items{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
                         <th>{ts}Received{/ts}</th>
@@ -124,6 +127,7 @@
                             </td>
                             <td>{$row.gift_aidable_amount}</td>
                             <td>{$row.total_amount}</td>
+                            <td>{$row.line_items|@count}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
@@ -131,7 +135,7 @@
                         </tr>
                         {if $row.line_items}
                             <tr class="line-items-container">
-                                <td colspan="6">
+                                <td colspan="8">
                                     {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                 </td>
                             </tr>
@@ -158,6 +162,7 @@
                         <th>{ts}Name{/ts}</th>
                         <th>{ts}Gift Aidable Amount{/ts}</th>
                         <th>{ts}Total Amount{/ts}</th>
+                        <th>{ts}No of items{/ts}</th>
                         <th>{ts}Type{/ts}</th>
                         <th>{ts}Source{/ts}</th>
                         <th>{ts}Received{/ts}</th>
@@ -170,13 +175,14 @@
                             </td>
                             <td>{$row.gift_aidable_amount}</td>
                             <td>{$row.total_amount}</td>
+                            <td>{$row.line_items|@count}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
                         </tr>
                         {if $row.line_items}
                             <tr class="line-items-container">
-                                <td colspan="6">
+                                <td colspan="7">
                                     {include file="CRM/Civigiftaid/Form/Task/LineItems.tpl" contributionId=$row.contribution_id}
                                 </td>
                             </tr>
