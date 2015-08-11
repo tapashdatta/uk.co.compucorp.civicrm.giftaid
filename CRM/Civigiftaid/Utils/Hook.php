@@ -77,10 +77,18 @@ abstract class CRM_Civigiftaid_Utils_Hook {
 
     /**
      * This hook allows doing any extra processing for contributions that are added to a batch.
-     * @param $contributionsAdded  contribution ids that have been batched
      *
      * @access public
      */
+
+  /**
+   * This hook allows doing any extra processing for contributions that are added to a batch.
+   *
+   * @param       $batchID
+   * @param array $contributionsAdded Contribution ids that have been batched
+   *
+   * @return mixed
+   */
     static function batchContributions( $batchID, $contributionsAdded ) {
 		return self::versionSwitcher( 2, $batchID, $contributionsAdded, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_batchContributions' );
     }
@@ -95,9 +103,9 @@ abstract class CRM_Civigiftaid_Utils_Hook {
     static function alterDeclarationQuery( &$query, &$queryParams ) {
 		return self::versionSwitcher( 2, $query, $queryParams, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_alterDeclarationQuery' );
     }
-    
+
     /*
-     * 
+     *
      */
     static function versionSwitcher($numParams, &$arg1, &$arg2, &$arg3, &$arg4, &$arg6, $fnSuffix, &$arg5 = NULL){
       $version = CRM_Utils_System::version();
@@ -109,6 +117,6 @@ abstract class CRM_Civigiftaid_Utils_Hook {
       else {
         return self::singleton()->invoke($numParams, $arg1, $arg2, $arg3, $arg4, $arg6, $fnSuffix);
       }
-      
+
     }
 }
