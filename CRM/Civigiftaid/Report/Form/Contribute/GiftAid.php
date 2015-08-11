@@ -107,29 +107,35 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
           array(
             'dao'    => 'CRM_Price_DAO_LineItem',
             'fields' => array(
-              'lineitem_id'      => array(
+              'id'           => array(
                 'name'       => 'id',
                 'title'      => 'Line Item No',
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
-              'line_item_amount' => array(
+              'amount'       => array(
                 'name'       => 'line_total',
                 'title'      => 'Line Total',
                 'no_display' => FALSE,
                 'required'   => TRUE,
                 'type'       => CRM_Utils_Type::T_MONEY
               ),
-              'quantity'         => array(
+              'quantity'     => array(
                 'name'       => 'qty',
                 'title'      => 'Quantity',
                 'no_display' => FALSE,
                 'required'   => TRUE,
                 'type'       => CRM_Utils_Type::T_INT
               ),
-              'entity_table'     => array(
+              'entity_table' => array(
                 'name'       => 'entity_table',
                 'title'      => 'Item',
+                'no_display' => FALSE,
+                'required'   => TRUE,
+              ),
+              'label'        => array(
+                'name'       => 'label',
+                'title'      => 'Description',
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
@@ -218,6 +224,13 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       }
     }
 
+    $this->_columnHeaders['custom_gift_aid_amount'] = array(
+      'title' => 'Gift Aid Amount',
+      'type'  => CRM_Utils_Type::T_MONEY
+    );
+
+    $this->reorderColumns();
+
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
@@ -263,26 +276,25 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
   public function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
-    $select = "
-        SELECT SUM( value_gift_aid_submission_civireport.amount ) as amount,
-               SUM( value_gift_aid_submission_civireport.gift_aid_amount ) as giftaid_amount";
-    $sql = "{$select} {$this->_from} {$this->_where}";
-    $dao = CRM_Core_DAO::executeQuery($sql);
+    $totalAmount = 0;
+    $totalGiftAidAmount = 0;
 
-    if ($dao->fetch()) {
-      $statistics['counts']['amount'] = array(
-        'value' => $dao->amount,
-        'title' => 'Total Amount',
-        'type'  => CRM_Utils_Type::T_MONEY
-      );
-      $statistics['counts']['giftaid'] = array(
-        'value' => $dao->giftaid_amount,
-        'title' => 'Total Gift Aid Amount',
-        'type'  => CRM_Utils_Type::T_MONEY
-      );
+    foreach ($rows as $row) {
+      $totalAmount += $row['civicrm_line_item_amount'];
+      $totalGiftAidAmount += $row['custom_gift_aid_amount'];
     }
 
-    //print_r ($config);exit;
+    $statistics['counts']['amount'] = array(
+      'value' => $totalAmount,
+      'title' => 'Total Amount',
+      'type'  => CRM_Utils_Type::T_MONEY
+    );
+    $statistics['counts']['giftaid'] = array(
+      'value' => $totalGiftAidAmount,
+      'title' => 'Total Gift Aid Amount',
+      'type'  => CRM_Utils_Type::T_MONEY
+    );
+
     return $statistics;
   }
 
@@ -312,6 +324,12 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
           $rows[$rowNum]['civicrm_contribution_contact_id_hover'] =
             ts("View Contact Summary for this Contact.");
         }
+        if (isset($row['civicrm_line_item_amount'])) {
+          $rows[$rowNum]['custom_gift_aid_amount'] =
+            CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
+              $row['civicrm_line_item_amount']
+            );
+        }
         if (!empty($row['civicrm_line_item_entity_table'])) {
           $rows[$rowNum]['civicrm_line_item_entity_table'] =
             CRM_Civigiftaid_Utils_Contribution::getLineItemName(
@@ -329,6 +347,55 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       }
       $lastKey = $rowNum;
     }
+  }
+
+  private function reorderColumns() {
+    $columnTitleOrder = [
+      'payment no',
+      'line item no',
+      'donor name',
+      'item',
+      'description',
+      'contribution date',
+      'street address',
+      'city',
+      'county',
+      'country',
+      'postal code',
+      'eligible for gift aid?',
+      'line total',
+      'gift aid amount',
+      'batch name'
+    ];
+
+    $compare = function ($a, $b) use (&$columnTitleOrder) {
+      $titleA = strtolower($a['title']);
+      $titleB = strtolower($b['title']);
+
+      $posA = array_search($titleA, $columnTitleOrder);
+      $posB = array_search($titleB, $columnTitleOrder);
+
+      if ($posA === FALSE) {
+        $columnTitleOrder[] = $titleA;
+      }
+      if ($posB === FALSE) {
+        $columnTitleOrder[] = $titleB;
+      }
+
+      if ($posA > $posB || $posA === FALSE) {
+        return 1;
+      }
+      if ($posA < $posB || $posB === FALSE) {
+        return -1;
+      }
+
+      return 0;
+    };
+
+    $orderedColumnHeaders = $this->_columnHeaders;
+    uasort($orderedColumnHeaders, $compare);
+
+    $this->_columnHeaders = $orderedColumnHeaders;
   }
 }
 
