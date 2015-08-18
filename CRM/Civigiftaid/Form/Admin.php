@@ -63,8 +63,6 @@ class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
       'uk.co.compucorp.civicrm.giftaid:settings'
     );
 
-    CRM_Core_Invoke::rebuildMenuAndCaches();
-
     CRM_Core_Session::setStatus(ts('Settings saved'), '', 'success');
 
     parent::postProcess();
