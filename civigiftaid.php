@@ -366,6 +366,18 @@ function civigiftaid_civicrm_validate($formName, &$fields, &$files, &$form) {
   }
 }
 
+function civigiftaid_civicrm_giftAidEligible(
+  &$isEligible,
+  $contactId,
+  $date,
+  $contributionId,
+  $contributionAmt
+) {
+  if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+     $isEligible =
+       CRM_Civigiftaid_Utils_Contribution::getContribAmtForEnabledFinanceTypes($contributionId) != 0;
+  }
+}
 
 /**
  * Add navigation for civigiftaid under "Administer" menu
