@@ -122,7 +122,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
               ),
               'quantity'     => array(
                 'name'       => 'qty',
-                'title'      => 'Quantity',
+                'title'      => 'Qty',
                 'no_display' => FALSE,
                 'required'   => TRUE,
                 'type'       => CRM_Utils_Type::T_INT
@@ -363,6 +363,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       'country',
       'postal code',
       'eligible for gift aid?',
+      'qty',
       'line total',
       'gift aid amount',
       'batch name'

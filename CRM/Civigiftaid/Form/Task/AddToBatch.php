@@ -62,7 +62,6 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
     $this->assign('notValidContributions', count($notValid));
 
     // get details of contribution that will be added to this batch.
-    $contributionsAddedRows = array();
     $contributionsAddedRows =
       CRM_Civigiftaid_Utils_Contribution::getContributionDetails($added);
     $this->assign('contributionsAddedRows', $contributionsAddedRows);
