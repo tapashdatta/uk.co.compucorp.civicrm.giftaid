@@ -231,15 +231,15 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @return float|int
    */
   public static function getContribAmtForEnabledFinanceTypes($contributionId) {
-    $enabledTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled();
-    $enabledTypesStr = implode(', ', $enabledTypes);
-
     $sql = "
       SELECT SUM(line_total) total
       FROM civicrm_line_item
       WHERE contribution_id = {$contributionId}";
 
     if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+      $enabledTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled();
+      $enabledTypesStr = implode(', ', $enabledTypes);
+
       // if no financial types are selected, don't return anything from query
       $sql .= $enabledTypesStr
         ? " AND financial_type_id IN ({$enabledTypesStr})"
@@ -545,6 +545,16 @@ class CRM_Civigiftaid_Utils_Contribution {
       ON i.financial_type_id = t.id
       WHERE c.id IN ($contributionIdStr)";
 
+    if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+      $enabledTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled();
+      $enabledTypesStr = implode(', ', $enabledTypes);
+
+      // if no financial types are selected, don't return anything from query
+      $query .= $enabledTypesStr
+        ? " AND i.financial_type_id IN ({$enabledTypesStr})"
+        : " AND 0";
+    }
+
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       if (isset($result[$dao->id])) {
@@ -562,6 +572,10 @@ class CRM_Civigiftaid_Utils_Contribution {
         $result[$dao->id]['line_items'][] = $lineItem;
       }
     }
+  }
+
+  public static function getGiftAidableAmtByContribId() {
+
   }
 
   /**
