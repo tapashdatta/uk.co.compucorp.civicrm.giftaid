@@ -370,8 +370,7 @@ function civigiftaid_civicrm_giftAidEligible(
   &$isEligible,
   $contactId,
   $date,
-  $contributionId,
-  $contributionAmt
+  $contributionId
 ) {
   if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
      $isEligible =
