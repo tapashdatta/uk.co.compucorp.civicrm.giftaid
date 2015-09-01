@@ -151,6 +151,10 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         $this->_columns['civicrm_value_gift_aid_submission']['fields']
         as $field => $values
       ) {
+        if($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'] == 'amount'){
+          unset($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]);
+          continue;
+        }
         $this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['default'] =
           TRUE;
       }
@@ -223,11 +227,6 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         }
       }
     }
-
-    $this->_columnHeaders['custom_gift_aid_amount'] = array(
-      'title' => 'Gift Aid Amount',
-      'type'  => CRM_Utils_Type::T_MONEY
-    );
 
     $this->reorderColumns();
 
