@@ -222,7 +222,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
                                       'id' => $currentDeclaration['id'],
                                       'end_date' => CRM_Utils_Date::isoToMysql($params['start_date']),
                                       );
-                CRM_Civigiftaid_GiftAid::_updateDeclaration( $updateParams );
+                CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
                 CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
             }
 
