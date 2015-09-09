@@ -373,8 +373,10 @@ function civigiftaid_civicrm_giftAidEligible(
   $contributionId
 ) {
   if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+    if($isEligible != 0){
      $isEligible =
        CRM_Civigiftaid_Utils_Contribution::getContribAmtForEnabledFinanceTypes($contributionId) != 0;
+    }
   }
 }
 
