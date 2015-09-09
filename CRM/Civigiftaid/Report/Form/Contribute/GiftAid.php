@@ -151,7 +151,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         $this->_columns['civicrm_value_gift_aid_submission']['fields']
         as $field => $values
       ) {
-        if($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'] == 'amount'){
+        if(in_array($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'], array('amount', 'gift_aid_amount'))){
           unset($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]);
           continue;
         }
@@ -228,6 +228,11 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       }
     }
 
+    $this->_columnHeaders['civicrm_line_item_gift_aid_amount'] = array(
+      'title' => 'Gift Aid Amount',
+      'type'  => CRM_Utils_Type::T_MONEY
+    );
+
     $this->reorderColumns();
 
     $this->_select = "SELECT " . implode(', ', $select) . " ";
@@ -280,7 +285,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
     foreach ($rows as $row) {
       $totalAmount += $row['civicrm_line_item_amount'];
-      $totalGiftAidAmount += $row['custom_gift_aid_amount'];
+      $totalGiftAidAmount += $row['civicrm_line_item_gift_aid_amount'];
     }
 
     $statistics['counts']['amount'] = array(
@@ -324,7 +329,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             ts("View Contact Summary for this Contact.");
         }
         if (isset($row['civicrm_line_item_amount'])) {
-          $rows[$rowNum]['custom_gift_aid_amount'] =
+          $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] =
             CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
               $row['civicrm_line_item_amount']
             );
