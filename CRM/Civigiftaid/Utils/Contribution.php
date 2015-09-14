@@ -560,7 +560,7 @@ class CRM_Civigiftaid_Utils_Contribution {
       if (isset($result[$dao->id])) {
         $item = static::getLineItemName($dao->entity_table);
 
-        $lineItem = [
+        $lineItem = array(
           'item'           => $item,
           'description'    => $dao->label,
           'financial_type' => $dao->name,
@@ -568,7 +568,7 @@ class CRM_Civigiftaid_Utils_Contribution {
             $dao->line_total, $dao->currency
           ),
           'qty'            => (int) $dao->qty,
-        ];
+        );
         $result[$dao->id]['line_items'][] = $lineItem;
       }
     }

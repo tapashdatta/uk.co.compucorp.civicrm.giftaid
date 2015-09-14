@@ -370,7 +370,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
   }
 
   private function reorderColumns() {
-    $columnTitleOrder = [
+    $columnTitleOrder = array(
       'payment no',
       'line item no',
       'donor name',
@@ -387,7 +387,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       'line total',
       'gift aid amount',
       'batch name'
-    ];
+    );
 
     $compare = function ($a, $b) use (&$columnTitleOrder) {
       $titleA = strtolower($a['title']);
