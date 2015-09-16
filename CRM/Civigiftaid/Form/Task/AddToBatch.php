@@ -155,6 +155,9 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
     $batchID = $createdBatch->id;
     $batchLabel = $batchParams['title'];
 
+    // Save current settings for the batch
+    CRM_Civigiftaid_BAO_BatchSettings::create(array('batch_id' => $batchID));
+
     require_once 'CRM/Civigiftaid/Utils/Contribution.php';
     list($total, $added, $notAdded) =
       CRM_Civigiftaid_Utils_Contribution::addContributionToBatch(
