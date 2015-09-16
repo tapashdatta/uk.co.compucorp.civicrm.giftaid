@@ -219,7 +219,38 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_3100() {
+    $this->ctx->log->info('Applying update 3100');
+    $this->executeSqlFile('sql/upgrade_3100.sql');
+    static::importBatches();
 
+    return TRUE;
+  }
+
+  /**
+   * Create default settings for existing batches, for which settings don't already exist.
+   */
+  private static function importBatches() {
+    $sql = "
+      SELECT id
+      FROM civicrm_batch
+      WHERE name LIKE 'GiftAid%'
+    ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    while ($dao->fetch()) {
+      // Only add settings for batches for which settings don't exist already
+      if (CRM_Civigiftaid_BAO_BatchSettings::findByBatchId($dao->id) === FALSE) {
+        // Set globally enabled to TRUE by default, for existing batches
+        CRM_Civigiftaid_BAO_BatchSettings::create(array(
+          'batch_id' => (int) $dao->id,
+          'financial_types_enabled' => array(),
+          'globally_enabled' => TRUE
+        ));
+      }
+    }
+  }
 
   /**
    * Example: Run an external SQL script
@@ -332,6 +363,10 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         $result = civicrm_api('OptionValue', 'create', $params);
       }
     }
+  }
+
+  public static function migrateToThree($ctx) {
+    $ctx->executeSqlFile('sql/upgrade_3100');
   }
 
 }
