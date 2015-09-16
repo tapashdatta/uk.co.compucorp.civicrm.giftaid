@@ -151,7 +151,8 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         $this->_columns['civicrm_value_gift_aid_submission']['fields']
         as $field => $values
       ) {
-        if(in_array($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'], array('amount', 'gift_aid_amount'))){
+        if (in_array($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'],
+          array('amount', 'gift_aid_amount'))) {
           unset($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]);
           continue;
         }
@@ -306,11 +307,13 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * Alter the rows for display
+   *
+   * @param array $rows
+   */
   public function alterDisplay(&$rows) {
-    // custom code to alter rows
-    $checkList = array();
     $entryFound = FALSE;
-    $display_flag = $prev_cid = $cid = 0;
     require_once 'CRM/Contact/DAO/Contact.php';
     foreach ($rows as $rowNum => $row) {
       // handle contribution status id
@@ -343,7 +346,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
         $entryFound = TRUE;
       }
-      
+
       // handle State/Province Codes
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
@@ -365,7 +368,6 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       if (!$entryFound) {
         break;
       }
-      $lastKey = $rowNum;
     }
   }
 
