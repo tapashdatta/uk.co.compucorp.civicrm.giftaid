@@ -53,6 +53,14 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
                 'options'      => CRM_Civigiftaid_Utils_Contribution::getBatchIdTitle('id desc'),
               ),
             ),
+          'fields'  => array(
+            'batch_id' => array(
+              'name'       => 'batch_id',
+              'title'      => 'Batch ID',
+              'no_display' => TRUE,
+              'required'   => TRUE
+            )
+          )
         ),
         'civicrm_contribution'   =>
           array(
@@ -151,7 +159,8 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         $this->_columns['civicrm_value_gift_aid_submission']['fields']
         as $field => $values
       ) {
-        if(in_array($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'], array('amount', 'gift_aid_amount'))){
+        if (in_array($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]['name'],
+          array('amount', 'gift_aid_amount'))) {
           unset($this->_columns['civicrm_value_gift_aid_submission']['fields'][$field]);
           continue;
         }
@@ -263,18 +272,6 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
     else {
       $this->_where .= " AND value_gift_aid_submission_civireport.amount IS NOT NULL";
     }
-
-    if (!CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
-      if ($enabledTypes =
-        CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled()
-      ) {
-        $financialTypeIds = implode(', ', $enabledTypes);
-        $this->_where .= " AND {$this->_aliases['civicrm_financial_type']}.id IN ({$financialTypeIds})";
-      }
-      else {
-        $this->_where .= " AND 0";
-      }
-    }
   }
 
   public function statistics(&$rows) {
@@ -306,13 +303,21 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
     parent::postProcess();
   }
 
+  /**
+   * Alter the rows for display
+   *
+   * @param array $rows
+   */
   public function alterDisplay(&$rows) {
-    // custom code to alter rows
-    $checkList = array();
     $entryFound = FALSE;
-    $display_flag = $prev_cid = $cid = 0;
     require_once 'CRM/Contact/DAO/Contact.php';
     foreach ($rows as $rowNum => $row) {
+      // i.e. remove row from report if it has financial type ineligible for Gift Aid
+      if (FALSE === $this->hasEligibleFinancialType($row)) {
+        unset($rows[$rowNum]);
+        continue;
+      }
+
       // handle contribution status id
       if (array_key_exists('civicrm_contribution_contact_id', $row)) {
         if ($value = $row['civicrm_contribution_contact_id']) {
@@ -343,7 +348,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
         $entryFound = TRUE;
       }
-      
+
       // handle State/Province Codes
       if (array_key_exists('civicrm_address_state_province_id', $row)) {
         if ($value = $row['civicrm_address_state_province_id']) {
@@ -365,8 +370,41 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       if (!$entryFound) {
         break;
       }
-      $lastKey = $rowNum;
     }
+  }
+
+  /**
+   * Return whether a row has financial type eligible for Gift Aid (i.e. has financial type which was enabled as
+   * eligible for Gift Aid, at the time the contribution was added to the batch).
+   *
+   * @param $row
+   *
+   * @return bool
+   */
+  private function hasEligibleFinancialType($row) {
+    // Lazy cache for batches
+    static $batches = array();
+
+    $batchId = $row['civicrm_entity_batch_batch_id'];
+    if (!isset($batches[$batchId])) {
+      if (($batch = CRM_Civigiftaid_BAO_BatchSettings::findByBatchId($batchId)) instanceof CRM_Core_DAO) {
+        $batchArr = $batch->toArray();
+        $batchArr['financial_types_enabled'] = unserialize($batchArr['financial_types_enabled']);
+
+        $batches[$batchId] = $batchArr;
+      }
+      else {
+        $batches[$batchId] = NULL;
+      }
+    }
+
+    if ($batches[$batchId] && !$batches[$batchId]['globally_enabled']) {
+      if (!in_array($row['civicrm_financial_type_financial_type_id'], $batches[$batchId]['financial_types_enabled'])) {
+        return FALSE;
+      }
+    }
+
+    return TRUE;
   }
 
   private function reorderColumns() {
