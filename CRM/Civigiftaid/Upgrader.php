@@ -219,6 +219,25 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     return TRUE;
   }
 
+  /**
+   * @return bool
+   */
+  public function upgrade_3000() {
+    $this->ctx->log->info('Applying update 3000');
+
+    // Add admin settings for the extension, and set globally enabled to TRUE by default
+    $settings = new stdClass();
+    $settings->globally_enabled = 1;
+    $settings->financial_types_enabled = array();
+    CRM_Core_BAO_Setting::setItem(
+      $settings,
+      'Extension',
+      'uk.co.compucorp.civicrm.giftaid:settings'
+    );
+
+    return TRUE;
+  }
+
   public function upgrade_3100() {
     $this->ctx->log->info('Applying update 3100');
     $this->executeSqlFile('sql/upgrade_3100.sql');
