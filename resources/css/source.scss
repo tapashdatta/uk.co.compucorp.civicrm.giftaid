@@ -31,6 +31,20 @@
     }
   }
 
+  .crm-section {
+    .label {
+      margin-right: 1.25rem;
+    }
+
+    .content {
+      .help-text {
+        color: #777;
+        margin-left: 0.5rem;
+        font-size: 0.95em;
+      }
+    }
+  }
+
   .crm-accordion-wrapper {
     margin: 1rem 0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);

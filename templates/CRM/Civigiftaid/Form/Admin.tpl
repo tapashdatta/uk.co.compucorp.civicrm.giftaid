@@ -6,7 +6,10 @@
 
     <div class="crm-section">
         <div class="label">{$form.globally_enabled.label}</div>
-        <div class="content">{$form.globally_enabled.html}</div>
+        <div class="content">
+            {$form.globally_enabled.html}
+            <span class="help-text">Enable gift aid for line items of any financial type</span>
+        </div>
         <div class="clear"></div>
     </div>
 

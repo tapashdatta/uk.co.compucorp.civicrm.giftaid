@@ -26,7 +26,7 @@ class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
   public function buildQuickForm() {
     CRM_Utils_System::setTitle(ts('Gift Aid - Settings'));
 
-    $this->add('checkbox', 'globally_enabled', 'Globally Enabled');
+    $this->add('checkbox', 'globally_enabled', 'Globally Enabled?');
 
     $this->add(
       'select',
