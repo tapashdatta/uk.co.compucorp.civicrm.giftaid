@@ -13,8 +13,8 @@ gulp.task('default', ['css', 'js', 'watch']);
  * Watch
  */
 gulp.task('watch', function () {
-  gulp.watch('client/**/*.scss', ['css']);
-  gulp.watch('client/**/*.js', ['js']);
+  gulp.watch('resources/**/*.scss', ['css']);
+  gulp.watch('resources/**/*.js', ['js']);
 });
 
 /**
