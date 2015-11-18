@@ -62,10 +62,6 @@ abstract class CRM_Civigiftaid_Utils_Hook {
         return self::$_singleton;
     }
 
-    abstract function invoke( $numParams,
-                              &$arg1, &$arg2, &$arg3, &$arg4, &$arg5,
-                              $fnSuffix );
-
     /**
      * This hook allows filtering contributions for gift-aid
      * @param bool    $isEligible eligibilty already detected if getDeclaration() method.
@@ -76,17 +72,25 @@ abstract class CRM_Civigiftaid_Utils_Hook {
      * @access public
      */
     static function giftAidEligible( &$isEligible, $contactID, $date = null, $contributionID = null ) {
-		return self::singleton( )->invoke( 4, $isEligible, $contactID, $date, $contributionID, self::$_nullObject, 'civicrm_giftAidEligible' );
+		return self::versionSwitcher(4, $isEligible, $contactID, $date, $contributionID, self::$_nullObject, 'civicrm_giftAidEligible' );
     }
 
     /**
      * This hook allows doing any extra processing for contributions that are added to a batch.
-     * @param $contributionsAdded  contribution ids that have been batched
      *
      * @access public
      */
+
+  /**
+   * This hook allows doing any extra processing for contributions that are added to a batch.
+   *
+   * @param       $batchID
+   * @param array $contributionsAdded Contribution ids that have been batched
+   *
+   * @return mixed
+   */
     static function batchContributions( $batchID, $contributionsAdded ) {
-		return self::singleton( )->invoke( 2, $batchID, $contributionsAdded, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_batchContributions' );
+		return self::versionSwitcher( 2, $batchID, $contributionsAdded, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_batchContributions' );
     }
 
     /**
@@ -97,6 +101,22 @@ abstract class CRM_Civigiftaid_Utils_Hook {
      * @access public
      */
     static function alterDeclarationQuery( &$query, &$queryParams ) {
-		return self::singleton( )->invoke( 2, $query, $queryParams, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_alterDeclarationQuery' );
+		return self::versionSwitcher( 2, $query, $queryParams, self::$_nullObject, self::$_nullObject, self::$_nullObject, 'civicrm_alterDeclarationQuery' );
+    }
+
+    /*
+     *
+     */
+    static function versionSwitcher($numParams, &$arg1, &$arg2, &$arg3, &$arg4, &$arg6, $fnSuffix, &$arg5 = NULL){
+      $version = CRM_Utils_System::version();
+      preg_match('/4\.[0-9]\.[0-9]/', $version, $matches);
+      $versionNum = str_replace(".","",array_pop($matches));
+      if ($versionNum >= 450){
+        return self::singleton()->invoke($numParams, $arg1, $arg2, $arg3, $arg4, $arg5, $arg6, $fnSuffix);
+      }
+      else {
+        return self::singleton()->invoke($numParams, $arg1, $arg2, $arg3, $arg4, $arg6, $fnSuffix);
+      }
+
     }
 }

@@ -57,12 +57,16 @@ class CRM_Civigiftaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task
     parent::preProcess( );
 
       require_once 'CRM/Civigiftaid/Utils/Contribution.php';
-      list( $total, $toRemove, $notInBatch, $alreadySubmited) = CRM_Civigiftaid_Utils_Contribution::_validationRemoveContributionFromBatch( $this->_contributionIds );
+      list( $total, $toRemove, $notInBatch, $alreadySubmited) = CRM_Civigiftaid_Utils_Contribution::validationRemoveContributionFromBatch( $this->_contributionIds );
 
       $this->assign('selectedContributions', $total);
       $this->assign('totalToRemoveContributions', count($toRemove));
       $this->assign('notInBatchContributions', count($notInBatch));
       $this->assign('alreadySubmitedContributions', count($alreadySubmited));
+      $this->assign(
+        'onlineSubmissionExtensionInstalled',
+        CRM_Civigiftaid_Utils_Contribution::isOnlineSubmissionExtensionInstalled()
+      );
 
       $contributionsToRemoveRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails ( $toRemove );
       $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows );

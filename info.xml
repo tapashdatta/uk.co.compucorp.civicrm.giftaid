@@ -9,21 +9,20 @@
   </description>
   <urls>
     <url desc="Main Extension Page">http://civicrm.org/extensions/gift-aid-extension-uk</url>
-    <url desc="Documentation">https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid</url>
+    <url desc="Documentation">https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid</url>
     <url desc="Support">http://forum.civicrm.org</url>
     <url desc="Licensing">http://civicrm.org/licensing</url>
   </urls>
   <license>AGPL</license>
   <maintainer>
-    <author>Erawat Chamanont, Jamie Novick</author>
-    <email>erawat@compucorp.co.uk, jamie@compucorp.co.uk</email>
+    <author>Erawat Chamanont, Jamie Novick, Guanhuan Chen</author>
+    <email>jamie@compucorp.co.uk, guanhuan@compucorp.co.uk</email>
   </maintainer>
-  <releaseDate>2013-11-12</releaseDate>
-  <version>2.2</version>
-  <develStage>stable</develStage>
+  <releaseDate>2015-11-18</releaseDate>
+  <version>3.0</version>
+  <develStage>alpha</develStage>
   <compatibility>
-    <ver>4.3</ver>
-    <ver>4.4</ver>
+    <ver>4.x</ver>
   </compatibility>
   <comments>For support, please contact project team on the forums. (http://forum.civicrm.org) or create a new issue on https://github.com/Compucorp/uk.co.compucorp.civicrm.giftaid/issues
   </comments>

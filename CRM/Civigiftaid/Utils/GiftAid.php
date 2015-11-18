@@ -87,7 +87,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
                             );
         // allow query to be modified via hook
         CRM_Civigiftaid_Utils_Hook::alterDeclarationQuery( $sql, $sqlParams );
-
         $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
         if ( $dao->fetch() ) {
             $currentDeclaration['id'] = $dao->id;
@@ -223,7 +222,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
                                       'id' => $currentDeclaration['id'],
                                       'end_date' => CRM_Utils_Date::isoToMysql($params['start_date']),
                                       );
-                CRM_Civigiftaid_GiftAid::_updateDeclaration( $updateParams );
+                CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
                 CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
             }
 

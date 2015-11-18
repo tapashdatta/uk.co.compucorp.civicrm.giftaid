@@ -1,0 +1,1 @@
+<xi:include href="CRM/BatchSettings/files.xml"         parse="xml" />
