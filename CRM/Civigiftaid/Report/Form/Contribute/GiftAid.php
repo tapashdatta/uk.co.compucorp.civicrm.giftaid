@@ -343,7 +343,8 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         if (isset($row['civicrm_line_item_amount'])) {
           $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] =
             CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
-              $row['civicrm_line_item_amount']
+              $row['civicrm_line_item_amount'],
+              CRM_Civigiftaid_Utils_Contribution::getBasicTaxRate()
             );
         }
         if (!empty($row['civicrm_line_item_entity_table'])) {
