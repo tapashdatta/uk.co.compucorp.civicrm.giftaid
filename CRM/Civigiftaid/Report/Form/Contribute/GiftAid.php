@@ -40,6 +40,13 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
   protected $_addressField = FALSE;
   protected $_customGroupExtends = array('Contribution');
 
+  /**
+   * Lazy cache for storing processed batches.
+   *
+   * @var array
+   */
+  private static $batches = array();
+
   public function __construct() {
     $this->_columns =
       array(
@@ -382,29 +389,36 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
    * @return bool
    */
   private function hasEligibleFinancialType($row) {
-    // Lazy cache for batches
-    static $batches = array();
-
-    $batchId = $row['civicrm_entity_batch_batch_id'];
-    if (!isset($batches[$batchId])) {
-      if (($batch = CRM_Civigiftaid_BAO_BatchSettings::findByBatchId($batchId)) instanceof CRM_Core_DAO) {
-        $batchArr = $batch->toArray();
-        $batchArr['financial_types_enabled'] = unserialize($batchArr['financial_types_enabled']);
-
-        $batches[$batchId] = $batchArr;
-      }
-      else {
-        $batches[$batchId] = NULL;
-      }
-    }
-
-    if ($batches[$batchId] && !$batches[$batchId]['globally_enabled']) {
-      if (!in_array($row['civicrm_financial_type_financial_type_id'], $batches[$batchId]['financial_types_enabled'])) {
+    if (($batch = $this->getBatchById($row['civicrm_entity_batch_batch_id'])) && !$batch['globally_enabled']) {
+      if (!in_array($row['civicrm_financial_type_financial_type_id'], $batch['financial_types_enabled'])) {
         return FALSE;
       }
     }
 
     return TRUE;
+  }
+
+  /**
+   * Get a batch by ID.
+   *
+   * @param $id
+   *
+   * @return mixed
+   */
+  private function getBatchById($id) {
+    if (!isset(self::$batches[$id])) {
+      if (($batch = CRM_Civigiftaid_BAO_BatchSettings::findByBatchId($id)) instanceof CRM_Core_DAO) {
+        $batchArr = $batch->toArray();
+        $batchArr['financial_types_enabled'] = unserialize($batchArr['financial_types_enabled']);
+
+        self::$batches[$id] = $batchArr;
+      }
+      else {
+        self::$batches[$id] = NULL;
+      }
+    }
+
+    return self::$batches[$id];
   }
 
   private function reorderColumns() {
