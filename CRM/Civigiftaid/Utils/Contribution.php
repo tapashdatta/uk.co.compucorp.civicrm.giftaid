@@ -129,7 +129,7 @@ class CRM_Civigiftaid_Utils_Contribution {
         );
 
         // get gift aid amount
-        $giftAidAmount = static::calculateGiftAidAmt($giftAidableContribAmt, static::getBasicTaxRate());
+        $giftAidAmount = static::calculateGiftAidAmt($giftAidableContribAmt, static::getBasicRateTax());
 
         // FIXME: check if there is customTable method
         $query = "
@@ -258,23 +258,19 @@ class CRM_Civigiftaid_Utils_Contribution {
 
   /**
    * This function calculate the gift aid amount.
-   * Formula used is: (basic rate of year * contributed amount) / (100 - basic rate of year)
+   * Formula used is: (contributed amount * basic rate of year) / (100 - basic rate of year)
+   * E.g. For a donation of £100 and basic rate of tax of 20%, gift aid amount = £100 * 20 / 80. In other words, £25
+   * for every £100, or 25p for every £1.
+   *
    * TODO: Move to utils.
    *
    * @param $contribAmt
    * @param $basicTaxRate
    *
    * @return float
-   * @throws \CRM_Extension_Exception
    */
   public static function calculateGiftAidAmt($contribAmt, $basicTaxRate) {
-    if (is_null($basicTaxRate) || $basicTaxRate === '') {
-      throw new CRM_Extension_Exception(
-        'Basic Tax Rate not currently set! Please set it in the Gift Aid extension settings.'
-      );
-    }
-
-    return (((float) $basicTaxRate * $contribAmt) / (100 - (float) $basicTaxRate));
+    return (($contribAmt * $basicTaxRate) / (100 - $basicTaxRate));
   }
 
   /**
@@ -283,9 +279,10 @@ class CRM_Civigiftaid_Utils_Contribution {
    * TODO: Move to utils.
    *
    * @return mixed
+   * @throws \CRM_Extension_Exception
    */
-  public static function getBasicTaxRate() {
-    $rate = null;
+  public static function getBasicRateTax() {
+    $rate = NULL;
 
     $gResult = civicrm_api(
       'OptionGroup',
@@ -312,7 +309,13 @@ class CRM_Civigiftaid_Utils_Contribution {
       }
     }
 
-    return $rate;
+    if (is_null($rate)) {
+      throw new CRM_Extension_Exception(
+        'Basic Tax Rate not currently set! Please set it in the Gift Aid extension settings.'
+      );
+    }
+
+    return (float) $rate;
   }
 
   /**

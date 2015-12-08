@@ -341,10 +341,11 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             ts("View Contact Summary for this Contact.");
         }
         if (isset($row['civicrm_line_item_amount'])) {
+          $batch = $this->getBatchById($row['civicrm_entity_batch_batch_id']);
           $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] =
             CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
               $row['civicrm_line_item_amount'],
-              CRM_Civigiftaid_Utils_Contribution::getBasicTaxRate()
+              $batch['basic_rate_tax']
             );
         }
         if (!empty($row['civicrm_line_item_entity_table'])) {
@@ -390,10 +391,11 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
    * @return bool
    */
   private function hasEligibleFinancialType($row) {
-    if (($batch = $this->getBatchById($row['civicrm_entity_batch_batch_id'])) && !$batch['globally_enabled']) {
-      if (!in_array($row['civicrm_financial_type_financial_type_id'], $batch['financial_types_enabled'])) {
-        return FALSE;
-      }
+    if ((!$batch = $this->getBatchById($row['civicrm_entity_batch_batch_id']))
+      || (!$batch['globally_enabled']
+        && !in_array($row['civicrm_financial_type_financial_type_id'], $batch['financial_types_enabled']))
+    ) {
+      return FALSE;
     }
 
     return TRUE;

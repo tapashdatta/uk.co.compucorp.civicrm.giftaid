@@ -50,4 +50,12 @@
     <add>4.4</add>
   </field>
 
+  <field>
+    <name>basic_rate_tax</name>
+    <type>decimal(4,2)</type>
+    <title>Basic Rate Tax</title>
+    <comment>Basic rate tax for the batch.</comment>
+    <add>4.4</add>
+  </field>
+
 </table>

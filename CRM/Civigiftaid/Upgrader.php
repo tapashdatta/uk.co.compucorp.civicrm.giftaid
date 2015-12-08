@@ -231,13 +231,16 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
    * Create default settings for existing batches, for which settings don't already exist.
    */
   private static function importBatches() {
-    $sql = "
+    $sql = /** @lang MySQL */
+      "
       SELECT id
       FROM civicrm_batch
       WHERE name LIKE 'GiftAid%'
     ";
 
     $dao = CRM_Core_DAO::executeQuery($sql);
+
+    $basicRateTax = CRM_Civigiftaid_Utils_Contribution::getBasicRateTax();
 
     while ($dao->fetch()) {
       // Only add settings for batches for which settings don't exist already
@@ -246,7 +249,8 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         CRM_Civigiftaid_BAO_BatchSettings::create(array(
           'batch_id' => (int) $dao->id,
           'financial_types_enabled' => array(),
-          'globally_enabled' => TRUE
+          'globally_enabled' => TRUE,
+          'basic_rate_tax' => $basicRateTax
         ));
       }
     }
