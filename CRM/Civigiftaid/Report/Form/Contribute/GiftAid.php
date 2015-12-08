@@ -354,6 +354,9 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
               $row['civicrm_line_item_entity_table']
             );
         }
+        if (isset($row['civicrm_line_item_quantity'])) {
+          $rows[$rowNum]['civicrm_line_item_quantity'] = (int) $row['civicrm_line_item_quantity'];
+        }
 
         $entryFound = TRUE;
       }
