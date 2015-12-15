@@ -49,6 +49,9 @@ class CRM_Civigiftaid_BAO_BatchSettings extends CRM_Civigiftaid_DAO_BatchSetting
     if (!isset($params['globally_enabled'])) {
       $params['globally_enabled'] = CRM_Civigiftaid_Form_Admin::isGloballyEnabled();
     }
+    if (!isset($params['basic_rate_tax'])) {
+      $params['basic_rate_tax'] = CRM_Civigiftaid_Utils_Contribution::getBasicRateTax();
+    }
   }
 
   private static function preProcessParams(&$params) {

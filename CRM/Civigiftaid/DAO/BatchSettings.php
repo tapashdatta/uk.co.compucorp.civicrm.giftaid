@@ -105,6 +105,12 @@ class CRM_Civigiftaid_DAO_BatchSettings extends CRM_Core_DAO
    */
   public $globally_enabled;
   /**
+   * Basic rate tax for the batch.
+   *
+   * @var boolean
+   */
+  public $basic_rate_tax;
+  /**
    * class constructor
    *
    * @return civicrm_civigiftaid_batchsettings
@@ -161,6 +167,12 @@ class CRM_Civigiftaid_DAO_BatchSettings extends CRM_Core_DAO
           'title' => ts('Globally Enabled') ,
           'description' => 'Globally enabled for this batch',
         ) ,
+        'basic_rate_tax' => array(
+          'name' => 'basic_rate_tax',
+          'type' => CRM_Utils_Type::T_FLOAT,
+          'title' => ts('Basic Rate Tax') ,
+          'description' => 'Basic rate tax for the batch.',
+        ) ,
       );
     }
     return self::$_fields;
@@ -179,6 +191,7 @@ class CRM_Civigiftaid_DAO_BatchSettings extends CRM_Core_DAO
         'batch_id' => 'batch_id',
         'financial_types_enabled' => 'financial_types_enabled',
         'globally_enabled' => 'globally_enabled',
+        'basic_rate_tax' => 'basic_rate_tax',
       );
     }
     return self::$_fieldKeys;

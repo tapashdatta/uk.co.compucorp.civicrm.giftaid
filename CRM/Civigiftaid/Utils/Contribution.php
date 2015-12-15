@@ -129,7 +129,7 @@ class CRM_Civigiftaid_Utils_Contribution {
         );
 
         // get gift aid amount
-        $giftAidAmount = static::calculateGiftAidAmt($giftAidableContribAmt);
+        $giftAidAmount = static::calculateGiftAidAmt($giftAidableContribAmt, static::getBasicRateTax());
 
         // FIXME: check if there is customTable method
         $query = "
@@ -257,19 +257,39 @@ class CRM_Civigiftaid_Utils_Contribution {
   }
 
   /**
-   * This function calculate the gift aid amount
-   * Formula used is: (basic rate of year*contributed amount)/(100-basic rate of year)
+   * This function calculate the gift aid amount.
+   * Formula used is: (contributed amount * basic rate of year) / (100 - basic rate of year)
+   * E.g. For a donation of £100 and basic rate of tax of 20%, gift aid amount = £100 * 20 / 80. In other words, £25
+   * for every £100, or 25p for every £1.
    *
-   * @param $contributionAmount
+   * TODO: Move to utils.
+   *
+   * @param $contribAmt
+   * @param $basicTaxRate
    *
    * @return float
    */
-  public static function calculateGiftAidAmt($contributionAmount) {
+  public static function calculateGiftAidAmt($contribAmt, $basicTaxRate) {
+    return (($contribAmt * $basicTaxRate) / (100 - $basicTaxRate));
+  }
+
+  /**
+   * Get the basic tax rate currently defined in the settings.
+   * TODO: Cache result.
+   * TODO: Move to utils.
+   *
+   * @return mixed
+   * @throws \CRM_Extension_Exception
+   */
+  public static function getBasicRateTax() {
+    $rate = NULL;
+
     $gResult = civicrm_api(
       'OptionGroup',
       'getsingle',
       array('version' => 3, 'name' => 'giftaid_basic_rate_tax')
     );
+
     if ($gResult['id']) {
       $params = array(
         'version'         => 3,
@@ -277,20 +297,25 @@ class CRM_Civigiftaid_Utils_Contribution {
         'option_group_id' => $gResult['id'],
         'name'            => 'basic_rate_tax',
       );
+
       $result = civicrm_api('OptionValue', 'get', $params);
+
       if ($result['values']) {
-        $basicRate = NULL;
         foreach ($result['values'] as $ov) {
-          if ($result['id'] == $ov['id']) {
-            $basicRate = $ov['value'];
+          if ($result['id'] == $ov['id'] && $ov['value'] !== '') {
+            $rate = $ov['value'];
           }
         }
       }
     }
 
-    //$basicRate = CIVICRM_GIFTAID_PERCENTAGE;
-    //return (($contributionAmount * $basicRate) / 100);
-    return (($basicRate * $contributionAmount) / (100 - $basicRate));
+    if (is_null($rate)) {
+      throw new CRM_Extension_Exception(
+        'Basic Tax Rate not currently set! Please set it in the Gift Aid extension settings.'
+      );
+    }
+
+    return (float) $rate;
   }
 
   /**
