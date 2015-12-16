@@ -115,6 +115,8 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     if ($reportClass->find(TRUE)) {
       $reportClass->delete();
     }
+
+    $this->unsetSettings();
   }
 
   /**
@@ -372,6 +374,17 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
       'Extension',
       $this->getExtensionKey() . ':settings'
     );
+  }
+
+  /**
+   * Remove the admin settings for the extension.
+   *
+   * @throws \CRM_Extension_Exception
+   */
+  private function unsetSettings() {
+    $settingName = $this->getExtensionKey() . ':settings';
+
+    CRM_Core_BAO_Setting::executeQuery("DELETE FROM civicrm_setting WHERE name = '{$settingName}'");
   }
 
   /**
