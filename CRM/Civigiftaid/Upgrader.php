@@ -63,6 +63,8 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         $result = civicrm_api('OptionValue', 'create', $params);
       }
     }
+
+    $this->upgrade_3000();
   }
 
   /**
@@ -114,6 +116,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
       $reportClass->delete();
     }
 
+    $this->unsetSettings();
   }
 
   /**
@@ -208,71 +211,35 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   }
 
   /**
-   * Run a update schema
+   * Perform upgrade to version 2.1
    *
    * @return TRUE on success
    * @throws Exception
    */
   public function upgrade_2100() {
-    $this->ctx->log->info('Applying update 2100');
+    $this->log('Applying update 2100');
     self::removeLegacyRegisteredReport();
     return TRUE;
   }
 
   /**
+   * Perform upgrade to version 3.0
+   *
    * @return bool
    */
   public function upgrade_3000() {
-    $this->ctx->log->info('Applying update 3000');
+    $this->log('Applying update 3000');
 
-    // Add admin settings for the extension, and set globally enabled to TRUE by default
-    $settings = new stdClass();
-    $settings->globally_enabled = 1;
-    $settings->financial_types_enabled = array();
-    CRM_Core_BAO_Setting::setItem(
-      $settings,
-      'Extension',
-      'uk.co.compucorp.civicrm.giftaid:settings'
-    );
+    // Set default settings.
+    $this->setDefaultSettings();
 
-    return TRUE;
-  }
+    // Create database schema.
+    $this->executeSqlFile('sql/upgrade_3000.sql');
 
-  public function upgrade_3100() {
-    $this->ctx->log->info('Applying update 3100');
-    $this->executeSqlFile('sql/upgrade_3100.sql');
+    // Import existing batches.
     static::importBatches();
 
     return TRUE;
-  }
-
-  /**
-   * Create default settings for existing batches, for which settings don't already exist.
-   */
-  private static function importBatches() {
-    $sql = /** @lang MySQL */
-      "
-      SELECT id
-      FROM civicrm_batch
-      WHERE name LIKE 'GiftAid%'
-    ";
-
-    $dao = CRM_Core_DAO::executeQuery($sql);
-
-    $basicRateTax = CRM_Civigiftaid_Utils_Contribution::getBasicRateTax();
-
-    while ($dao->fetch()) {
-      // Only add settings for batches for which settings don't exist already
-      if (CRM_Civigiftaid_BAO_BatchSettings::findByBatchId($dao->id) === FALSE) {
-        // Set globally enabled to TRUE by default, for existing batches
-        CRM_Civigiftaid_BAO_BatchSettings::create(array(
-          'batch_id' => (int) $dao->id,
-          'financial_types_enabled' => array(),
-          'globally_enabled' => TRUE,
-          'basic_rate_tax' => $basicRateTax
-        ));
-      }
-    }
   }
 
   /**
@@ -392,4 +359,81 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     $ctx->executeSqlFile('sql/upgrade_3100');
   }
 
+  /**
+   * Set the default admin settings for the extension.
+   */
+  private function setDefaultSettings() {
+    $settings = new stdClass();
+
+    // Set 'Globally Enabled' by default
+    $settings->globally_enabled = 1;
+    $settings->financial_types_enabled = array();
+
+    CRM_Core_BAO_Setting::setItem(
+      $settings,
+      'Extension',
+      $this->getExtensionKey() . ':settings'
+    );
+  }
+
+  /**
+   * Remove the admin settings for the extension.
+   *
+   * @throws \CRM_Extension_Exception
+   */
+  private function unsetSettings() {
+    $settingName = $this->getExtensionKey() . ':settings';
+
+    CRM_Core_BAO_Setting::executeQuery("DELETE FROM civicrm_setting WHERE name = '{$settingName}'");
+  }
+
+  /**
+   * Create default settings for existing batches, for which settings don't already exist.
+   */
+  private static function importBatches() {
+    $sql = /** @lang MySQL */
+      "
+      SELECT id
+      FROM civicrm_batch
+      WHERE name LIKE 'GiftAid%'
+    ";
+
+    $dao = CRM_Core_DAO::executeQuery($sql);
+
+    $basicRateTax = CRM_Civigiftaid_Utils_Contribution::getBasicRateTax();
+
+    while ($dao->fetch()) {
+      // Only add settings for batches for which settings don't exist already
+      if (CRM_Civigiftaid_BAO_BatchSettings::findByBatchId($dao->id) === FALSE) {
+        // Set globally enabled to TRUE by default, for existing batches
+        CRM_Civigiftaid_BAO_BatchSettings::create(array(
+          'batch_id' => (int) $dao->id,
+          'financial_types_enabled' => array(),
+          'globally_enabled' => TRUE,
+          'basic_rate_tax' => $basicRateTax
+        ));
+      }
+    }
+  }
+
+  /**
+   * @return string
+   * @throws \CRM_Extension_Exception
+   * @throws \CRM_Extension_Exception_ParseException
+   */
+  private function getExtensionKey() {
+    $info = CRM_Extension_Info::loadFromFile(__DIR__ . '/../../info.xml');
+
+    if (empty($info->key)) {
+      throw new CRM_Extension_Exception('Extension key not found for Gift Aid extension');
+    }
+
+    return $info->key;
+  }
+
+  private function log($message) {
+    if (is_object($this->ctx) && method_exists($this->ctx, 'info')) {
+      $this->ctx->log->info($message);
+    }
+  }
 }
