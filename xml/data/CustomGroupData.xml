@@ -13,7 +13,13 @@
       <label>Reason Ended</label>
       <is_active>1</is_active>
     </OptionGroup>
-    </OptionGroups>
+    <OptionGroup>
+      <name>eligibility_declaration_options</name>
+      <title>Eligibility Declaration Options</title>
+      <label>Eligibility Declaration Options</label>
+      <is_active>1</is_active>
+    </OptionGroup>
+  </OptionGroups>
     <OptionGroups>
     <OptionGroup>
       <title>The GiftAid basic rate tax</title>
@@ -22,7 +28,40 @@
       <is_active>1</is_active>
     </OptionGroup>
     </OptionGroups>
-    <OptionValues>
+      <OptionValues>
+        <OptionValue>
+        <label>Yes</label>
+        <value>1</value>
+        <name>eligible_for_giftaid</name>
+        <is_default>0</is_default>
+        <weight>1</weight>
+        <is_optgroup>0</is_optgroup>
+        <is_reserved>0</is_reserved>
+        <is_active>1</is_active>
+        <option_group_name>eligibility_declaration_options</option_group_name>
+      </OptionValue>
+      <OptionValue>
+        <label>No</label>
+        <value>2</value>
+        <name>not_eligible_for_giftaid</name>
+        <is_default>0</is_default>
+        <weight>2</weight>
+        <is_optgroup>0</is_optgroup>
+        <is_reserved>0</is_reserved>
+        <is_active>1</is_active>
+        <option_group_name>eligibility_declaration_options</option_group_name>
+      </OptionValue>
+      <OptionValue>
+        <label>Yes, in the Past 4 Years</label>
+        <value>3</value>
+        <name>past_four_years</name>
+        <is_default>0</is_default>
+        <weight>3</weight>
+        <is_optgroup>0</is_optgroup>
+        <is_reserved>0</is_reserved>
+        <is_active>1</is_active>
+        <option_group_name>eligibility_declaration_options</option_group_name>
+      </OptionValue>
       <OptionValue>
         <label>Contact Declined</label>
         <value>Contact Declined</value>
@@ -253,7 +292,7 @@
     <CustomField>
       <name>Eligible_for_Gift_Aid</name>
       <label>Eligible for Gift Aid?</label>
-      <data_type>Boolean</data_type>
+      <data_type>String</data_type>
       <html_type>Radio</html_type>
       <is_required>1</is_required>
       <is_searchable>1</is_searchable>
@@ -266,6 +305,7 @@
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
       <column_name>eligible_for_gift_aid</column_name>
+      <option_group_name>eligibility_declaration_options</option_group_name>
       <custom_group_name>Gift_Aid</custom_group_name>
     </CustomField>
     <CustomField>
