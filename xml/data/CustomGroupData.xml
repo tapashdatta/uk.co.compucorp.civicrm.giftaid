@@ -42,7 +42,7 @@
       </OptionValue>
       <OptionValue>
         <label>No</label>
-        <value>2</value>
+        <value>0</value>
         <name>not_eligible_for_giftaid</name>
         <is_default>0</is_default>
         <weight>2</weight>
