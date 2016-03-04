@@ -243,33 +243,33 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     return TRUE;
   }
 
-    /*
-     * Set up Past Year Submissions Job
-     */
-    public function upgrade_3001()
-    {
-      $this->log('Applying update 3001');
+  /*
+   * Set up Past Year Submissions Job
+   */
+  public function upgrade_3001()
+  {
+    $this->log('Applying update 3001');
 
+    $dao = new CRM_Core_DAO_Job();
+    $dao->api_entity = 'gift_aid';
+    $dao->api_action = 'makepastyearsubmissions';
+    $dao->find(TRUE);
+    if (!$dao->id)
+    {
       $dao = new CRM_Core_DAO_Job();
+      $dao->domain_id = CRM_Core_Config::domainID();
+      $dao->run_frequency = 'Daily';
+      $dao->parameters = null;
+      $dao->name = 'Make Past Year Submissions';
+      $dao->description = 'Make Past Year Submissions';
       $dao->api_entity = 'gift_aid';
       $dao->api_action = 'makepastyearsubmissions';
-      $dao->find(TRUE);
-      if (!$dao->id)
-      {
-        $dao = new CRM_Core_DAO_Job();
-        $dao->domain_id = CRM_Core_Config::domainID();
-        $dao->run_frequency = 'Daily';
-        $dao->parameters = null;
-        $dao->name = 'Make Past Year Submissions';
-        $dao->description = 'Make Past Year Submissions';
-        $dao->api_entity = 'gift_aid';
-        $dao->api_action = 'makepastyearsubmissions';
-        $dao->is_active = 0;
-        $dao->save();
-      }
-        
-      return TRUE;
+      $dao->is_active = 0;
+      $dao->save();
     }
+
+    return TRUE;
+  }
 
   /**
    * Example: Run an external SQL script
