@@ -78,7 +78,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         // - if > 1, pick latest end_date
         $currentDeclaration = array();
         $sql = "
-        SELECT id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
+        SELECT id, entity_id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
         FROM   civicrm_value_gift_aid_declaration
         WHERE  entity_id = %1 AND start_date <= %2 AND (end_date > %2 OR end_date IS NULL) {$charityClause}
         ORDER BY end_date DESC";
@@ -90,6 +90,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
         if ( $dao->fetch() ) {
             $currentDeclaration['id'] = $dao->id;
+            $currentDeclaration['entity_id'] = $dao->entity_id;
             $currentDeclaration['eligible_for_gift_aid'] = $dao->eligible_for_gift_aid;
             $currentDeclaration['start_date'] = $dao->start_date;
             $currentDeclaration['end_date'] = $dao->end_date;
@@ -331,5 +332,78 @@ class CRM_Civigiftaid_Utils_GiftAid {
         }
 
         $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
+    }
+
+    static function getContactsWithDeclarations() {
+      $contactsWithPastDeclarations = array();
+      $sql = "
+        SELECT id, eligible_for_gift_aid, entity_id
+        FROM   civicrm_value_gift_aid_declaration
+        GROUP BY entity_id";
+
+      $dao = CRM_Core_DAO::executeQuery( $sql );
+      foreach($dao->fetchAll() as $row){
+        $contactsWithDeclarations[] = $row['entity_id'];
+      }
+
+      return $contactsWithDeclarations;
+    }
+
+    static function getCurrentDeclarations($contacts, $date = null, $charity = null) {
+      $currentDeclarations = array();
+
+      foreach($contacts as $contactId) {
+        $currentDeclarations[] = self::getDeclaration($contactId);
+      }
+
+      return $currentDeclarations;
+    }
+
+    static function setSubmission( $params ) {
+      // Insert
+        $sql = "
+        INSERT INTO civicrm_value_gift_aid_submission (entity_id, eligible_for_gift_aid, amount, gift_aid_amount, batch_name)
+        VALUES (%1, %2, NULL, NULL, NULL)";
+        $queryParams = array(
+                             1 => array($params['entity_id'], 'Integer'),
+                             2 => array($params['eligible_for_gift_aid'], 'Integer'),
+                             );
+        $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
+    }
+
+    static function getEnabledFinancialTypeContributions($contactIds = array(), $limit = 100) {
+      if(CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+        $result = civicrm_api3('Contribution', 'get', array(
+          'sequential' => 1,
+          'return' => "financial_type_id,id",
+          'contact_id' => $contactIds,
+          'options' => array('limit' => $limit),
+          'id' => array('NOT IN' => self::submittedContributions()),
+        ));
+      }else if($financialTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled()) {
+        $result = civicrm_api3('Contribution', 'get', array(
+          'sequential' => 1,
+          'return' => "financial_type_id,id",
+          'contact_id' => $contactIds,
+          'financial_type_id' => $financialTypes,
+          'options' => array('limit' => $limit),
+          'id' => array('NOT IN' => self::submittedContributions()),
+        ));
+      }
+      return $result['values'];
+    }
+
+    static function submittedContributions() {
+      $submittedContributions = array();
+      $sql = "
+        SELECT entity_id
+        FROM   civicrm_value_gift_aid_submission";
+
+      $dao = CRM_Core_DAO::executeQuery( $sql );
+      foreach($dao->fetchAll() as $row){
+        $submittedContributions[] = $row['entity_id'];
+      }
+
+      return $submittedContributions;
     }
 }
