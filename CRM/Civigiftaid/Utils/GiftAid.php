@@ -371,23 +371,52 @@ class CRM_Civigiftaid_Utils_GiftAid {
         $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
     }
 
-    static function getEnabledFinancialTypeContributions($contactIds = array(), $limit = 100) {
+    static function getContributionsByDeclarations($declarations = array(), $limit = 100) {
+      $contributionsToSubmit = array();
+
+      foreach($declarations as $declaration) {
+        $dateRange = array();
+
+        $contactId = $declaration['entity_id'];
+        $startDate = $declaration['start_date'];
+        $dateRange[0] = self::dateFourYearsAgo($startDate);
+        $dateRange[1] = $startDate;
+        $contributions = self::getContributionsByDateRange($contactId, $dateRange);
+        $contributionsToSubmit = array_merge($contributions, $contributionsToSubmit);
+
+        if(count($contributionsToSubmit) >= $limit) {
+          $contributionsToSubmit = array_slice($contributionsToSubmit, 0, $limit);
+          break;
+        }
+      }
+      return $contributionsToSubmit;
+    }
+
+    static function dateFourYearsAgo($startDate) {
+      $date = new DateTime($startDate);
+      $dateFourYearsAgo = $date->modify('-4 year')->format('Y-m-d H:i:s');
+      return $dateFourYearsAgo;
+    }
+
+    static function getContributionsByDateRange($contactId, $dateRange) {
       if(CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
         $result = civicrm_api3('Contribution', 'get', array(
           'sequential' => 1,
           'return' => "financial_type_id,id",
-          'contact_id' => $contactIds,
-          'options' => array('limit' => $limit),
+          'contact_id' => $contactId,
           'id' => array('NOT IN' => self::submittedContributions()),
+          'receive_date' => array('BETWEEN' => $dateRange),
         ));
       }else if($financialTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled()) {
         $result = civicrm_api3('Contribution', 'get', array(
           'sequential' => 1,
           'return' => "financial_type_id,id",
-          'contact_id' => $contactIds,
+          'contact_id' => $contactId,
           'financial_type_id' => $financialTypes,
-          'options' => array('limit' => $limit),
           'id' => array('NOT IN' => self::submittedContributions()),
+          'receive_date' => array(
+              'BETWEEN' => array($dateRange),
+          ),
         ));
       }
       return $result['values'];

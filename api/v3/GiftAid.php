@@ -13,17 +13,16 @@ function civicrm_api3_gift_aid_makepastyearsubmissions($params) {
   foreach($currentDeclarations as $currentDeclaration) {
     if($currentDeclaration['eligible_for_gift_aid'] == 3){
       $currentWithPastYearOption[] = $currentDeclaration;
-      $contactIds[] = $currentDeclaration['entity_id'];
     }
   }
 
   // select all contributions which are not submissions and with eligible financial type
-  $eligibleFinancialTypeContributions =
-          CRM_Civigiftaid_Utils_GiftAid::getEnabledFinancialTypeContributions($contactIds, 100);
+  $contributionsToSubmit =
+          CRM_Civigiftaid_Utils_GiftAid::getContributionsByDeclarations($currentWithPastYearOption, 100);
 
   // make submissions
-  if(!empty($eligibleFinancialTypeContributions)) {
-    foreach($eligibleFinancialTypeContributions as $contribution) {
+  if(!empty($contributionsToSubmit)) {
+    foreach($contributionsToSubmit as $contribution) {
       $submission['entity_id'] = $contribution['contribution_id'];
       $submission['eligible_for_gift_aid'] = 3;
 
