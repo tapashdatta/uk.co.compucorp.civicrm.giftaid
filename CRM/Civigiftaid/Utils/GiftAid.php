@@ -113,7 +113,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
         $declaration = self::getDeclaration( $contactID, $date, $charity );
 		if (isset($declaration['eligible_for_gift_aid']))
-			$isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 );
+			$isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 || $declaration['eligible_for_gift_aid'] == 3 );
 
         // hook can alter the eligibility if needed
         CRM_Civigiftaid_Utils_Hook::giftAidEligible( $isEligible, $contactID, $date, $contributionID );
