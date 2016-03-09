@@ -292,7 +292,7 @@
     <CustomField>
       <name>Eligible_for_Gift_Aid</name>
       <label>Eligible for Gift Aid?</label>
-      <data_type>String</data_type>
+      <data_type>Int</data_type>
       <html_type>Radio</html_type>
       <is_required>1</is_required>
       <is_searchable>1</is_searchable>
