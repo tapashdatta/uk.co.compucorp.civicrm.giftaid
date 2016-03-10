@@ -250,6 +250,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   {
     $this->log('Applying update 3001');
 
+    // create scheduled job
     $dao = new CRM_Core_DAO_Job();
     $dao->api_entity = 'gift_aid';
     $dao->api_action = 'makepastyearsubmissions';
@@ -267,6 +268,103 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
       $dao->is_active = 0;
       $dao->save();
     }
+
+    return TRUE;
+  }
+
+  public function upgrade_3002() {
+    $this->log('Applying update 3002');
+
+    // Alter existing eligible_for_gift_aid columns
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_value_gift_aid_declaration MODIFY COLUMN eligible_for_gift_aid int");
+    CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_value_gift_aid_submission MODIFY COLUMN eligible_for_gift_aid int");
+
+    // Update custom field type from String to Int
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET data_type = 'Int' WHERE name = 'Eligible_for_Gift_Aid'");
+
+    // Add new option groups and options
+    $og1 = civicrm_api3('OptionGroup', 'create', array(
+      'sequential' => 1,
+      'name' => "eligibility_declaration_options",
+      'title' => "Eligibility Declaration Options",
+      'label' => "Eligibility Declaration Options",
+      'is_active' => 1,
+      'is_reserved' => 1,
+    ));
+
+    $og2 = civicrm_api3('OptionGroup', 'create', array(
+      'sequential' => 1,
+      'name' => "uk_taxpayer_options",
+      'title' => "UK Taxpayer Options",
+      'label' => "UK Taxpayer Options",
+      'is_active' => 1,
+      'is_reserved' => 1
+    ));
+
+    $og1Id = CRM_Utils_Array::value('id', $og1);
+    $og2Id = CRM_Utils_Array::value('id', $og2);
+
+    $optionValues = array (
+      array (
+        'sequential' => 1,
+        'option_group_id' => $og1Id,
+        'label' => 'Yes',
+        'value' => 1,
+        'name' => 'eligible_for_giftaid',
+      ),
+      array (
+        'sequential' => 1,
+        'option_group_id' => $og1Id,
+        'label' => 'No',
+        'value' => 0,
+        'name' => 'not_eligible_for_giftaid',
+      ),
+      array (
+        'sequential' => 1,
+        'option_group_id' => $og1Id,
+        'label' => 'Yes, in the Past 4 Years',
+        'value' => 3,
+        'name' => 'past_four_years',
+      ),
+      array (
+        'sequential' => 1,
+        'option_group_id' => $og2Id,
+        'label' => 'Yes',
+        'value' => 1,
+        'name' => 'yes_uk_taxpayer',
+      ),
+      array (
+        'sequential' => 1,
+        'option_group_id' => $og2Id,
+        'label' => 'No',
+        'value' => 0,
+        'name' => 'not_uk_taxpayer',
+      ),
+      array (
+        'sequential' => 1,
+        'option_group_id' => $og2Id,
+        'label' => 'Yes, in the Past 4 Years',
+        'value' => 3,
+        'name' => 'uk_taxpayer_past_four_years',
+      ),
+    );
+
+    foreach($optionValues as $params) {
+      $result = civicrm_api3('OptionValue', 'create', $params);
+    }
+
+    $declarationCustomGroupID = CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+      'version' => 3,
+      'name' => 'Gift_Aid_Declaration')
+    ));
+
+    $submissionCustomGroupId = CRM_Utils_Array::value('id',civicrm_api('CustomGroup', 'getsingle', array(
+      'version' => 3,
+      'name' => 'Gift_Aid')
+    ));
+
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$og1Id} WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$declarationCustomGroupID}");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$og2Id} WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$submissionCustomGroupId}");
 
     return TRUE;
   }
