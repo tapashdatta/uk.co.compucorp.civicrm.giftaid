@@ -246,7 +246,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   /*
    * Set up Past Year Submissions Job
    */
-  public function upgrade_3001()
+  public function upgrade_3101()
   {
     $this->log('Applying update 3001');
 
@@ -272,7 +272,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     return TRUE;
   }
 
-  public function upgrade_3002() {
+  public function upgrade_3102() {
     $this->log('Applying update 3002');
 
     // Alter existing eligible_for_gift_aid columns
