@@ -248,7 +248,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
    */
   public function upgrade_3101()
   {
-    $this->log('Applying update 3001');
+    $this->log('Applying update 3101');
 
     // create scheduled job
     $dao = new CRM_Core_DAO_Job();
@@ -273,7 +273,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   }
 
   public function upgrade_3102() {
-    $this->log('Applying update 3002');
+    $this->log('Applying update 3102');
 
     // Alter existing eligible_for_gift_aid columns
     CRM_Core_DAO::executeQuery("ALTER TABLE civicrm_value_gift_aid_declaration MODIFY COLUMN eligible_for_gift_aid int");
