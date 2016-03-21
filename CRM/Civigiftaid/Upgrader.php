@@ -65,7 +65,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     }
 
     $this->upgrade_3000();
-    $this->upgrade_3001();
+    $this->upgrade_3101();
   }
 
   /**
