@@ -48,7 +48,7 @@ Having collected contributions with the appropriate Gift Aid profile enabled you
 
 1. To add a contribution to the Gift Aid Batch, from the main menu go to ‘Contributions -> Find Contributions’. When you have a list of your contributions, select the contributions using the checkbox to the left of each one and then select ‘Add to Gift Aid Batch’ from the drop down list and hit Next name your batch and click the “add to batch button” at the bottom of the screen.
 
-2. The module will indicate which contributions are eligable to be placed in a batch. These are contributions where the donor has a valid Gift Aid declaration at the time of the contribution, a valid UK address with postcode and where the contribution is not already in a batch.
+2. The module will indicate which contributions are eligible to be placed in a batch. These are contributions where the donor has a valid Gift Aid declaration at the time of the contribution, a valid UK address with postcode and where the contribution is not already in a batch. A valid UK address with postcode needs to be input by the donor at the point of signing up.
 
 Remove contributions from Gift Aid batch - If you need to remove a contribution from a Gift Aid batch, select the contributions, then select “Remove from gift aid batch” and hit ‘Go’. Then you will see the following information summarised:
 
