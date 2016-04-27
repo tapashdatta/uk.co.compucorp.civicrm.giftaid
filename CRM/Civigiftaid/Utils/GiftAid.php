@@ -414,9 +414,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
           'contact_id' => $contactId,
           'financial_type_id' => $financialTypes,
           'id' => array('NOT IN' => self::submittedContributions()),
-          'receive_date' => array(
-              'BETWEEN' => array($dateRange),
-          ),
+          'receive_date' => array('BETWEEN' => $dateRange),
         ));
       }
       return $result['values'];
