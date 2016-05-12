@@ -393,7 +393,7 @@
       <weight>4</weight>
       <is_active>1</is_active>
       <is_view>1</is_view>
-      <text_length>256</text_length>
+      <text_length>255</text_length>
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
       <column_name>batch_name</column_name>
