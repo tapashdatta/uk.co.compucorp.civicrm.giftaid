@@ -62,9 +62,11 @@ class CRM_Civigiftaid_Utils_GiftAid {
     static function getDeclaration( $contactID, $date = null, $charity = null ) {
         static $charityColumnExists = null;
 
-        if ( is_null($date) ) {
-            $date = date('Y-m-d H:i:s');
-        }
+        //if ( is_null($date) ) {
+        //    $date = date('Y-m-d H:i:s');
+       // }
+
+        $date = date('Y-m-d H:i:s');
 
         if ( $charityColumnExists === NULL ) {
             $charityColumnExists = CRM_Core_DAO::checkFieldExists( 'civicrm_value_gift_aid_declaration', 'charity' );
@@ -112,9 +114,14 @@ class CRM_Civigiftaid_Utils_GiftAid {
         }
 
         $declaration = self::getDeclaration( $contactID, $date, $charity );
-		if (isset($declaration['eligible_for_gift_aid']))
-			$isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 || $declaration['eligible_for_gift_aid'] == 3 );
 
+        if (isset($declaration['eligible_for_gift_aid'])) {
+	  $isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 || $declaration['eligible_for_gift_aid'] == 3 );
+        }
+
+        if(isset($contributionID)) {
+          $isEligible = self::isContributionSubmitted($contributionID);
+        }
         // hook can alter the eligibility if needed
         CRM_Civigiftaid_Utils_Hook::giftAidEligible( $isEligible, $contactID, $date, $contributionID );
 
@@ -432,5 +439,17 @@ class CRM_Civigiftaid_Utils_GiftAid {
       }
 
       return $submittedContributions;
+    }
+
+    static function isContributionSubmitted($contributionID) {
+      $sql = "SELECT * FROM civicrm_value_gift_aid_submission where entity_id = %1";
+      $sqlParams = array( 1 => array($contributionID, 'Integer') );
+
+      $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
+
+      if(!count($dao->fetchAll())) {
+        return FALSE;
+      }
+      return TRUE;
     }
 }
