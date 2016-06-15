@@ -32,7 +32,7 @@ You'll need to add a Gift Aid profile to any contribution forms that you want to
 
 1. Go to ‘Administer -> Custom Data and screens -> profiles’ to edit the info text or fields to display so it’s suits your organisation’s needs.
 
-2. Create Online Contribution Page. Go to ‘Contributions -> Manage Contributions Pages’ to add a new contribution page. See here for more details on how to do this: 
+2. Create Online Contribution Page. Go to ‘Contributions -> Manage Contributions Pages’ to add a new contribution page. See here for more details on how to do this:
 
 3. Add gift aid form to Contribution Form. In the profiles section of your contribution page ensure you include ‘Gift Aid’ in the top/bottom of your page. Or you can add the profile to an existing contribution page. Go to Contributions > Manage contribution pages. Select your contribution page > Configure > Include profiles.
 
@@ -77,7 +77,7 @@ From v2.0 of the module you are now able to change the rate of tax that the modu
 
 The GiftAid basic rate tax
 
-You can edit this by navigating to administration>>>civigiftaid>>>basicrateoftax link in the admin menu. You can also edit the option value in the group.“Administer” system settings ‘Option groups’. 
+You can edit this by navigating to administration>>>civigiftaid>>>basicrateoftax link in the admin menu. You can also edit the option value in the group.“Administer” system settings ‘Option groups’.
 
 Changing the rate of tax (shown as a percentage) will not affect past Gift Aid amounts calculated, but only the new amounts calculated when new contributions are added to a batch.
 
@@ -86,3 +86,5 @@ CiviCRM Extension Page: https://civicrm.org/extensions/gift-aid-extension-uk
 
 Please contact the follow email if you have any question:
 <guanhuan@compucorp.co.uk>, <support@compucorp.co.uk>
+
+Paid support for this extension is available, please contact us either via github or at <info@compucorp.co.uk>
