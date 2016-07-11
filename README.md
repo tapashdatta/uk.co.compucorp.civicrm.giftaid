@@ -8,9 +8,7 @@ These instructions assume that you are only upgrading the Gift Aid module from v
 
 1. If you navigate to the extension list in your install, CiviCRM should display a message stating that a newer version of the Gift Aid extension is available for download.
 
-   Alternatively you can download the latest version of the Gift Aid extension from the Compucorp Github below:
-
-[Download Gift Aid from Git](https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid"GiftAid Github")
+   Alternatively you can download the latest version of the Gift Aid extension from the Compucorp Github: [Download Gift Aid from Git](https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid"GiftAid Github")
 
 2. Once installed you should receive a message bubble indicating that your Gift Aid module code has changed and an upgrade script is required to be run.
 
@@ -25,6 +23,13 @@ These instructions assume that you are only upgrading the Gift Aid module from v
 1. Edit the settings for the ‘Gift Aid’ data group here http://www.example.com/civicrm/admin/custom/group?reset=1
 
 2. Click settings and then choose the specific contribution type(s) you want gift aid to be available for i.e “Donation”
+
+3. [3.0] Go to Gift Aid settings page http://www.example.com/civicrm/admin/gift-aid and select the financial types that should be considered as donation or leave it as default to enable Gift Aid for all financial types.
+
+4. [3.0] **[Important]** A new type of Gift Aid declaration is applied to covers both present& future donation and the donations a donor made in the past four years from the declaration date as long as the Gift Aid claim amount does not exceed tax amount. The old 'Yes' declaration is reserved to cover any old declarations donors made. Settings for the declatation options can be modified in the 'UK Taxpayer Options' list here: https://tpg.ccuptest.co.uk/civicrm/admin/options?reset=1
+
+5. [3.0] **[Important]** From Gift Aid 3.0 onwards, a new mechanism is introduced to marking donations from the past 4 years eligible to Gift Aid based on the new declaration type. **Present and future donations will not be affected by this new mechanism.** A scheduled job will be used to handle the 100 past donation records per run. To enable this scheduled job, please go to http://www.example.com/civicrm/admin/job and enable the job 'Process Gift Aid eligible donations'.
+
 
 ###Configure the Gift Aid Profile and disclaimer
 
@@ -50,6 +55,9 @@ Having collected contributions with the appropriate Gift Aid profile enabled you
 
 2. The module will indicate which contributions are eligible to be placed in a batch. These are contributions where the donor has a valid Gift Aid declaration at the time of the contribution, a valid UK address with postcode and where the contribution is not already in a batch. A valid UK address with postcode needs to be input by the donor at the point of signing up.
 
+3. You can use the 'Process eligible donations manually' function to process eligiblity of donations instantly if some donations are not yet marked as eligible when adding to batch.
+
+
 Remove contributions from Gift Aid batch - If you need to remove a contribution from a Gift Aid batch, select the contributions, then select “Remove from gift aid batch” and hit ‘Go’. Then you will see the following information summarised:
 
 * The number of contributions selected.
@@ -58,7 +66,7 @@ Remove contributions from Gift Aid batch - If you need to remove a contribution 
 
 * The number of contributions not yet added to any batch
 
-**Note: contributions submitted to the HMRC cannot be removed from a Batch**
+**Note: contributions submitted to the HMRC should not be removed from a batch**
 
 ###Submission to HMRC
 
