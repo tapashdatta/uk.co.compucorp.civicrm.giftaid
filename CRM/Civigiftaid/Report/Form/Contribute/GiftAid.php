@@ -69,6 +69,30 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             )
           )
         ),
+        'civicrm_contact'   =>
+          array(
+            'dao'    => 'CRM_Contact_DAO_Contact',
+            'fields' => array(
+              'prefix_id' => array(
+                'name'       => 'prefix_id',
+                'title'      => 'Title',
+                'no_display' => FALSE,
+                'required'   => TRUE,
+              ),
+              'first_name'      => array(
+                'name'       => 'first_name',
+                'title'      => 'First Name',
+                'no_display' => FALSE,
+                'required'   => TRUE,
+              ),
+              'last_name'    => array(
+                'name'       => 'last_name',
+                'title'      => 'Last Name',
+                'no_display' => FALSE,
+                'required'   => TRUE,
+              ),
+            ),
+          ),
         'civicrm_contribution'   =>
           array(
             'dao'    => 'CRM_Contribute_DAO_Contribution',
@@ -83,7 +107,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
                 'name'       => 'contact_id',
                 'title'      => 'Donor Name',
                 'no_display' => FALSE,
-                'required'   => TRUE,
+                'required'   => FALSE,
               ),
               'receive_date'    => array(
                 'name'       => 'receive_date',
@@ -260,6 +284,8 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       INNER JOIN civicrm_contribution {$this->_aliases['civicrm_contribution']}
       ON {$this->_aliases['civicrm_entity_batch']}.entity_table = 'civicrm_contribution'
         AND {$this->_aliases['civicrm_entity_batch']}.entity_id = {$this->_aliases['civicrm_contribution']}.id
+      INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
+      ON {$this->_aliases['civicrm_contribution']}.contact_id = {$this->_aliases['civicrm_contact']}.id
       INNER JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
       ON {$this->_aliases['civicrm_contribution']}.id = {$this->_aliases['civicrm_line_item']}.contribution_id
       INNER JOIN civicrm_financial_type {$this->_aliases['civicrm_financial_type']}
@@ -377,6 +403,14 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         $entryFound = TRUE;
       }
 
+      // handle Contact Title
+      if (array_key_exists('civicrm_contact_prefix_id', $row)) {
+        if ($value = $row['civicrm_contact_prefix_id']) {
+          $rows[$rowNum]['civicrm_contact_prefix_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $value);
+        }
+        $entryFound = TRUE;
+      }
+
       // skip looking further in rows, if first row itself doesn't
       // have the column we need
       if (!$entryFound) {
@@ -431,6 +465,9 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
     $columnTitleOrder = array(
       'payment no',
       'line item no',
+      'title',
+      'first name',
+      'last name',
       'donor name',
       'item',
       'description',
