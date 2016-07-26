@@ -73,6 +73,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
    *
    */
   public function uninstall() {
+    /*
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_group WHERE name = 'giftaid_batch_name'");
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_group WHERE name = 'giftaid_basic_rate_tax'");
     CRM_Core_DAO::executeQuery("DELETE FROM civicrm_option_group WHERE name = 'reason_ended'");
@@ -100,6 +101,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
         'name' => 'Gift_Aid_Declaration')
       )),
     ));
+    */
 
     $reportUrl = new CRM_Core_DAO_OptionValue();
     $reportUrl->option_group_id = self::getReportTemplateGroupId();;
