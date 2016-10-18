@@ -55,7 +55,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
           'filters' =>
             array(
               'batch_id' => array(
-                'title'        => 'Batch',
+                'title'        => ts('Batch'),
                 'operatorType' => CRM_Report_Form::OP_MULTISELECT,
                 'options'      => CRM_Civigiftaid_Utils_Contribution::getBatchIdTitle('id desc'),
               ),
@@ -63,9 +63,9 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
           'fields'  => array(
             'batch_id' => array(
               'name'       => 'batch_id',
-              'title'      => 'Batch ID',
+              'title'      => ts('Batch ID'),
               'no_display' => TRUE,
-              'required'   => TRUE
+              'required'   => TRUE,
             )
           )
         ),
@@ -75,19 +75,19 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             'fields' => array(
               'prefix_id' => array(
                 'name'       => 'prefix_id',
-                'title'      => 'Title',
+                'title'      => ts('Title'),
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
               'first_name'      => array(
                 'name'       => 'first_name',
-                'title'      => 'First Name',
+                'title'      => ts('First Name'),
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
               'last_name'    => array(
                 'name'       => 'last_name',
-                'title'      => 'Last Name',
+                'title'      => ts('Last Name'),
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
@@ -99,19 +99,17 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             'fields' => array(
               'contribution_id' => array(
                 'name'       => 'id',
-                'title'      => 'Payment No',
-                'no_display' => FALSE,
-                'required'   => TRUE,
+                'title'      => ts('Payment No'),
               ),
               'contact_id'      => array(
                 'name'       => 'contact_id',
-                'title'      => 'Donor Name',
+                'title'      => ts('Donor Name'),
                 'no_display' => FALSE,
-                'required'   => FALSE,
+                'required'   => TRUE,
               ),
               'receive_date'    => array(
                 'name'       => 'receive_date',
-                'title'      => 'Contribution Date',
+                'title'      => ts('Donation Date'),
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
@@ -123,9 +121,9 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             'fields' => array(
               'financial_type_id' => array(
                 'name'       => 'id',
-                'title'      => 'Financial Type No',
+                'title'      => ts('Financial Type No'),
                 'no_display' => TRUE,
-                'required'   => TRUE,
+                'required'   => FALSE,
               ),
             ),
           ),
@@ -135,11 +133,30 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             'grouping' => 'contact-fields',
             'fields'   =>
               array(
-                'street_address'    => NULL,
-                'city'              => NULL,
-                'state_province_id' => array('title' => ts('State/Province'),),
-                'country_id'        => array('title' => ts('Country'),),
-                'postal_code'       => NULL,
+                'street_address'    => array(
+                  'name'       => 'street_address',
+                  'title'      => ts('Street Address'),
+                  'no_display' => FALSE,
+                  'required'   => TRUE,
+                ),
+                'city'              => array(
+                  'name'       => 'city',
+                  'title'      => ts('City'),
+                ),
+                'state_province_id' => array(
+                  'name'       => 'state_province_id',
+                  'title'      => ts('State/Province'),
+                ),
+                'country_id'        => array(
+                  'name'       => 'country_id',
+                  'title' => ts('Country'),
+                ),
+                'postal_code'       => array(
+                  'name'       => 'postal_code',
+                  'title'      => ts('Postcode'),
+                  'no_display' => FALSE,
+                  'required'   => TRUE,
+                ),
               ),
           ),
         'civicrm_line_item'      =>
@@ -148,35 +165,27 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
             'fields' => array(
               'id'           => array(
                 'name'       => 'id',
-                'title'      => 'Line Item No',
-                'no_display' => FALSE,
-                'required'   => TRUE,
+                'title'      => ts('Line Item No'),
               ),
               'amount'       => array(
                 'name'       => 'line_total',
-                'title'      => 'Line Total',
+                'title'      => ts('Amount'),
                 'no_display' => FALSE,
                 'required'   => TRUE,
                 'type'       => CRM_Utils_Type::T_MONEY
               ),
               'quantity'     => array(
                 'name'       => 'qty',
-                'title'      => 'Qty',
-                'no_display' => FALSE,
-                'required'   => TRUE,
+                'title'      => ts('Quantity'),
                 'type'       => CRM_Utils_Type::T_INT
               ),
               'entity_table' => array(
                 'name'       => 'entity_table',
-                'title'      => 'Item',
-                'no_display' => FALSE,
-                'required'   => TRUE,
+                'title'      => ts('Item'),
               ),
               'label'        => array(
                 'name'       => 'label',
-                'title'      => 'Description',
-                'no_display' => FALSE,
-                'required'   => TRUE,
+                'title'      => ts('Description'),
               ),
             ),
           )
@@ -471,15 +480,15 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       'donor name',
       'item',
       'description',
-      'contribution date',
+      'donation date',
       'street address',
       'city',
       'county',
       'country',
-      'postal code',
+      'postcode',
       'eligible for gift aid?',
-      'qty',
-      'line total',
+      'quantity',
+      'amount',
       'gift aid amount',
       'batch name'
     );
