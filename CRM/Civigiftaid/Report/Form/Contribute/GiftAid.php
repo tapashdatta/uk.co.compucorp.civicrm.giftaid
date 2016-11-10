@@ -110,6 +110,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
               'receive_date'    => array(
                 'name'       => 'receive_date',
                 'title'      => ts('Donation Date'),
+                'type'       => CRM_Utils_Type::T_STRING,
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
@@ -280,7 +281,6 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
     $this->_columnHeaders['civicrm_line_item_gift_aid_amount'] = array(
       'title' => 'Gift Aid Amount',
-      // HMRC requires only number
       //'type'  => CRM_Utils_Type::T_MONEY
     );
 
@@ -382,11 +382,11 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         }
         if (isset($row['civicrm_line_item_amount'])) {
           $batch = $this->getBatchById($row['civicrm_entity_batch_batch_id']);
-          $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] =
-            CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
+          $giftaidAmount = CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
               $row['civicrm_line_item_amount'],
               $batch['basic_rate_tax']
-            );
+          );
+          $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] = number_format((float)$giftaidAmount, 2, '.', '');
         }
         if (!empty($row['civicrm_line_item_entity_table'])) {
           $rows[$rowNum]['civicrm_line_item_entity_table'] =
@@ -421,6 +421,14 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       if (array_key_exists('civicrm_contact_prefix_id', $row)) {
         if ($value = $row['civicrm_contact_prefix_id']) {
           $rows[$rowNum]['civicrm_contact_prefix_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $value);
+        }
+        $entryFound = TRUE;
+      }
+
+      // handle donation date
+      if (array_key_exists('civicrm_contribution_receive_date', $row)) {
+        if ($value = $row['civicrm_contribution_receive_date']) {
+          $rows[$rowNum]['civicrm_contribution_receive_date'] = date("d/m/y", strtotime($value));
         }
         $entryFound = TRUE;
       }
