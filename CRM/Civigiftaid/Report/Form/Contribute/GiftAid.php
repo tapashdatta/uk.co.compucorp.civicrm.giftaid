@@ -110,6 +110,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
               'receive_date'    => array(
                 'name'       => 'receive_date',
                 'title'      => ts('Donation Date'),
+                'type'       => CRM_Utils_Type::T_STRING,
                 'no_display' => FALSE,
                 'required'   => TRUE,
               ),
@@ -123,7 +124,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
                 'name'       => 'id',
                 'title'      => ts('Financial Type No'),
                 'no_display' => TRUE,
-                'required'   => FALSE,
+                'required'   => TRUE,
               ),
             ),
           ),
@@ -172,7 +173,8 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
                 'title'      => ts('Amount'),
                 'no_display' => FALSE,
                 'required'   => TRUE,
-                'type'       => CRM_Utils_Type::T_MONEY
+                // HMRC requires only number
+                //'type'       => CRM_Utils_Type::T_MONEY
               ),
               'quantity'     => array(
                 'name'       => 'qty',
@@ -279,7 +281,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
     $this->_columnHeaders['civicrm_line_item_gift_aid_amount'] = array(
       'title' => 'Gift Aid Amount',
-      'type'  => CRM_Utils_Type::T_MONEY
+      //'type'  => CRM_Utils_Type::T_MONEY
     );
 
     $this->reorderColumns();
@@ -326,6 +328,9 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       $totalAmount += $row['civicrm_line_item_amount'];
       $totalGiftAidAmount += $row['civicrm_line_item_gift_aid_amount'];
     }
+
+    $totalAmount = round($totalAmount, 2);
+    $totalGiftAidAmount = round($totalGiftAidAmount, 2);
 
     $statistics['counts']['amount'] = array(
       'value' => $totalAmount,
@@ -377,11 +382,11 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
         }
         if (isset($row['civicrm_line_item_amount'])) {
           $batch = $this->getBatchById($row['civicrm_entity_batch_batch_id']);
-          $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] =
-            CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
+          $giftaidAmount = CRM_Civigiftaid_Utils_Contribution::calculateGiftAidAmt(
               $row['civicrm_line_item_amount'],
               $batch['basic_rate_tax']
-            );
+          );
+          $rows[$rowNum]['civicrm_line_item_gift_aid_amount'] = number_format((float)$giftaidAmount, 2, '.', '');
         }
         if (!empty($row['civicrm_line_item_entity_table'])) {
           $rows[$rowNum]['civicrm_line_item_entity_table'] =
@@ -416,6 +421,14 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
       if (array_key_exists('civicrm_contact_prefix_id', $row)) {
         if ($value = $row['civicrm_contact_prefix_id']) {
           $rows[$rowNum]['civicrm_contact_prefix_id'] = CRM_Core_PseudoConstant::getLabel('CRM_Contact_DAO_Contact', 'prefix_id', $value);
+        }
+        $entryFound = TRUE;
+      }
+
+      // handle donation date
+      if (array_key_exists('civicrm_contribution_receive_date', $row)) {
+        if ($value = $row['civicrm_contribution_receive_date']) {
+          $rows[$rowNum]['civicrm_contribution_receive_date'] = date("d/m/y", strtotime($value));
         }
         $entryFound = TRUE;
       }
@@ -472,25 +485,25 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
 
   private function reorderColumns() {
     $columnTitleOrder = array(
-      'payment no',
-      'line item no',
       'title',
       'first name',
       'last name',
-      'donor name',
-      'item',
-      'description',
-      'donation date',
       'street address',
       'city',
       'county',
-      'country',
       'postcode',
-      'eligible for gift aid?',
-      'quantity',
+      'country',
+      'donation date',
       'amount',
-      'gift aid amount',
-      'batch name'
+      'donor name',
+      'item',
+      'description',
+      'quantity',
+      'eligible for gift aid?',
+      'batch name',
+      'payment no',
+      'line item no',
+      'gift aid amount'
     );
 
     $compare = function ($a, $b) use (&$columnTitleOrder) {
