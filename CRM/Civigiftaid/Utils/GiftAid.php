@@ -447,7 +447,8 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
       $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
 
-      if(!count($dao->fetchAll())) {
+      $count = count($dao->fetchAll());
+      if(!$count || $dao->eligible_for_gift_aid == 0) {
         return FALSE;
       }
       return TRUE;
