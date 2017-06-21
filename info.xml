@@ -18,8 +18,8 @@
     <author>Erawat Chamanont, Jamie Novick, Guanhuan Chen, Robin Mitra</author>
     <email>jamie@compucorp.co.uk, guanhuan@compucorp.co.uk</email>
   </maintainer>
-  <releaseDate>2016-06-05</releaseDate>
-  <version>3.0beta</version>
+  <releaseDate>2017-06-21</releaseDate>
+  <version>3.0beta2</version>
   <develStage>beta</develStage>
   <compatibility>
     <ver>4.5</ver>
