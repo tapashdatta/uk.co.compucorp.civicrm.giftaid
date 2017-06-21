@@ -1,14 +1,14 @@
-#UK GiftAid Extension for CiviCRM
+# UK GiftAid Extension for CiviCRM
 
-###Install GiftAid Extension
-See [Here](http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions"CiviCRM Extensions Installation") for full instructions and information on how to set and configure extensions
+### Install GiftAid Extension
+See [Here](http://wiki.civicrm.org/confluence/display/CRMDOC/Extensions "CiviCRM Extensions Installation") for full instructions and information on how to set and configure extensions
 
-###Upgrade GiftAid Extension
+### Upgrade GiftAid Extension
 These instructions assume that you are only upgrading the Gift Aid module from v2.x to higer and not upgrading from v1.0 and are running version 4.4.x or higher CiviCRM.
 
 1. If you navigate to the extension list in your install, CiviCRM should display a message stating that a newer version of the Gift Aid extension is available for download.
 
-   Alternatively you can download the latest version of the Gift Aid extension from the Compucorp Github: [Download Gift Aid from Git](https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid"GiftAid Github")
+   Alternatively you can download the latest version of the Gift Aid extension from the Compucorp Github: [Download Gift Aid from Git](https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid "GiftAid Github")
 
 2. Once installed you should receive a message bubble indicating that your Gift Aid module code has changed and an upgrade script is required to be run.
 
@@ -18,7 +18,7 @@ These instructions assume that you are only upgrading the Gift Aid module from v
 
 3. Give yourself a pat on the back... You're all done!
 
-###Configuration
+### Configuration
 
 1. Edit the settings for the ‘Gift Aid’ data group here http://www.example.com/civicrm/admin/custom/group?reset=1
 
@@ -31,7 +31,7 @@ These instructions assume that you are only upgrading the Gift Aid module from v
 5. [3.0] **[Important]** From Gift Aid 3.0 onwards, a new mechanism is introduced to marking donations from the past 4 years eligible to Gift Aid based on the new declaration type. **Present and future donations will not be affected by this new mechanism.** A scheduled job will be used to handle the 100 past donation records per run. To enable this scheduled job, please go to http://www.example.com/civicrm/admin/job and enable the job 'Process Gift Aid eligible donations'.
 
 
-###Configure the Gift Aid Profile and disclaimer
+### Configure the Gift Aid Profile and disclaimer
 
 You'll need to add a Gift Aid profile to any contribution forms that you want to use to collect "Gift-aid-able" contributions.
 
@@ -47,7 +47,7 @@ You'll need to add a Gift Aid profile to any contribution forms that you want to
 
 Having collected the relevant information about the donation you are now ready to create your batch and submit to HMRC.
 
-###Creating and managing your batch
+### Creating and managing your batch
 
 Having collected contributions with the appropriate Gift Aid profile enabled you can now create a batch to be submitted to HMRC by using GiftAid report. To do this you first need to create a batch. Instructions on how to do this are below
 
@@ -68,7 +68,7 @@ Remove contributions from Gift Aid batch - If you need to remove a contribution 
 
 **Note: contributions submitted to the HMRC should not be removed from a batch**
 
-###Submission to HMRC
+### Submission to HMRC
 
 Create Report - After successfully creating a batch of contributions eligible for Gift Aid go to “Reports -> All Reports “ and click “new report” which will bring you here
 
@@ -80,7 +80,7 @@ http://www.example.com/civicrm/report/template/list?reset=1
 
 3. Once you are happy with your report you can save/print it and submit it to the HMRC.
 
-###Changing the basic rate of Tax
+### Changing the basic rate of Tax
 From v2.0 of the module you are now able to change the rate of tax that the module uses to calculate the Gift Aid amount reclaimable and stored in the Gift Aid amount field. The percentage used in the calculation is now stored in an option group labeled:
 
 The GiftAid basic rate tax
@@ -89,7 +89,7 @@ You can edit this by navigating to administration>>>civigiftaid>>>basicrateoftax
 
 Changing the rate of tax (shown as a percentage) will not affect past Gift Aid amounts calculated, but only the new amounts calculated when new contributions are added to a batch.
 
-###Support
+### Support
 CiviCRM Extension Page: https://civicrm.org/extensions/gift-aid-extension-uk
 
 Please contact the follow email if you have any question:
