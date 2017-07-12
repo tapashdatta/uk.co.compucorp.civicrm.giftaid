@@ -62,9 +62,11 @@ class CRM_Civigiftaid_Utils_GiftAid {
     static function getDeclaration( $contactID, $date = null, $charity = null ) {
         static $charityColumnExists = null;
 
-        if ( is_null($date) ) {
-            $date = date('Y-m-d H:i:s');
-        }
+        //if ( is_null($date) ) {
+        //    $date = date('Y-m-d H:i:s');
+       // }
+
+        $date = date('Y-m-d H:i:s');
 
         if ( $charityColumnExists === NULL ) {
             $charityColumnExists = CRM_Core_DAO::checkFieldExists( 'civicrm_value_gift_aid_declaration', 'charity' );
@@ -78,7 +80,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         // - if > 1, pick latest end_date
         $currentDeclaration = array();
         $sql = "
-        SELECT id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
+        SELECT id, entity_id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
         FROM   civicrm_value_gift_aid_declaration
         WHERE  entity_id = %1 AND start_date <= %2 AND (end_date > %2 OR end_date IS NULL) {$charityClause}
         ORDER BY end_date DESC";
@@ -90,6 +92,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
         if ( $dao->fetch() ) {
             $currentDeclaration['id'] = $dao->id;
+            $currentDeclaration['entity_id'] = $dao->entity_id;
             $currentDeclaration['eligible_for_gift_aid'] = $dao->eligible_for_gift_aid;
             $currentDeclaration['start_date'] = $dao->start_date;
             $currentDeclaration['end_date'] = $dao->end_date;
@@ -111,9 +114,14 @@ class CRM_Civigiftaid_Utils_GiftAid {
         }
 
         $declaration = self::getDeclaration( $contactID, $date, $charity );
-		if (isset($declaration['eligible_for_gift_aid']))
-			$isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 );
 
+        if (isset($declaration['eligible_for_gift_aid'])) {
+	  $isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 || $declaration['eligible_for_gift_aid'] == 3 );
+        }
+
+        if(isset($contributionID)) {
+          $isEligible = self::isContributionSubmitted($contributionID);
+        }
         // hook can alter the eligibility if needed
         CRM_Civigiftaid_Utils_Hook::giftAidEligible( $isEligible, $contactID, $date, $contributionID );
 
@@ -216,7 +224,31 @@ class CRM_Civigiftaid_Utils_GiftAid {
                                       );
                 CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
 
-            } else if ( $currentDeclaration['eligible_for_gift_aid'] == 0 ) {
+            } else if ( $currentDeclaration['eligible_for_gift_aid'] == 0 || $currentDeclaration['eligible_for_gift_aid'] == 3 ) {
+                //   - if current negative, set its end_date to now and create new ending new_end_date.
+                $updateParams = array(
+                                      'id' => $currentDeclaration['id'],
+                                      'end_date' => CRM_Utils_Date::isoToMysql($params['start_date']),
+                                      );
+                CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
+                CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
+            }
+
+        } else if ( $params['eligible_for_gift_aid'] == 3 ) {
+
+            if ( !$currentDeclaration ) {
+                // There is no current declaration so create new.
+               CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
+
+            } else if ( $currentDeclaration['eligible_for_gift_aid'] == 3 && $endTimestamp ) {
+                //   - if current positive, extend its end_date to new_end_date.
+                $updateParams = array(
+                                      'id' => $currentDeclaration['id'],
+                                      'end_date' => date('YmdHis', $endTimestamp),
+                                      );
+                CRM_Civigiftaid_Utils_GiftAid::_updateDeclaration( $updateParams );
+
+            } else if ( $currentDeclaration['eligible_for_gift_aid'] == 0 || $currentDeclaration['eligible_for_gift_aid'] == 1 ) {
                 //   - if current negative, set its end_date to now and create new ending new_end_date.
                 $updateParams = array(
                                       'id' => $currentDeclaration['id'],
@@ -232,7 +264,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
                 // There is no current declaration so create new.
                 CRM_Civigiftaid_Utils_GiftAid::_insertDeclaration( $params, $endTimestamp );
 
-            } else if ( $currentDeclaration['eligible_for_gift_aid'] == 1 ) {
+            } else if ( $currentDeclaration['eligible_for_gift_aid'] == 1 || $currentDeclaration['eligible_for_gift_aid'] == 3 ) {
                 //   - if current positive, set its end_date to now and create new ending new_end_date.
                 $updateParams = array(
                                       'id' => $currentDeclaration['id'],
@@ -307,5 +339,118 @@ class CRM_Civigiftaid_Utils_GiftAid {
         }
 
         $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
+    }
+
+    static function getContactsWithDeclarations() {
+      $contactsWithPastDeclarations = array();
+      $sql = "
+        SELECT id, eligible_for_gift_aid, entity_id
+        FROM   civicrm_value_gift_aid_declaration
+        GROUP BY entity_id";
+
+      $dao = CRM_Core_DAO::executeQuery( $sql );
+      foreach($dao->fetchAll() as $row){
+        $contactsWithDeclarations[] = $row['entity_id'];
+      }
+
+      return $contactsWithDeclarations;
+    }
+
+    static function getCurrentDeclarations($contacts, $date = null, $charity = null) {
+      $currentDeclarations = array();
+
+      foreach($contacts as $contactId) {
+        $currentDeclarations[] = self::getDeclaration($contactId);
+      }
+
+      return $currentDeclarations;
+    }
+
+    static function setSubmission( $params ) {
+      // Insert
+        $sql = "
+        INSERT INTO civicrm_value_gift_aid_submission (entity_id, eligible_for_gift_aid, amount, gift_aid_amount, batch_name)
+        VALUES (%1, %2, NULL, NULL, NULL)";
+        $queryParams = array(
+                             1 => array($params['entity_id'], 'Integer'),
+                             2 => array($params['eligible_for_gift_aid'], 'Integer'),
+                             );
+        $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
+    }
+
+    static function getContributionsByDeclarations($declarations = array(), $limit = 100) {
+      $contributionsToSubmit = array();
+
+      foreach($declarations as $declaration) {
+        $dateRange = array();
+
+        $contactId = $declaration['entity_id'];
+        $startDate = $declaration['start_date'];
+        $dateRange[0] = self::dateFourYearsAgo($startDate);
+        $dateRange[1] = $startDate;
+        $contributions = self::getContributionsByDateRange($contactId, $dateRange);
+        $contributionsToSubmit = array_merge($contributions, $contributionsToSubmit);
+
+        if(count($contributionsToSubmit) >= $limit) {
+          $contributionsToSubmit = array_slice($contributionsToSubmit, 0, $limit);
+          break;
+        }
+      }
+      return $contributionsToSubmit;
+    }
+
+    static function dateFourYearsAgo($startDate) {
+      $date = new DateTime($startDate);
+      $dateFourYearsAgo = $date->modify('-4 year')->format('Y-m-d H:i:s');
+      return $dateFourYearsAgo;
+    }
+
+    static function getContributionsByDateRange($contactId, $dateRange) {
+      if(CRM_Civigiftaid_Form_Admin::isGloballyEnabled()) {
+        $result = civicrm_api3('Contribution', 'get', array(
+          'sequential' => 1,
+          'return' => "financial_type_id,id",
+          'contact_id' => $contactId,
+          'id' => array('NOT IN' => self::submittedContributions()),
+          'receive_date' => array('BETWEEN' => $dateRange),
+        ));
+      }else if($financialTypes = CRM_Civigiftaid_Form_Admin::getFinancialTypesEnabled()) {
+        $result = civicrm_api3('Contribution', 'get', array(
+          'sequential' => 1,
+          'return' => "financial_type_id,id",
+          'contact_id' => $contactId,
+          'financial_type_id' => $financialTypes,
+          'id' => array('NOT IN' => self::submittedContributions()),
+          'receive_date' => array('BETWEEN' => $dateRange),
+        ));
+      }
+      return $result['values'];
+    }
+
+    static function submittedContributions() {
+      $submittedContributions = array();
+      $sql = "
+        SELECT entity_id
+        FROM   civicrm_value_gift_aid_submission";
+
+      $dao = CRM_Core_DAO::executeQuery( $sql );
+      foreach($dao->fetchAll() as $row){
+        $submittedContributions[] = $row['entity_id'];
+      }
+
+      return $submittedContributions;
+    }
+
+    static function isContributionSubmitted($contributionID) {
+      $sql = "SELECT * FROM civicrm_value_gift_aid_submission where entity_id = %1";
+      $sqlParams = array( 1 => array($contributionID, 'Integer') );
+
+      $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
+
+      $count = count($dao->fetchAll());
+      if(!$count || $dao->eligible_for_gift_aid == 0) {
+        return FALSE;
+      }
+      return TRUE;
     }
 }

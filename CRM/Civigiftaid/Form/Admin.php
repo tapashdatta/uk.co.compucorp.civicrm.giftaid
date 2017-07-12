@@ -148,8 +148,9 @@ class CRM_Civigiftaid_Form_Admin extends CRM_Core_Form {
   private function getFinancialTypes() {
     $result = civicrm_api3('FinancialType', 'get', 
       array(
-        'sequential' => 1, 
-        'options' => array('limit' => 200),
+        'sequential' => 1,
+        'is_active' => 1,
+        'options' => array('limit' => 0),
       )
     );
 
