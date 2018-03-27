@@ -46,6 +46,11 @@ class CRM_Civigiftaid_Utils_GiftAid {
      * How long a positive Gift Aid declaration is valid for under HMRC rules (years).
      */
     const DECLARATION_LIFETIME = 3;
+    
+    // Giftaid Declaration Options.
+    const DECLARATION_IS_YES = 1;
+    const DECLARATION_IS_NO = 0;
+    const DECLARATION_IS_PAST_4_YEARS = 3;
 
     /**
      * Get Gift Aid declaration record for Individual.
@@ -62,11 +67,11 @@ class CRM_Civigiftaid_Utils_GiftAid {
     static function getDeclaration( $contactID, $date = null, $charity = null ) {
         static $charityColumnExists = null;
 
-        //if ( is_null($date) ) {
-        //    $date = date('Y-m-d H:i:s');
-       // }
+        if ( is_null($date) ) {
+            $date = date('Y-m-d H:i:s');
+        }
 
-        $date = date('Y-m-d H:i:s');
+        //$date = date('Y-m-d H:i:s');
 
         if ( $charityColumnExists === NULL ) {
             $charityColumnExists = CRM_Core_DAO::checkFieldExists( 'civicrm_value_gift_aid_declaration', 'charity' );
@@ -105,6 +110,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
     }
 
     static function isEligibleForGiftAid( $contactID, $date = null, $contributionID = null ) {
+        $isEligible = FALSE;
         $charity = null;
         if ( $contributionID &&
              CRM_Core_DAO::checkFieldExists( 'civicrm_value_gift_aid_submission', 'charity' ) ) {
@@ -113,14 +119,10 @@ class CRM_Civigiftaid_Utils_GiftAid {
                                                 array( 1 => array( $contributionID, 'Integer' ) ) );
         }
 
-        $declaration = self::getDeclaration( $contactID, $date, $charity );
-
-        if (isset($declaration['eligible_for_gift_aid'])) {
-	  $isEligible  = ( $declaration['eligible_for_gift_aid'] == 1 || $declaration['eligible_for_gift_aid'] == 3 );
-        }
-
         if(isset($contributionID)) {
-          $isEligible = self::isContributionSubmitted($contributionID);
+          $isContributionEligible = self::isContributionEligible($contactID, $contributionID);
+          $isContributionSubmitted = self::isContributionSubmitted($contributionID);
+          $isEligible = ($isContributionEligible && $isContributionSubmitted);
         }
         // hook can alter the eligibility if needed
         CRM_Civigiftaid_Utils_Hook::giftAidEligible( $isEligible, $contactID, $date, $contributionID );
@@ -452,5 +454,82 @@ class CRM_Civigiftaid_Utils_GiftAid {
         return FALSE;
       }
       return TRUE;
+    }
+    
+    /**
+     * Get all gift aid declarations made by a contact.
+     *
+     * @param int $contactId
+     * @return bool|array
+     */
+    static function getAllDeclarations($contactID) {
+      $declarations = array();
+      $sql = "SELECT id, entity_id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
+              FROM civicrm_value_gift_aid_declaration
+              WHERE  entity_id = %1";
+      $sqlParams = array( 
+                     1 => array($contactID, 'Integer')
+                   );
+
+      $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
+
+      if($declarations = $dao->fetchAll()) {
+        return $declarations;
+      }
+
+      return FALSE;
+    }
+
+    /**
+     * Check if Eligibility criteria for Contribution is met.
+     *
+     * @param Int $contactID
+     * @param Int $contributionID
+     * @return boolean
+     */
+    static function isContributionEligible($contactID, $contributionID) {
+      $contributionDeclarationDateMatchFound = FALSE;
+      $declarations = self::getAllDeclarations($contactID);
+
+      $eligibilityFieldId = civicrm_api3('CustomField', 'getsingle', array(
+                        'return' => array("id"),
+                        'name' => "eligible_for_gift_aid",
+                        'custom_group_id' => "Gift_Aid",
+                      ))['id'];
+      $eligibilityFieldCol = 'custom_' . $eligibilityFieldId;
+      $contribution = civicrm_api3('Contribution', 'getsingle', array(
+                        'return' => array($eligibilityFieldCol, "receive_date"),
+                        'id' => $contributionID,
+                      ));
+
+      if($contribution[$eligibilityFieldCol] == self::DECLARATION_IS_NO) {
+        return FALSE;
+      }
+
+      foreach($declarations as $declaration) {
+        if($declaration['eligible_for_gift_aid'] == self::DECLARATION_IS_PAST_4_YEARS) {
+          $declaration['start_date'] = self::dateFourYearsAgo($declaration['start_date']);
+        }
+
+        // Convert dates to timestamps.
+        $startDateTS = strtotime($declaration['start_date']);
+        $endDateTS = !empty($declaration['end_date']) ? strtotime($declaration['end_date']) : NULL;
+        $contributionDateTS = strtotime($contribution['receive_date']);
+
+        /**
+         * Check between which date the contribution's receive date falls.
+         */
+        if(!empty($endDateTS)) {
+          $contributionDeclarationDateMatchFound =
+            ($contributionDateTS >= $startDateTS) && ($contributionDateTS < $endDateTS);
+        }
+        else {
+          $contributionDeclarationDateMatchFound = ($contributionDateTS >= $startDateTS);
+        }
+
+        if($contributionDeclarationDateMatchFound == TRUE) {
+          return ((bool) $declaration['eligible_for_gift_aid']);
+        }
+      }
     }
 }
