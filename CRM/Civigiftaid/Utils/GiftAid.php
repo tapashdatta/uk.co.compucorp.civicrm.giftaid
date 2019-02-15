@@ -369,15 +369,30 @@ class CRM_Civigiftaid_Utils_GiftAid {
     }
 
     static function setSubmission( $params ) {
-      // Insert
+      $sql = "SELECT * FROM civicrm_value_gift_aid_submission where entity_id = %1";
+      $sqlParams = array( 1 => array($params['entity_id'], 'Integer') );
+      $dao = CRM_Core_DAO::executeQuery( $sql, $sqlParams );
+      $count = count($dao->fetchAll());
+
+      if ($count == 0) {
+        // Insert
         $sql = "
         INSERT INTO civicrm_value_gift_aid_submission (entity_id, eligible_for_gift_aid, amount, gift_aid_amount, batch_name)
         VALUES (%1, %2, NULL, NULL, NULL)";
-        $queryParams = array(
-                             1 => array($params['entity_id'], 'Integer'),
-                             2 => array($params['eligible_for_gift_aid'], 'Integer'),
-                             );
-        $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
+      }
+      else {
+        // Update
+        $sql = "
+        UPDATE civicrm_value_gift_aid_submission
+        SET eligible_for_gift_aid = %1
+        WHERE entity_id = %2";
+      }
+
+      $queryParams = array(
+        1 => array($params['entity_id'], 'Integer'),
+        2 => array($params['eligible_for_gift_aid'], 'Integer'),
+      );  
+      $dao = CRM_Core_DAO::executeQuery( $sql, $queryParams );
     }
 
     static function getContributionsByDeclarations($declarations = array(), $limit = 100) {
