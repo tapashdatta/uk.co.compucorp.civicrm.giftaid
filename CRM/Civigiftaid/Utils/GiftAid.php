@@ -276,6 +276,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
       $charityColumnExists = false;
     }
 
+    $charityCol = $charityVal = NULL;
     if ($charityColumnExists) {
       $charityCol = ', charity';
       $charityVal = ', %10';
