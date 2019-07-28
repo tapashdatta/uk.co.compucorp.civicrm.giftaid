@@ -473,11 +473,13 @@ class CRM_Civigiftaid_Utils_GiftAid {
       'name' => "gift_aid",
     ]);
 
-    if (CRM_Utils_Array::value(CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID), $contribution) == self::DECLARATION_IS_NO) {
+    $contributionEligible = CRM_Utils_Array::value(CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID), $contribution);
+    // If it is not set ('') it's not the same as DECLARATION_IS_NO
+    if (!empty($contributionEligible) && ($contributionEligible == self::DECLARATION_IS_NO)) {
       return FALSE;
     }
 
-    foreach($declarations as $declaration) {
+    foreach ($declarations as $declaration) {
       if($declaration['eligible_for_gift_aid'] == self::DECLARATION_IS_PAST_4_YEARS) {
         $declaration['start_date'] = self::dateFourYearsAgo($declaration['start_date']);
       }

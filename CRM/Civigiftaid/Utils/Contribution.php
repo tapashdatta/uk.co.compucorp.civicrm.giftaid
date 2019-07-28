@@ -96,12 +96,20 @@ class CRM_Civigiftaid_Utils_Contribution {
 
   /**
    * @param int $contributionID
+   * @param string $batchName - if this is set to NULL it will NOT be changed
+   * @param int $eligibleForGiftAid - if this is NULL if will NOT be set, otherwise set it to eg CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES
+   *
+   * @throws \CRM_Extension_Exception
+   * @throws \CiviCRM_API3_Exception
+   */
+  /**
+   * @param $contributionID
    * @param string $batchName
    *
    * @throws \CRM_Extension_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  public static function updateGiftAidFields($contributionID, $batchName = '') {
+  public static function updateGiftAidFields($contributionID, $batchName = '', $eligibleForGiftAid = NULL) {
     $totalAmount = civicrm_api3('Contribution', 'getvalue', [
       'return' => "total_amount",
       'id' => $contributionID,
@@ -118,8 +126,13 @@ class CRM_Civigiftaid_Utils_Contribution {
       'id' => $contributionID,
       CRM_Civigiftaid_Utils::getCustomByName('gift_aid_amount', $groupID) => $giftAidAmount,
       CRM_Civigiftaid_Utils::getCustomByName('amount', $groupID) => $giftAidableContribAmt,
-      CRM_Civigiftaid_Utils::getCustomByName('batch_name', $groupID) => $batchName,
     ];
+    if ($batchName !== NULL) {
+      $contributionParams[CRM_Civigiftaid_Utils::getCustomByName('batch_name', $groupID)] = $batchName;
+    }
+    if ($eligibleForGiftAid) {
+      $contributionParams[CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID)] = $eligibleForGiftAid;
+    }
     civicrm_api3('Contribution', 'create', $contributionParams);
   }
 
