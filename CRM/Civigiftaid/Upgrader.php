@@ -1,9 +1,8 @@
 <?php
-
 use CRM_Civigiftaid_ExtensionUtil as E;
 
 /**
- * Collection of upgrade steps
+ * Collection of upgrade steps.
  */
 class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
 
@@ -19,12 +18,12 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   public function install() {
     //only for vesion 1.0 to 2.1
     //To remove the future
-    self::removeLegacyRegisteredReport();
     self::migrateOneToTwo($this);
     //end step for upgrading version 1.0 t0 2.1
 
     $this->upgrade_3000();
     $this->upgrade_3101();
+    $this->upgrade_3103();
   }
 
   /**
@@ -118,8 +117,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   /*
    * Set up Past Year Submissions Job
    */
-  public function upgrade_3101()
-  {
+  public function upgrade_3101() {
     $this->log('Applying update 3101 - Add past year submissions job');
 
     $existing = civicrm_api3('Job', 'get', [

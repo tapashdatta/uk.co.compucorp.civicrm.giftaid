@@ -60,7 +60,7 @@ function civigiftaid_civicrm_disable() {
  *                for 'enqueue', returns void
  */
 function civigiftaid_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
-  _civigiftaid_civix_civicrm_upgrade($op, $queue);
+  return _civigiftaid_civix_civicrm_upgrade($op, $queue);
 }
 
 /**
