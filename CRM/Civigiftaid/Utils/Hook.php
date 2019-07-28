@@ -1,9 +1,11 @@
 <?php
-
 /**
- * https://civicrm.org/license
+ * https://civicrm.org/licensing
  */
 
+/**
+ * Class CRM_Civigiftaid_Utils_Hook
+ */
 abstract class CRM_Civigiftaid_Utils_Hook extends CRM_Utils_Hook {
 
   /**
@@ -18,12 +20,6 @@ abstract class CRM_Civigiftaid_Utils_Hook extends CRM_Utils_Hook {
   public static function giftAidEligible(&$isEligible, $contactID, $date = NULL, $contributionID = NULL) {
     return self::singleton()->invoke(4, $isEligible, $contactID, $date, $contributionID, self::$_nullObject, self::$_nullObject, 'civicrm_giftAidEligible');
   }
-
-  /**
-   * This hook allows doing any extra processing for contributions that are added to a batch.
-   *
-   * @access public
-   */
 
   /**
    * This hook allows doing any extra processing for contributions that are added to a batch.

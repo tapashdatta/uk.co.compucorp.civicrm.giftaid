@@ -15,15 +15,15 @@ class CRM_Civigiftaid_BAO_BatchSettings extends CRM_Civigiftaid_DAO_BatchSetting
    * @throws \CiviCRM_API3_Exception
    */
   public static function create($params) {
-    static::addDefaults($params);
-    static::preProcessParams($params);
+    self::addDefaults($params);
+    self::preProcessParams($params);
 
     $entityName = 'BatchSettings';
     $hook = empty($params['id']) ? 'create' : 'edit';
 
     CRM_Utils_Hook::pre($hook, $entityName, CRM_Utils_Array::value('id', $params), $params);
 
-    $instance = new static;
+    $instance = new self;
     $instance->copyValues($params);
     $instance->save();
 
@@ -33,7 +33,7 @@ class CRM_Civigiftaid_BAO_BatchSettings extends CRM_Civigiftaid_DAO_BatchSetting
   }
 
   public static function findByBatchId($id) {
-    $dao = static::executeQuery("SELECT * FROM " . static::getTableName() . " WHERE batch_id = {$id}");
+    $dao = self::executeQuery("SELECT * FROM " . self::getTableName() . " WHERE batch_id = {$id}");
 
     if ($dao->fetch()) {
       return $dao;

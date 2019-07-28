@@ -1,19 +1,18 @@
 <?php
-
 /**
- * https://civicrm.org/license
+ * https://civicrm.org/licensing
  */
 
 use CRM_Civigiftaid_ExtensionUtil as E;
 
 /**
+ * Class CRM_Civigiftaid_Form_Task_AddToBatch
  * This class provides the functionality to add a group of contribution to a batch.
  */
-
 class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
 
   /**
-   * @var int
+   * @var int Existing batch ID
    */
   protected $_id = NULL;
 
@@ -28,23 +27,18 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
     $this->assign('notValidContributions', count($notValid));
 
     // get details of contribution that will be added to this batch.
-    $contributionsAddedRows =
-      CRM_Civigiftaid_Utils_Contribution::getContributionDetails($added);
+    $contributionsAddedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($added);
     $this->assign('contributionsAddedRows', $contributionsAddedRows);
 
     // get details of contribution thatare already added to this batch.
-    $contributionsAlreadyAddedRows = [];
-    $contributionsAlreadyAddedRows =
-      CRM_Civigiftaid_Utils_Contribution::getContributionDetails($alreadyAdded);
+    $contributionsAlreadyAddedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($alreadyAdded);
     $this->assign(
       'contributionsAlreadyAddedRows',
       $contributionsAlreadyAddedRows
     );
 
     // get details of contribution that are not valid for giftaid
-    $contributionsNotValid = [];
-    $contributionsNotValid =
-      CRM_Civigiftaid_Utils_Contribution::getContributionDetails($notValid);
+    $contributionsNotValid = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($notValid);
     $this->assign('contributionsNotValid', $contributionsNotValid);
   }
 
@@ -60,19 +54,14 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
       ['CRM_Batch_DAO_Batch', $this->_id, 'title']
     );
 
-    $this->add(
-      'textarea',
-      'description',
-      E::ts('Description:') . ' ',
-      $attributes['description']
-    );
+    $this->add('textarea', 'description', E::ts('Description:') . ' ', $attributes['description']);
 
     $batchName = CRM_Batch_BAO_Batch::generateBatchName();
     $defaults = ['title' => E::ts('GiftAid ' . $batchName)];
 
     $this->setDefaults($defaults);
 
-    $this->addDefaultButtons(E::ts('Add to batch'));
+    $this->addDefaultButtons(E::ts('Add to batch'), 'next', 'cancel');
   }
 
   public function postProcess() {

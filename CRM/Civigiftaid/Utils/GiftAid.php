@@ -1,9 +1,11 @@
 <?php
-
 /**
- * https://civicrm.org/license
+ * https://civicrm.org/licensing
  */
 
+/**
+ * Class CRM_Civigiftaid_Utils_GiftAid
+ */
 class CRM_Civigiftaid_Utils_GiftAid {
 
   // Giftaid Declaration Options.
@@ -64,33 +66,27 @@ class CRM_Civigiftaid_Utils_GiftAid {
   }
 
   /**
-   * @param int $contactID
-   * @param string $date
-   * @param int $contributionID
+   * @param array $contribution
    *
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  public static function isEligibleForGiftAid($contactID, $date = NULL, $contributionID = NULL) {
-    $isEligible = FALSE;
+  public static function isEligibleForGiftAid($contribution) {
+    $isContributionEligible = FALSE;
 
-    if(isset($contributionID)) {
-      $isContributionEligible = self::isContributionEligible($contactID, $contributionID);
-      $isContributionSubmitted = self::isContributionSubmitted($contributionID);
-      $isEligible = ($isContributionEligible && $isContributionSubmitted);
+    if(isset($contribution['id'])) {
+      $isContributionEligible = self::isContributionEligible($contribution);
     }
     // hook can alter the eligibility if needed
-    CRM_Civigiftaid_Utils_Hook::giftAidEligible($isEligible, $contactID, $date, $contributionID);
+    CRM_Civigiftaid_Utils_Hook::giftAidEligible($isContributionEligible, $contribution['contact_id'], $contribution['receive_date'], $contribution['id']);
 
-    return $isEligible;
+    return $isContributionEligible;
   }
 
   /**
    * Create / update Gift Aid declaration records on Individual when
    * "Eligible for Gift Aid" field on Contribution is updated.
-   * See http://wiki.civicrm.org/confluence/display/CRM/Gift+aid+implementation
    *
-   * TODO change arguments to single $param array
    * @param array  $params    - fields to store in declaration:
    *               - entity_id:  the Individual for whom we will create/update declaration
    *               - eligible_for_gift_aid: 1 for positive declaration, 0 for negative
@@ -439,24 +435,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
   }
 
   /**
-   * @param int $contributionID
-   *
-   * @return bool
-   */
-  public static function isContributionSubmitted($contributionID) {
-    $sql = "SELECT * FROM civicrm_value_gift_aid_submission where entity_id = %1";
-    $sqlParams = [1 => [$contributionID, 'Integer']];
-
-    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
-
-    $count = count($dao->fetchAll());
-    if(!$count || $dao->eligible_for_gift_aid == self::DECLARATION_IS_NO) {
-      return FALSE;
-    }
-    return TRUE;
-  }
-
-  /**
    * Get all gift aid declarations made by a contact.
    *
    * @param int $contactID
@@ -482,27 +460,20 @@ class CRM_Civigiftaid_Utils_GiftAid {
   /**
    * Check if Eligibility criteria for Contribution is met.
    *
-   * @param int $contactID
-   * @param int $contributionID
+   * @param array $contribution
    *
    * @return bool
    * @throws \CiviCRM_API3_Exception
    */
-  public static function isContributionEligible($contactID, $contributionID) {
-    $declarations = self::getAllDeclarations($contactID);
+  public static function isContributionEligible($contribution) {
+    $declarations = self::getAllDeclarations($contribution['contact_id']);
 
-    $eligibilityFieldId = civicrm_api3('CustomField', 'getsingle', [
-      'return' => ["id"],
-      'name' => "eligible_for_gift_aid",
-      'custom_group_id' => "Gift_Aid",
-    ])['id'];
-    $eligibilityFieldCol = 'custom_' . $eligibilityFieldId;
-    $contribution = civicrm_api3('Contribution', 'getsingle', [
-      'return' => [$eligibilityFieldCol, "receive_date"],
-      'id' => $contributionID,
+    $groupID = civicrm_api3('CustomGroup', 'getvalue', [
+      'return' => "id",
+      'name' => "gift_aid",
     ]);
 
-    if($contribution[$eligibilityFieldCol] == self::DECLARATION_IS_NO) {
+    if (CRM_Utils_Array::value(CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID), $contribution) == self::DECLARATION_IS_NO) {
       return FALSE;
     }
 
@@ -531,5 +502,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         return ((bool) $declaration['eligible_for_gift_aid']);
       }
     }
+    return FALSE;
   }
+
 }

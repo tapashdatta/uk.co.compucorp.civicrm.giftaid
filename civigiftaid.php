@@ -140,9 +140,8 @@ function civigiftaid_civicrm_postProcess($formName, &$form) {
   if ($customGroupTableName == 'civicrm_value_gift_aid_declaration') {
     //FIXME: dirty hack to get the latest declaration for the contact
     $sql = "
-      SELECT MAX(id) FROM civicrm_value_gift_aid_declaration
+      SELECT MAX(id) FROM {$customGroupTableName}
       WHERE entity_id = %1";
-
     $params = [1 => [$contactId, 'Integer']];
     $rowId = CRM_Core_DAO::singleValueQuery($sql, $params);
 
@@ -150,7 +149,7 @@ function civigiftaid_civicrm_postProcess($formName, &$form) {
     list($addressDetails, $postCode) = _civigiftaid_civicrm_custom_get_address_and_postal_code($contactId, 1);
 
     $sql = "
-      UPDATE civicrm_value_gift_aid_declaration
+      UPDATE {$customGroupTableName}
       SET  address = %1,
       post_code = %2
       WHERE  id = %3";
@@ -182,6 +181,10 @@ function civigiftaid_civicrm_custom($op, $groupID, $entityID, &$params) {
   ]);
 
   if ($customGroupTableName == 'civicrm_value_gift_aid_submission') {
+    if (!empty(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
+      return;
+    }
+    Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
     // Iterate through $params to get new declaration value
     $giftAidEligibleStatus = NULL;
     if (!is_array($params) || empty($params)) {
@@ -211,7 +214,7 @@ function civigiftaid_update_declaration_amount($contributionID) {
 
   $customFieldID = civicrm_api3('CustomField', 'getvalue', [
     'custom_group_id' => $customGroupID,
-    'name' => "eligible_for_gift_aid",
+    'name' => "Eligible_for_Gift_Aid",
     'return' => 'id',
   ]);
 
@@ -278,47 +281,39 @@ function civigiftaid_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 }
 
 function civigiftaid_callback_civicrm_post_contribution($params) {
+  if (Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount']) {
+    return;
+  }
+  Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
   civigiftaid_update_declaration_amount($params['id']);
 }
 
 /**
- * Implementation of hook_civicrm_validate
+ * Implementation of hook_civicrm_validateForm
  * Validate set of Gift Aid declaration records on Individual,
  * from multi-value custom field edit form:
  * - check end > start,
  * - check for overlaps between declarations.
  */
-function civigiftaid_civicrm_validate($formName, &$fields, &$files, &$form) {
+function civigiftaid_civicrm_validateForm($formName, &$fields, &$files, &$form, &$errors) {
   $errors = [];
 
   if ($formName == 'CRM_Contact_Form_CustomData') {
     $groupID = $form->getVar('_groupID');
     $contactID = $form->getVar('_entityId');
-    $tableName = CRM_Core_DAO::getFieldValue(
-      'CRM_Core_DAO_CustomGroup',
-      $groupID,
-      'table_name',
-      'id'
-    );
+    $tableName = civicrm_api3('CustomGroup', 'getvalue', [
+      'return' => 'table_name',
+      'id' => $groupID,
+    ]);
 
     if ($tableName == 'civicrm_value_gift_aid_declaration') {
-
       // Assemble multi-value field values from custom_X_Y into
       // array $declarations of sets of values as column_name => value
-      $sql = "
-        SELECT id, column_name
-        FROM civicrm_custom_field
-        WHERE custom_group_id = %1";
-
-      $dao = CRM_Core_DAO::executeQuery(
-        $sql,
-        [1 => [$groupID, 'Integer']]
-      );
-
-      $columnNames = [];
-      while ($dao->fetch()) {
-        $columnNames[$dao->id] = $dao->column_name;
-      }
+      $columnNames = civicrm_api3('CustomField', 'get', [
+        'return' => ["column_name"],
+        'custom_group_id' => $groupID,
+      ]);
+      $columnNames = CRM_Utils_Array::collect('column_name', CRM_Utils_Array::value('values', $columnNames));
 
       $declarations = [];
       foreach ($fields as $name => $value) {

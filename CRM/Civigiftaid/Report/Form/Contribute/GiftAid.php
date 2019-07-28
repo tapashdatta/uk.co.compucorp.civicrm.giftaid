@@ -1,9 +1,11 @@
 <?php
-
 /**
- * https://civicrm.org/license
+ * https://civicrm.org/licensing
  */
 
+/**
+ * Class CRM_Civigiftaid_Report_Form_Contribute_GiftAid
+ */
 class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
   protected $_addressField = FALSE;
   protected $_customGroupExtends = ['Contribution'];

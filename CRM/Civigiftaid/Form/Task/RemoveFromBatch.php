@@ -1,30 +1,24 @@
 <?php
-
 /**
- * https://civicrm.org/license
+ * https://civicrm.org/licensing
  */
 
 use CRM_Civigiftaid_ExtensionUtil as E;
 /**
+ * Class CRM_Civigiftaid_Form_Task_RemoveFromBatch
+ *
  * This class provides the functionality to delete a group of  contribution from batch.
  */
-
 class CRM_Civigiftaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task {
 
-  /**
-   * @var int
-   */
-  protected $_id = null;
-
   public function preProcess() {
-
     parent::preProcess();
-    list($total, $toRemove, $notInBatch, $alreadySubmited) = CRM_Civigiftaid_Utils_Contribution::validationRemoveContributionFromBatch($this->_contributionIds);
+    list($total, $toRemove, $notInBatch, $alreadySubmitted) = CRM_Civigiftaid_Utils_Contribution::validationRemoveContributionFromBatch($this->_contributionIds);
 
     $this->assign('selectedContributions', $total);
     $this->assign('totalToRemoveContributions', count($toRemove));
     $this->assign('notInBatchContributions', count($notInBatch));
-    $this->assign('alreadySubmitedContributions', count($alreadySubmited));
+    $this->assign('alreadySubmitedContributions', count($alreadySubmitted));
     $this->assign(
       'onlineSubmissionExtensionInstalled',
       CRM_Civigiftaid_Utils_Contribution::isOnlineSubmissionExtensionInstalled()
@@ -33,7 +27,7 @@ class CRM_Civigiftaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task
     $contributionsToRemoveRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($toRemove);
     $this->assign('contributionsToRemoveRows', $contributionsToRemoveRows);
 
-    $contributionsAlreadySubmitedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($alreadySubmited);
+    $contributionsAlreadySubmitedRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($alreadySubmitted);
     $this->assign('contributionsAlreadySubmitedRows', $contributionsAlreadySubmitedRows);
 
     $contributionsNotInBatchRows = CRM_Civigiftaid_Utils_Contribution::getContributionDetails($notInBatch);
@@ -41,7 +35,7 @@ class CRM_Civigiftaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task
   }
 
   public function buildQuickForm() {
-    $this->addDefaultButtons(E::ts('Remove from batch'));
+    $this->addDefaultButtons(E::ts('Remove from batch'), 'next', 'cancel');
   }
 
   public function postProcess() {
@@ -62,10 +56,8 @@ class CRM_Civigiftaid_Form_Task_RemoveFromBatch extends CRM_Contribute_Form_Task
       if ($notRemoved) {
         $status = E::ts('Total Contribution(s) not removed from batch: %1', [1 => $notRemoved]);
       }
-
     }
     CRM_Core_Session::setStatus($status);
-
   }
 
 }

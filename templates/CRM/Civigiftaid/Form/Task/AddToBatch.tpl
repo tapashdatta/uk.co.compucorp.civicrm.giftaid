@@ -5,7 +5,15 @@
 <div id="gift-aid-add" class="crm-block crm-form-block crm-export-form-block gift-aid">
     <h2>{ts}Add To Gift Aid{/ts}</h2>
 
-    <div class="help"><p>{ts}Use this form to submit Gift Aid contributions.{/ts}</p></div>
+    <div class="help">
+        <p>{ts}Use this form to submit Gift Aid contributions. Note that this action is irreversible, i.e. you cannot take contributions out of a batch once they have been added.{/ts}</p>
+        <p><strong>Possible reasons for contributions not valid for gift aid:</strong></p>
+        <ol>
+            <li>Contribution status is not 'Completed'</li>
+            <li>Related Contact does not have a valid gift aid declaration</li>
+            <li>Related Contact's gift aid declaration does not cover the contribution date</li>
+        </ol>
+    </div>
 
     <table class="form-layout">
         <tr>
@@ -23,6 +31,10 @@
             </td>
         </tr>
     </table>
+
+    <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
+
+    <div class="clear"></div>
 
     <h3>{ts}Summary{/ts}</h3>
 
@@ -52,9 +64,9 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                             </td>
-                            <td>{$row.gift_aidable_amount}</td>
-                            <td>{$row.total_amount}</td>
-                            <td>{$row.line_items|@count}</td>
+                            <td>{$row.gift_aidable_amount|crmMoney:$row.currency}</td>
+                            <td>{$row.total_amount|crmMoney:$row.currency}</td>
+                            <td>{if $row.line_items}{$row.line_items|@count}{/if}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
@@ -98,9 +110,9 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                             </td>
-                            <td>{$row.gift_aidable_amount}</td>
-                            <td>{$row.total_amount}</td>
-                            <td>{$row.line_items|@count}</td>
+                            <td>{$row.gift_aidable_amount|crmMoney:$row.currency}</td>
+                            <td>{$row.total_amount|crmMoney:$row.currency}</td>
+                            <td>{if $row.line_items}{$row.line_items|@count}{/if}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
@@ -144,9 +156,9 @@
                             <td>
                                 <a href="{crmURL p='civicrm/contact/view' q="reset=1&cid=`$row.contact_id`"}">{$row.display_name}</a>
                             </td>
-                            <td>{$row.gift_aidable_amount}</td>
-                            <td>{$row.total_amount}</td>
-                            <td>{$row.line_items|@count}</td>
+                            <td>{$row.gift_aidable_amount|crmMoney:$row.currency}</td>
+                            <td>{$row.total_amount|crmMoney:$row.currency}</td>
+                            <td>{if $row.line_items}{$row.line_items|@count}{/if}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
@@ -165,16 +177,4 @@
     {else}
         {include file="CRM/Civigiftaid/Form/Task/EmptyAccordion.tpl" content="Number of contributions not valid for gift aid: $notValidContributions"}
     {/if}
-
-    <p>{ts}Use this form to submit Gift Aid contributions. Note that this action is irreversible, i.e. you cannot take contributions out of a batch once they have been added.{/ts}</p>
-
-    <p><strong>Possible reasons for contributions not valid for gift aid:</strong></p>
-
-    <ol>
-        <li>Contribution status is not 'Completed'</li>
-        <li>Related Contact does not have a valid gift aid declaration</li>
-        <li>Related Contact's gift aid declaration does not cover the contribution date</li>
-    </ol>
-
-    {$form.buttons.html}
 </div>
