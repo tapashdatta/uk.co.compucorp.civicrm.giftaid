@@ -106,12 +106,14 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
     if ($added <= 0) {
       // rollback since there were no contributions added, and we might not want to keep an empty batch
       $transaction->rollback();
+      $statusType = 'alert';
       $status = E::ts(
         'Could not create batch "%1", as there were no valid contribution(s) to be added.',
         [1 => $batchLabel]
       );
     }
     else {
+      $statusType = 'success';
       $status = [
         E::ts('Added Contribution(s) to %1', [1 => $batchLabel]),
         E::ts('Total Selected Contribution(s): %1', [1 => $total])
@@ -131,7 +133,7 @@ class CRM_Civigiftaid_Form_Task_AddToBatch extends CRM_Contribute_Form_Task {
       $status = implode('<br/>', $status);
     }
     $transaction->commit();
-    CRM_Core_Session::setStatus($status);
+    CRM_Core_Session::setStatus($status, E::ts('Gift Aid'), $statusType);
   }
 
 }
