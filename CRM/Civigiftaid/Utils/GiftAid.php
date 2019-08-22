@@ -165,7 +165,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
     } else {
       $endTimestamp = NULL;
     }
-    $params['end_date'] = $endTimestamp ? date('YmdHis', $endTimestamp) : '';
 
     switch ($params['eligible_for_gift_aid']) {
       case self::DECLARATION_IS_YES:
@@ -184,11 +183,8 @@ class CRM_Civigiftaid_Utils_GiftAid {
         }
         elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_NO || $currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_PAST_4_YEARS) {
           //   - if current negative, set its end_date to now and create new ending new_end_date.
-          $updateParams = [
-            'id' => $currentDeclaration['id'],
-            'end_date' => $params['start_date'],
-          ];
-          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          $params['id'] = $currentDeclaration['id'];
+          $params['end_date'] = $params['start_date'];
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
         break;
@@ -209,11 +205,8 @@ class CRM_Civigiftaid_Utils_GiftAid {
         }
         elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_NO || $currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_YES) {
           //   - if current negative, set its end_date to now and create new ending new_end_date.
-          $updateParams = [
-            'id' => $currentDeclaration['id'],
-            'end_date' => $params['start_date'],
-          ];
-          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          $params['id'] = $currentDeclaration['id'];
+          $params['end_date'] = $params['start_date'];
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
         break;
@@ -224,23 +217,18 @@ class CRM_Civigiftaid_Utils_GiftAid {
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
         elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_YES || $currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_PAST_4_YEARS) {
-          //   - if current positive, set its end_date to now and create new ending new_end_date.
-          $updateParams = [
-            'id' => $currentDeclaration['id'],
-            'end_date' => $params['start_date'],
-          ];
-          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          // If current declaration is "Yes", set its end_date to now and create new ending new_end_date.
+          $params['id'] = $currentDeclaration['id'];
+          $params['end_date'] = $params['start_date'];
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
         break;
 
-      //   - if current negative, leave as is.
+        // If current negative, leave as is.
     }
 
     return [
       'is_error' => 0,
-      // TODO 'inserted' => array(id => A, entity_id = B, ...),
-      // TODO 'updated'  => array(id => A, entity_id = B, ...),
     ];
   }
 
@@ -293,21 +281,34 @@ class CRM_Civigiftaid_Utils_GiftAid {
     if ($charityColumnExists) {
       $cols['charity'] = 'String';
     }
-    $queryType = 'INSERT';
+
     if (CRM_Utils_Array::value('id', $params)) {
+      $keyVals = [];
+      foreach ($cols as $colName => $colType) {
+        if (isset($params[$colName])) {
+          $keyVals[] = "{$colName}='{$params[$colName]}'";
+        }
+      }
+      $keyValsString = implode(',', $keyVals);
+      $queryParams = [];
       $cols['id'] = 'Integer';
-      $queryType = 'REPLACE';
-    }
 
-    $count = 1;
-    foreach ($cols as $colName => $colType) {
-      $insertVals[$colName] = CRM_Utils_Array::value($colName, $params, '');
-      $values[] = "%{$count}";
-      $queryParams[$count] = [CRM_Utils_Array::value($colName, $params, ''), $colType];
-      $count++;
+      $query = "UPDATE civicrm_value_gift_aid_declaration SET {$keyValsString} WHERE id={$params['id']}";
     }
+    else {
+      $count = 1;
+      foreach ($cols as $colName => $colType) {
+        $insertVals[$colName] = CRM_Utils_Array::value($colName, $params, '');
+        $values[] = "%{$count}";
+        $queryParams[$count] = [
+          CRM_Utils_Array::value($colName, $params, ''),
+          $colType
+        ];
+        $count++;
+      }
 
-    $query = "{$queryType} INTO civicrm_value_gift_aid_declaration (" . implode(',', array_keys($insertVals)) . ") VALUES (" . implode(',', $values) . ")";
+      $query = "INSERT INTO civicrm_value_gift_aid_declaration (" . implode(',', array_keys($insertVals)) . ") VALUES (" . implode(',', $values) . ")";
+    }
 
     // Insert
     CRM_Core_DAO::executeQuery($query, $queryParams);
