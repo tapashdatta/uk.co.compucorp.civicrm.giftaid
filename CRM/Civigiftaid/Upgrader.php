@@ -24,6 +24,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     $this->upgrade_3000();
     $this->upgrade_3101();
     $this->upgrade_3103();
+    $this->upgrade_3104();
   }
 
   /**
@@ -252,7 +253,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     $declarationCustomGroupID = CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration']));
     $submissionCustomGroupID = CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid']));
 
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$og1Id} WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$declarationCustomGroupID}");
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$og2Id} WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$declarationCustomGroupID}");
     CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$og2Id} WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$submissionCustomGroupID}");
 
     return TRUE;
@@ -261,6 +262,37 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
   public function upgrade_3103() {
     $this->log('Applying update 3103 - delete old report templates');
     $this->removeLegacyRegisteredReport();
+    return TRUE;
+  }
+
+  public function upgrade_3104() {
+    $this->log('Applying update 3104 - change profile(s) to use Individual declaration eligibility field instead of contribution eligibility field');
+    $contributionGiftAidField = CRM_Civigiftaid_Utils::getCustomByName('Eligible_For_Gift_Aid', 'Gift_Aid');
+    $contactGiftAidField = CRM_Civigiftaid_Utils::getCustomByName('Eligible_For_Gift_Aid', 'Gift_Aid_Declaration');
+    $helpPost = '<p>By selecting &#039;Yes&#039; above you are confirming that you are a UK taxpayer and the amount of income and/or capital gains tax you pay is at least as much as we will reclaim on your donations in this tax year.</p>
+<p><b>About Gift Aid</b></p>
+<p>Gift Aid increases the value of donations to charities by allowing them to reclaim basic rate tax on your gift.  We would like to reclaim gift aid on your behalf.  We can only reclaim Gift Aid if you are a UK taxpayer.  Please confirm that you are a eligible for gift aid above.  <a href="http://www.hmrc.gov.uk/individuals/giving/gift-aid.htm">More about Gift Aid</a>.</p>';
+
+    $query = "UPDATE civicrm_uf_field SET field_name='{$contactGiftAidField}', field_type='Individual', help_post='{$helpPost}' WHERE field_name='{$contributionGiftAidField}'";
+    CRM_Core_DAO::executeQuery($query);
+
+    $this->log('Applying update 3104 - Remove eligibility_declaration_options as it duplicates uk_taxpayer_options');
+    $declarationCustomGroupID = CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration']));
+    $og2 = civicrm_api3('OptionGroup', 'get', [
+      'name' => "uk_taxpayer_options",
+    ]);
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$og2['id']} WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$declarationCustomGroupID}");
+
+    try {
+      $optionGroup = civicrm_api3('OptionGroup', 'getsingle', [
+        'name' => 'eligibility_declaration_options',
+      ]);
+      civicrm_api3('OptionGroup', 'delete', ['id' => $optionGroup['id']]);
+    }
+    catch (Exception $e) {
+      // Not found, that's ok - it's already deleted!
+    }
+
     return TRUE;
   }
 

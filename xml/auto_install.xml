@@ -417,7 +417,7 @@
   </ProfileGroups>
   <ProfileFields>
     <ProfileField>
-      <field_name>custom.civicrm_value_gift_aid_submission.eligible_for_gift_aid</field_name>
+      <field_name>custom.civicrm_value_gift_aid_declaration.eligible_for_gift_aid</field_name>
       <is_active>1</is_active>
       <is_view>0</is_view>
       <is_required>1</is_required>
