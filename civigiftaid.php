@@ -179,53 +179,50 @@ function civigiftaid_civicrm_custom($op, $groupID, $entityID, &$params) {
     'id' => $groupID,
     'return' => 'table_name',
   ]);
+  switch ($customGroupTableName) {
+    case 'civicrm_value_gift_aid_declaration':
+      break;
 
-  if ($customGroupTableName == 'civicrm_value_gift_aid_submission') {
-    if (!empty(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
-      return;
-    }
-    Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
-    // Iterate through $params to get new declaration value
-    $giftAidEligibleStatus = NULL;
-    if (!is_array($params) || empty($params)) {
-      return;
-    }
-
-    foreach ($params as $field) {
-      if ($field['column_name'] == 'eligible_for_gift_aid') {
-        $giftAidEligibleStatus = $field['value'];
-        break;
+    case 'civicrm_value_gift_aid_submission':
+      if (!empty(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
+        return;
       }
-    }
+      Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
+      // Iterate through $params to get new declaration value
+      $giftAidEligibleStatus = NULL;
+      if (!is_array($params) || empty($params)) {
+        return;
+      }
 
-    if (is_null($giftAidEligibleStatus)) {
-      return;
-    }
+      foreach ($params as $field) {
+        if ($field['column_name'] == 'eligible_for_gift_aid') {
+          $giftAidEligibleStatus = $field['value'];
+          break;
+        }
+      }
 
-    civigiftaid_update_declaration_amount($entityID);
+      if (is_null($giftAidEligibleStatus)) {
+        return;
+      }
+
+      civigiftaid_update_declaration_amount($entityID);
+      break;
   }
 }
 
 function civigiftaid_update_declaration_amount($contributionID) {
-  $customGroupID = civicrm_api3('CustomGroup', 'getvalue', [
-    'table_name' => 'civicrm_value_gift_aid_submission',
-    'return' => 'id',
-  ]);
-
-  $customFieldID = civicrm_api3('CustomField', 'getvalue', [
-    'custom_group_id' => $customGroupID,
-    'name' => "Eligible_for_Gift_Aid",
-    'return' => 'id',
-  ]);
+  $contributionCustomGiftAidEligibleFieldName = CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', 'Gift_Aid');
+  $contactCustomGiftAidEligibleFieldName = CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', 'Gift_Aid_Declaration');
 
   $contribution = civicrm_api3('Contribution', 'getsingle', [
     'id' => $contributionID,
-    'return' => ['contact_id', 'receive_date', 'custom_' . $customFieldID]
+    'return' => ['contact_id', 'receive_date', $contributionCustomGiftAidEligibleFieldName]
   ]);
+
+  $giftAidEligibleStatus = CRM_Utils_Request::retrieveValue($contactCustomGiftAidEligibleFieldName, 'String', NULL);
 
   // Get the gift aid eligible status
   // If it's not a valid number don't do any further processing
-  $giftAidEligibleStatus = $contribution['custom_' . $customFieldID];
   if (!is_numeric($giftAidEligibleStatus)) {
     return;
   }
@@ -238,13 +235,13 @@ function civigiftaid_update_declaration_amount($contributionID) {
   $params = [
     'entity_id'             => $contribution['contact_id'],
     'eligible_for_gift_aid' => (int) $giftAidEligibleStatus,
-    'start_date'            => $contribution['receive_date'],
+    'start_date'            => CRM_Utils_Date::isoToMysql($contribution['receive_date']),
     'address'               => $addressDetails,
     'post_code'             => $postCode,
   ];
   CRM_Civigiftaid_Utils_GiftAid::setDeclaration($params);
   if ($giftAidEligibleStatus === CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_PAST_4_YEARS || $giftAidEligibleStatus === CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES) {
-    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID);
+    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID, $giftAidEligibleStatus, '');
   }
 }
 
@@ -281,7 +278,7 @@ function civigiftaid_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 }
 
 function civigiftaid_callback_civicrm_post_contribution($params) {
-  if (Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount']) {
+  if (isset(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
     return;
   }
   Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;

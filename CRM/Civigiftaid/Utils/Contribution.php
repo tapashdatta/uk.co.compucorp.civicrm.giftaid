@@ -69,7 +69,7 @@ class CRM_Civigiftaid_Utils_Contribution {
           'entity_table' => 'civicrm_contribution',
         ]);
 
-        self::updateGiftAidFields($contribution['id'], $batchName);
+        self::updateGiftAidFields($contribution['id'], NULL, $batchName);
 
         $contributionsAdded[] = $contribution['id'];
       }
@@ -96,20 +96,13 @@ class CRM_Civigiftaid_Utils_Contribution {
 
   /**
    * @param int $contributionID
-   * @param string $batchName - if this is set to NULL it will NOT be changed
    * @param int $eligibleForGiftAid - if this is NULL if will NOT be set, otherwise set it to eg CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES
+   * @param string $batchName - if this is set to NULL it will NOT be changed
    *
    * @throws \CRM_Extension_Exception
    * @throws \CiviCRM_API3_Exception
    */
-  /**
-   * @param $contributionID
-   * @param string $batchName
-   *
-   * @throws \CRM_Extension_Exception
-   * @throws \CiviCRM_API3_Exception
-   */
-  public static function updateGiftAidFields($contributionID, $batchName = '', $eligibleForGiftAid = NULL) {
+  public static function updateGiftAidFields($contributionID, $eligibleForGiftAid = NULL, $batchName = '') {
     $totalAmount = civicrm_api3('Contribution', 'getvalue', [
       'return' => "total_amount",
       'id' => $contributionID,

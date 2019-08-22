@@ -82,7 +82,7 @@ function civicrm_api3_gift_aid_updateeligiblecontributions($params) {
 
     // This must be an eligible contribution - update it
     // We don't touch batchName
-    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contribution['id'], NULL, CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES);
+    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contribution['id'], CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES, NULL);
     $updatedIDs[$contribution['id']] = 1;
   }
   return civicrm_api3_create_success($updatedIDs, $params, 'gift_aid', 'updateeligiblecontributions');
