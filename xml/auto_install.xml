@@ -1,143 +1,5 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <CustomData>
-  <OptionGroups>
-    <OptionGroup>
-      <title>GiftAid Batch Name</title>
-      <name>giftaid_batch_name</name>
-      <label>giftaid_batch_name</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-    <OptionGroup>
-      <title>Reason ended</title>
-      <name>reason_ended</name>
-      <label>Reason Ended</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-    <OptionGroup>
-      <name>eligibility_declaration_options</name>
-      <title>Eligibility Declaration Options</title>
-      <label>Eligibility Declaration Options</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-    <OptionGroup>
-      <title>UK Taxpayer Options</title>
-      <name>uk_taxpayer_options</name>
-      <label>UK Taxpayer Options</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-  </OptionGroups>
-    <OptionGroups>
-    <OptionGroup>
-      <title>The GiftAid basic rate tax</title>
-      <name>giftaid_basic_rate_tax</name>
-      <label>GiftAid basic rate tax</label>
-      <is_active>1</is_active>
-    </OptionGroup>
-    </OptionGroups>
-      <OptionValues>
-        <OptionValue>
-        <label>Yes</label>
-        <value>1</value>
-        <name>eligible_for_giftaid</name>
-        <is_default>0</is_default>
-        <weight>1</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>eligibility_declaration_options</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>No</label>
-        <value>0</value>
-        <name>not_eligible_for_giftaid</name>
-        <is_default>0</is_default>
-        <weight>2</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>eligibility_declaration_options</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>Yes, in the Past 4 Years</label>
-        <value>3</value>
-        <name>past_four_years</name>
-        <is_default>0</is_default>
-        <weight>3</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>eligibility_declaration_options</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>Yes</label>
-        <value>1</value>
-        <name>yes_uk_taxpayer</name>
-        <is_default>0</is_default>
-        <weight>1</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>uk_taxpayer_options</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>No</label>
-        <value>0</value>
-        <name>not_uk_taxpayer</name>
-        <is_default>0</is_default>
-        <weight>2</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>uk_taxpayer_options</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>Yes, in the Past 4 Years</label>
-        <value>3</value>
-        <name>uk_taxpayer_past_four_years</name>
-        <is_default>0</is_default>
-        <weight>3</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>uk_taxpayer_options</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>Contact Declined</label>
-        <value>Contact Declined</value>
-        <name>Contact_Declined</name>
-        <is_default>0</is_default>
-        <weight>2</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>reason_ended</option_group_name>
-      </OptionValue>
-      <OptionValue>
-        <label>HMRC Declined</label>
-        <value>HMRC Declined</value>
-        <name>HMRC_Declined</name>
-        <is_default>0</is_default>
-        <weight>1</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>0</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>reason_ended</option_group_name>
-      </OptionValue>
-    </OptionValues>
-    <OptionValues>
-      <OptionValue>
-        <label>The basic rate tax</label>
-        <value>20</value>
-        <name>basic_rate_tax</name>
-        <is_default>0</is_default>
-        <description>The GiftAid Basic Tax Rate (%)</description>
-        <weight>2</weight>
-        <is_optgroup>0</is_optgroup>
-        <is_reserved>1</is_reserved>
-        <is_active>1</is_active>
-        <option_group_name>giftaid_basic_rate_tax</option_group_name>
-      </OptionValue>
-    </OptionValues>
   <CustomGroups>
     <CustomGroup>
       <name>Gift_Aid_Declaration</name>
@@ -185,7 +47,7 @@
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
       <column_name>eligible_for_gift_aid</column_name>
-      <option_group_name>uk_taxpayer_options</option_group_name>
+      <option_group_id>1</option_group_id>
       <custom_group_name>Gift_Aid_Declaration</custom_group_name>
     </CustomField>
     <CustomField>
@@ -274,7 +136,7 @@
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
       <column_name>reason_ended</column_name>
-      <option_group_name>reason_ended</option_group_name>
+      <option_group_id>1</option_group_id>
       <custom_group_name>Gift_Aid_Declaration</custom_group_name>
     </CustomField>
     <CustomField>
@@ -344,8 +206,8 @@
       <text_length>255</text_length>
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
+      <option_group_id>1</option_group_id>
       <column_name>eligible_for_gift_aid</column_name>
-      <option_group_name>eligibility_declaration_options</option_group_name>
       <custom_group_name>Gift_Aid</custom_group_name>
     </CustomField>
     <CustomField>
@@ -396,8 +258,8 @@
       <text_length>255</text_length>
       <note_columns>60</note_columns>
       <note_rows>4</note_rows>
+      <option_group_id>1</option_group_id>
       <column_name>batch_name</column_name>
-      <option_group_name>giftaid_batch_name</option_group_name>
       <custom_group_name>Gift_Aid</custom_group_name>
     </CustomField>
   </CustomFields>
