@@ -518,6 +518,9 @@ class CRM_Civigiftaid_Utils_GiftAid {
    */
   public static function isContributionEligible($contribution) {
     $declarations = self::getAllDeclarations($contribution['contact_id']);
+    if (!$declarations) {
+      return FALSE;
+    }
 
     $groupID = civicrm_api3('CustomGroup', 'getvalue', [
       'return' => "id",
