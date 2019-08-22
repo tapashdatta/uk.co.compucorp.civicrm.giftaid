@@ -220,6 +220,7 @@ function civigiftaid_update_declaration_amount($contributionID) {
   ]);
 
   $giftAidEligibleStatus = CRM_Utils_Request::retrieveValue($contactCustomGiftAidEligibleFieldName, 'String', NULL);
+  $contributionGiftAidEligibleStatus = CRM_Utils_Request::retrieveValue($contributionCustomGiftAidEligibleFieldName, 'String', NULL);
 
   // Get the gift aid eligible status
   // If it's not a valid number don't do any further processing
@@ -228,6 +229,10 @@ function civigiftaid_update_declaration_amount($contributionID) {
   }
   else {
     $giftAidEligibleStatus = (int) $giftAidEligibleStatus;
+  }
+  // We could specify both declaration + contribution fields on the profile, so you could sign a declaration but say this contribution is not eligible for example.
+  if (!$contributionGiftAidEligibleStatus) {
+    $contributionGiftAidEligibleStatus = $giftAidEligibleStatus;
   }
 
   list($addressDetails, $postCode) = _civigiftaid_civicrm_custom_get_address_and_postal_code($contribution['contact_id'], 1);
@@ -241,7 +246,7 @@ function civigiftaid_update_declaration_amount($contributionID) {
   ];
   CRM_Civigiftaid_Utils_GiftAid::setDeclaration($params);
   if ($giftAidEligibleStatus === CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_PAST_4_YEARS || $giftAidEligibleStatus === CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES) {
-    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID, $giftAidEligibleStatus, '');
+    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID, $contributionGiftAidEligibleStatus, '');
   }
 }
 
