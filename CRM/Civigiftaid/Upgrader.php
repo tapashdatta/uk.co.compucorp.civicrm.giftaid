@@ -53,7 +53,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
 
     civicrm_api3('UFGroup', 'update', [
       'is_active' => 1,
-      'id' =>  CRM_Utils_Array::value('id',civicrm_api3('UFGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration'])),
+      'id' =>  CRM_Utils_Array::value('id',civicrm_api3('UFGroup', 'getsingle', ['name' => 'Gift_Aid'])),
     ]);
   }
 
@@ -66,20 +66,35 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 0 WHERE name = 'giftaid_basic_rate_tax'");
     CRM_Core_DAO::executeQuery("UPDATE civicrm_option_group SET is_active = 0 WHERE name = 'reason_ended'");
 
-    civicrm_api3('CustomGroup', 'update', [
-      'is_active' => 0,
-      'id' => CRM_Utils_Array::value('id',civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid'])),
-    ]);
+    try {
+      civicrm_api3('CustomGroup', 'update', [
+        'is_active' => 0,
+        'id' => CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid'])),
+      ]);
+    }
+    catch (Exception $e) {
+      // Couldn't find CustomGroup, maybe it was manually deleted
+    }
 
-    civicrm_api3('CustomGroup', 'update', [
-      'is_active' => 0,
-      'id' =>  CRM_Utils_Array::value('id',civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration'])),
-    ]);
+    try {
+      civicrm_api3('CustomGroup', 'update', [
+        'is_active' => 0,
+        'id' => CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration'])),
+      ]);
+    }
+    catch (Exception $e) {
+      // Couldn't find CustomGroup, maybe it was manually deleted
+    }
 
-    civicrm_api3('UFGroup', 'update', [
-      'is_active' => 0,
-      'id' =>  CRM_Utils_Array::value('id',civicrm_api3('UFGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration'])),
-    ]);
+    try {
+      civicrm_api3('UFGroup', 'update', [
+        'is_active' => 0,
+        'id' =>  CRM_Utils_Array::value('id',civicrm_api3('UFGroup', 'getsingle', ['name' => 'Gift_Aid'])),
+      ]);
+    }
+    catch (Exception $e) {
+      // Couldn't find CustomGroup, maybe it was manually deleted
+    }
   }
 
   /**
