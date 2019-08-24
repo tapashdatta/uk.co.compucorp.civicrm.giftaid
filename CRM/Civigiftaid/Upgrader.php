@@ -277,7 +277,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     foreach($optionValues as $params) {
       $optionValue = civicrm_api3('OptionValue', 'get', [
         'option_group_id' => $params['option_group_id'],
-        'name' => $params['name'],
+        'value' => $params['value'],
       ]);
       if (CRM_Utils_Array::value('id', $optionValue)) {
         $params['id'] = $optionValue['id'];
