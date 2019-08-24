@@ -28,6 +28,7 @@ class CRM_Civigiftaid_Report_Form_Contribute_GiftAid extends CRM_Report_Form {
                 'title'        => ts('Batch'),
                 'operatorType' => CRM_Report_Form::OP_MULTISELECT,
                 'options'      => CRM_Civigiftaid_Utils_Contribution::getBatchIdTitle('id desc'),
+                'type' => CRM_Utils_Type::T_INT,
               ],
             ],
           'fields'  => [
