@@ -1,3 +1,7 @@
+## Release 3.3.1
+
+* Major performance improvement to "Add to Batch".
+
 ## Release 3.3
 **In this release we update profiles to use the declaration eligibility field instead of the contribution.
 This allows us to create a new declaration (as it will be the user filling in a profile via contribution page etc.)

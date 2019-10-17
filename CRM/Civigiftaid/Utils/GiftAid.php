@@ -72,14 +72,10 @@ class CRM_Civigiftaid_Utils_GiftAid {
    * @throws \CiviCRM_API3_Exception
    */
   public static function isEligibleForGiftAid($contribution) {
-    $isContributionEligible = FALSE;
+    $isContributionEligible = self::isContributionEligible($contribution);
 
-    if(isset($contribution['id'])) {
-      $isContributionEligible = self::isContributionEligible($contribution);
-    }
     // hook can alter the eligibility if needed
     CRM_Civigiftaid_Utils_Hook::giftAidEligible($isContributionEligible, $contribution['contact_id'], $contribution['receive_date'], $contribution['id']);
-
     return $isContributionEligible;
   }
 
@@ -457,20 +453,17 @@ class CRM_Civigiftaid_Utils_GiftAid {
    * @return bool|array
    */
   public static function getAllDeclarations($contactID) {
-    $sql = "SELECT id, entity_id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
+    if (!isset(Civi::$statics[__CLASS__][$contactID]['declarations'])) {
+      $sql = "SELECT id, entity_id, eligible_for_gift_aid, start_date, end_date, reason_ended, source, notes
               FROM civicrm_value_gift_aid_declaration
               WHERE  entity_id = %1";
-    $sqlParams = [
-      1 => [$contactID, 'Integer']
-    ];
+      $sqlParams[1] = [$contactID, 'Integer'];
 
-    $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
-
-    if($declarations = $dao->fetchAll()) {
-      return $declarations;
+      $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
+      Civi::$statics[__CLASS__][$contactID]['declarations'] = $dao->fetchAll();
     }
 
-    return FALSE;
+    return Civi::$statics[__CLASS__][$contactID]['declarations'];
   }
 
   /**
@@ -519,7 +512,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
    */
   public static function isContributionEligible($contribution) {
     $declarations = self::getAllDeclarations($contribution['contact_id']);
-    if (!$declarations) {
+    if (empty($declarations)) {
       return FALSE;
     }
 

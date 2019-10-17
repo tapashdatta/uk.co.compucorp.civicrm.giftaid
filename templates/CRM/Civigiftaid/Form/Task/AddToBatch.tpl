@@ -66,7 +66,7 @@
                             </td>
                             <td>{$row.gift_aidable_amount|crmMoney:$row.currency}</td>
                             <td>{$row.total_amount|crmMoney:$row.currency}</td>
-                            <td>{if $row.line_items}{$row.line_items|@count}{/if}</td>
+                            <td>{$row.line_items_count}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
@@ -112,7 +112,7 @@
                             </td>
                             <td>{$row.gift_aidable_amount|crmMoney:$row.currency}</td>
                             <td>{$row.total_amount|crmMoney:$row.currency}</td>
-                            <td>{if $row.line_items}{$row.line_items|@count}{/if}</td>
+                            <td>{$row.line_items_count}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>
@@ -158,7 +158,7 @@
                             </td>
                             <td>{$row.gift_aidable_amount|crmMoney:$row.currency}</td>
                             <td>{$row.total_amount|crmMoney:$row.currency}</td>
-                            <td>{if $row.line_items}{$row.line_items|@count}{/if}</td>
+                            <td>{$row.line_items_count}</td>
                             <td>{$row.financial_account}</td>
                             <td>{$row.source}</td>
                             <td>{$row.receive_date}</td>

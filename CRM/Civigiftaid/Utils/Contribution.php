@@ -103,12 +103,11 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @throws \CiviCRM_API3_Exception
    */
   public static function updateGiftAidFields($contributionID, $eligibleForGiftAid = NULL, $batchName = '') {
-    $totalAmount = civicrm_api3('Contribution', 'getvalue', [
+    $totalAmount = (float) civicrm_api3('Contribution', 'getvalue', [
       'return' => "total_amount",
       'id' => $contributionID,
     ]);
     $giftAidableContribAmt = self::getGiftAidableContribAmt($totalAmount, $contributionID);
-
     $giftAidAmount = self::calculateGiftAidAmt($giftAidableContribAmt, self::getBasicRateTax());
 
     $groupID = civicrm_api3('CustomGroup', 'getvalue', [
@@ -116,7 +115,7 @@ class CRM_Civigiftaid_Utils_Contribution {
       'name' => "gift_aid",
     ]);
     $contributionParams = [
-      'id' => $contributionID,
+      'entity_id' => $contributionID,
       CRM_Civigiftaid_Utils::getCustomByName('gift_aid_amount', $groupID) => $giftAidAmount,
       CRM_Civigiftaid_Utils::getCustomByName('amount', $groupID) => $giftAidableContribAmt,
     ];
@@ -126,7 +125,8 @@ class CRM_Civigiftaid_Utils_Contribution {
     if ($eligibleForGiftAid) {
       $contributionParams[CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID)] = $eligibleForGiftAid;
     }
-    civicrm_api3('Contribution', 'create', $contributionParams);
+    // We use CustomValue.create instead of Contribution.create because Contribution.create is way too slow
+    civicrm_api3('CustomValue', 'create', $contributionParams);
   }
 
   /**
@@ -197,22 +197,20 @@ class CRM_Civigiftaid_Utils_Contribution {
 
     if (!(bool) CRM_Civigiftaid_Settings::getValue('globally_enabled')) {
       $enabledTypes = (array) CRM_Civigiftaid_Settings::getValue('financial_types_enabled');
+      if (empty($enabledTypes)) {
+        // if no financial types are selected
+        return 0;
+      }
       $enabledTypesStr = implode(', ', $enabledTypes);
-
-      // if no financial types are selected, don't return anything from query
-      $sql .= $enabledTypesStr
-        ? " AND financial_type_id IN ({$enabledTypesStr})"
-        : " AND 0";
+      $sql .= " AND financial_type_id IN ({$enabledTypesStr})";
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql);
-
-    $contributionAmount = 0;
-    while ($dao->fetch()) {
-      $contributionAmount = (float) $dao->total;
+    if ($dao->fetch()) {
+      return (float) $dao->total;
     }
 
-    return $contributionAmount;
+    return 0;
   }
 
   /**
@@ -363,6 +361,7 @@ class CRM_Civigiftaid_Utils_Contribution {
       'options' => ['limit' => 0],
     ];
     $contributions = civicrm_api3('Contribution', 'get', $contributionParams);
+
     foreach (CRM_Utils_Array::value('values', $contributions) as $contribution) {
       if (!empty($contribution[CRM_Civigiftaid_Utils::getCustomByName('batch_name', $groupID)])) {
         $contributionsAlreadyAdded[] = $contribution['id'];
@@ -412,20 +411,16 @@ class CRM_Civigiftaid_Utils_Contribution {
    * @return array
    */
   public static function getContributionDetails($contributionIds) {
-    $result = [];
+    $contributionDetails = [];
 
     if (empty($contributionIds)) {
-      return $result;
+      return $contributionDetails;
     }
 
     $contributionIdStr = implode(',', $contributionIds);
-    self::addContributionDetails($contributionIdStr, $result);
+    $contributionDetails = self::addContributionDetails($contributionIdStr, $contributionDetails);
 
-    if (count($result)) {
-      self::addLineItemDetails($contributionIdStr, $result);
-    }
-
-    return $result;
+    return $contributionDetails;
   }
 
   /**
@@ -471,11 +466,12 @@ class CRM_Civigiftaid_Utils_Contribution {
 
   /**
    * @param string $contributionIdStr
-   * @param array $result
+   * @param array $contributionDetails
    *
+   * @return array
    * @throws \CiviCRM_API3_Exception
    */
-  private static function addContributionDetails($contributionIdStr, &$result) {
+  private static function addContributionDetails($contributionIdStr, $contributionDetails) {
     // Get all contributions from found IDs that are not already in a batch
     $group = civicrm_api3('CustomGroup', 'getsingle', [
       'return' => ['id', 'table_name'],
@@ -491,67 +487,62 @@ class CRM_Civigiftaid_Utils_Contribution {
       LEFT JOIN civicrm_entity_batch entity_batch ON ( entity_batch.entity_id = contribution.id )
       LEFT JOIN civicrm_batch batch ON ( batch.id = entity_batch.batch_id )
       LEFT JOIN {$group['table_name']} giftaidsubmission ON ( contribution.id = giftaidsubmission.entity_id )
-      WHERE contribution.id IN ({$contributionIdStr})";
+      WHERE contribution.id IN (%1)";
 
-    $dao = CRM_Core_DAO::executeQuery($query);
+    $queryParams[1] = [$contributionIdStr, 'CommaSeparatedIntegers'];
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
 
     while ($dao->fetch()) {
-      $result[$dao->id]['contact_id'] = $dao->contact_id;
-      $result[$dao->id]['contribution_id'] = $dao->id;
-      $result[$dao->id]['display_name'] = $dao->display_name;
-      $result[$dao->id]['gift_aidable_amount'] = $dao->gift_aid_amount;
-      $result[$dao->id]['total_amount'] = $dao->total_amount;
-      $result[$dao->id]['currency'] = $dao->currency;
-      $result[$dao->id]['financial_account'] = $dao->name;
-      $result[$dao->id]['source'] = $dao->source;
-      $result[$dao->id]['receive_date'] = $dao->receive_date;
-      $result[$dao->id]['batch'] = $dao->title;
-      $result[$dao->id]['batch_id'] = $dao->batch_id;
+      $contributionDetails[$dao->id]['contact_id'] = $dao->contact_id;
+      $contributionDetails[$dao->id]['contribution_id'] = $dao->id;
+      $contributionDetails[$dao->id]['display_name'] = $dao->display_name;
+      $contributionDetails[$dao->id]['gift_aidable_amount'] = $dao->gift_aid_amount;
+      $contributionDetails[$dao->id]['total_amount'] = $dao->total_amount;
+      $contributionDetails[$dao->id]['currency'] = $dao->currency;
+      $contributionDetails[$dao->id]['financial_account'] = $dao->name;
+      $contributionDetails[$dao->id]['source'] = $dao->source;
+      $contributionDetails[$dao->id]['receive_date'] = $dao->receive_date;
+      $contributionDetails[$dao->id]['batch'] = $dao->title;
+      $contributionDetails[$dao->id]['batch_id'] = $dao->batch_id;
+      $contributionDetails[$dao->id]['line_items_count'] = 0;
     }
+
+    if (count($contributionDetails)) {
+      $contributionDetails = self::countLineItems($contributionIdStr, $contributionDetails);
+    }
+    return $contributionDetails;
   }
 
   /**
-   * @param string $contributionIdStr
-   * @param array $result
+   * This gets a count of all lineitems for a contribution for display on the "Add to Batch" list.
    *
-   * @throws \CRM_Core_Exception
+   * @param string $contributionIdStr
+   * @param array $contributionDetails
+   *
+   * @return array
    */
-  private static function addLineItemDetails($contributionIdStr, &$result) {
-    $query = "
-      SELECT c.id, i.entity_table, i.label, i.line_total, i.qty, c.currency, t.name
-      FROM civicrm_contribution c
-      LEFT JOIN civicrm_line_item i
-      ON c.id = i.contribution_id
-      LEFT JOIN civicrm_financial_type t
-      ON i.financial_type_id = t.id
-      WHERE c.id IN ($contributionIdStr)";
+  private static function countLineItems($contributionIdStr, $contributionDetails) {
+    $query = "SELECT i.contribution_id as contribution_id, COUNT(i.contribution_id) as line_item_count
+      FROM civicrm_line_item i
+      WHERE i.contribution_id IN (%1)";
+    $queryParams[1] = [$contributionIdStr, 'CommaSeparatedIntegers'];
 
     if (!(bool) CRM_Civigiftaid_Settings::getValue('globally_enabled')) {
       $enabledTypes = (array) CRM_Civigiftaid_Settings::getValue('financial_types_enabled');
-      $enabledTypesStr = implode(', ', $enabledTypes);
-
-      // if no financial types are selected, don't return anything from query
-      $query .= $enabledTypesStr
-        ? " AND i.financial_type_id IN ({$enabledTypesStr})"
-        : " AND 0";
-    }
-
-    $dao = CRM_Core_DAO::executeQuery($query);
-    while ($dao->fetch()) {
-      if (isset($result[$dao->id])) {
-        $item = self::getLineItemName($dao->entity_table);
-
-        $lineItem = [
-          'item'           => $item,
-          'description'    => $dao->label,
-          'financial_type' => $dao->name,
-          'amount'         => $dao->line_total,
-          'currency'       => $dao->currency,
-          'qty'            => (int) $dao->qty,
-        ];
-        $result[$dao->id]['line_items'][] = $lineItem;
+      if (empty($enabledTypes)) {
+        // if no financial types are selected
+        return $contributionDetails;
       }
+      $query .= " AND financial_type_id IN (%2)";
+      $queryParams[2] = [implode(', ', $enabledTypes), 'CommaSeparatedIntegers'];
     }
+
+    $query .= " GROUP BY i.contribution_id";
+    $dao = CRM_Core_DAO::executeQuery($query, $queryParams);
+    while ($dao->fetch()) {
+      $contributionDetails[$dao->contribution_id]['line_items_count'] = $dao->line_item_count;
+    }
+    return $contributionDetails;
   }
 
   /**

@@ -411,15 +411,6 @@ function civigiftaid_civicrm_validateForm($formName, &$fields, &$files, &$form, 
   }
 }
 
-function civigiftaid_civicrm_giftAidEligible(&$isEligible, $contactId, $date, $contributionId) {
-  if (!(bool) CRM_Civigiftaid_Settings::getValue('globally_enabled')) {
-    if($isEligible != 0){
-     $isEligible =
-       CRM_Civigiftaid_Utils_Contribution::getContribAmtForEnabledFinanceTypes($contributionId) != 0;
-    }
-  }
-}
-
 /**
  * Add navigation for GiftAid under "Administer/CiviContribute" menu
  */
