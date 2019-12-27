@@ -260,6 +260,13 @@ function civigiftaid_update_declaration_amount($contributionID) {
  * @throws \CiviCRM_API3_Exception
  */
 function civigiftaid_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  $hooks = [
+    new CRM_Civigiftaid_Hook_Post_SetContributionGiftAidEligibility(),
+  ];
+  foreach ($hooks as $hook) {
+    $hook->run($op, $objectName, $objectId, $objectRef);
+  }
+
   switch ($objectName) {
     case 'Contribution':
       if ($op == 'edit' || $op == 'create') {
