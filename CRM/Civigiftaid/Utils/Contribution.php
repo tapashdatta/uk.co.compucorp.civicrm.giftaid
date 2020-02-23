@@ -123,7 +123,7 @@ class CRM_Civigiftaid_Utils_Contribution {
       $contributionParams[CRM_Civigiftaid_Utils::getCustomByName('batch_name', $groupID)] = $batchName;
     }
     if ($eligibleForGiftAid) {
-      $contributionParams[CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID)] = $eligibleForGiftAid;
+      $contributionParams[CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', $groupID)] = 1;
     }
     // We use CustomValue.create instead of Contribution.create because Contribution.create is way too slow
     civicrm_api3('CustomValue', 'create', $contributionParams);

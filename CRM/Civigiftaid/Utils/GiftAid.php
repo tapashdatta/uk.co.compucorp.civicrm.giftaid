@@ -98,13 +98,13 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
     // Retrieve existing declarations for this user.
     $currentDeclaration = CRM_Civigiftaid_Utils_GiftAid::getDeclaration($params['entity_id'], $params['start_date'], $charity);
-    $partialDeclarationID = CRM_Civigiftaid_Utils_GiftAid::getPartialDeclaration($params['entity_id']);
-    if ($currentDeclaration && $partialDeclarationID) {
+    $partialDeclaration = CRM_Civigiftaid_Utils_GiftAid::getPartialDeclaration($params['entity_id']);
+    if ($currentDeclaration && !empty($partialDeclaration)) {
       // We've got partial declarations (no post_code, no start_date) and a current (valid) declaration so delete the partials
       CRM_Civigiftaid_Utils_GiftAid::deletePartialDeclaration($params['entity_id']);
     }
-    elseif ($partialDeclarationID) {
-      $params['id'] = $partialDeclarationID;
+    elseif (!empty($partialDeclaration)) {
+      $params = array_merge($params, $partialDeclaration);
     }
 
     $charityClause = '';
@@ -177,7 +177,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         break;
 
       case self::DECLARATION_IS_PAST_4_YEARS:
-        if (!$currentDeclaration) {
+        if (empty($currentDeclaration)) {
           // There is no current declaration so create new.
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
@@ -199,7 +199,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
         break;
 
       case self::DECLARATION_IS_NO:
-        if (!$currentDeclaration) {
+        if (empty($currentDeclaration)) {
           // There is no current declaration so create new.
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
@@ -497,10 +497,10 @@ class CRM_Civigiftaid_Utils_GiftAid {
    *
    * @param int $contactID
    *
-   * @return bool
+   * @return array
    */
-  public static function getPartialDeclaration($contactID) {
-    $sql = "SELECT id as id, start_date
+  public static function getPartialDeclaration($contactID): array {
+    $sql = "SELECT id as id, start_date, eligible_for_gift_aid
               FROM civicrm_value_gift_aid_declaration
               WHERE  entity_id = %1 ORDER BY id DESC LIMIT 1";
     $sqlParams = [
@@ -510,10 +510,13 @@ class CRM_Civigiftaid_Utils_GiftAid {
     $dao = CRM_Core_DAO::executeQuery($sql, $sqlParams);
     $dao->fetch();
     if (!empty($dao->id) && empty($dao->start_date)) {
-      return $dao->id;
+      return [
+        'id' => $dao->id,
+        'eligible_for_gift_aid' => $dao->eligible_for_gift_aid,
+      ];
     }
 
-    return FALSE;
+    return [];
   }
 
   public static function deletePartialDeclaration($contactID) {

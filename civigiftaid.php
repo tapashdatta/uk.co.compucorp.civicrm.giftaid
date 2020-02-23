@@ -165,87 +165,38 @@ function civigiftaid_civicrm_postProcess($formName, &$form) {
   }
 }
 
-/**
- * Implementation of hook_civicrm_custom
- * Create / update Gift Aid declaration records on Individual when
- * "Eligible for Gift Aid" field on Contribution is updated.
- */
-function civigiftaid_civicrm_custom($op, $groupID, $entityID, &$params) {
-  if ($op != 'create' && $op != 'edit') {
-    return;
-  }
-
-  $customGroupTableName = civicrm_api3('CustomGroup', 'getvalue', [
-    'id' => $groupID,
-    'return' => 'table_name',
-  ]);
-  switch ($customGroupTableName) {
-    case 'civicrm_value_gift_aid_declaration':
-      break;
-
-    case 'civicrm_value_gift_aid_submission':
-      if (!empty(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
-        return;
-      }
-      Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
-      // Iterate through $params to get new declaration value
-      $giftAidEligibleStatus = NULL;
-      if (!is_array($params) || empty($params)) {
-        return;
-      }
-
-      foreach ($params as $field) {
-        if ($field['column_name'] == 'eligible_for_gift_aid') {
-          $giftAidEligibleStatus = $field['value'];
-          break;
-        }
-      }
-
-      if (is_null($giftAidEligibleStatus)) {
-        return;
-      }
-
-      civigiftaid_update_declaration_amount($entityID);
-      break;
-  }
-}
-
 function civigiftaid_update_declaration_amount($contributionID) {
   $contributionCustomGiftAidEligibleFieldName = CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', 'Gift_Aid');
-  $contactCustomGiftAidEligibleFieldName = CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', 'Gift_Aid_Declaration');
 
   $contribution = civicrm_api3('Contribution', 'getsingle', [
     'id' => $contributionID,
     'return' => ['contact_id', 'receive_date', $contributionCustomGiftAidEligibleFieldName]
   ]);
 
-  $giftAidEligibleStatus = CRM_Utils_Request::retrieveValue($contactCustomGiftAidEligibleFieldName, 'String', NULL);
-  $contributionGiftAidEligibleStatus = CRM_Utils_Request::retrieveValue($contributionCustomGiftAidEligibleFieldName, 'String', NULL);
+  $contactGiftAidEligibleStatus = CRM_Civigiftaid_Utils_GiftAid::isEligibleForGiftAid($contribution);
+  $contributionGiftAidEligibleStatus = $contribution[$contributionCustomGiftAidEligibleFieldName];
 
   // Get the gift aid eligible status
   // If it's not a valid number don't do any further processing
-  if (!is_numeric($giftAidEligibleStatus)) {
+  if (!$contactGiftAidEligibleStatus) {
     return;
   }
-  else {
-    $giftAidEligibleStatus = (int) $giftAidEligibleStatus;
-  }
+
   // We could specify both declaration + contribution fields on the profile, so you could sign a declaration but say this contribution is not eligible for example.
   if (!$contributionGiftAidEligibleStatus) {
-    $contributionGiftAidEligibleStatus = $giftAidEligibleStatus;
+    $contributionGiftAidEligibleStatus = $contactGiftAidEligibleStatus;
   }
 
   list($addressDetails, $postCode) = _civigiftaid_civicrm_custom_get_address_and_postal_code($contribution['contact_id'], 1);
 
   $params = [
     'entity_id'             => $contribution['contact_id'],
-    'eligible_for_gift_aid' => (int) $giftAidEligibleStatus,
     'start_date'            => CRM_Utils_Date::isoToMysql($contribution['receive_date']),
     'address'               => $addressDetails,
     'post_code'             => $postCode,
   ];
   CRM_Civigiftaid_Utils_GiftAid::setDeclaration($params);
-  if ($giftAidEligibleStatus === CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_PAST_4_YEARS || $giftAidEligibleStatus === CRM_Civigiftaid_Utils_GiftAid::DECLARATION_IS_YES) {
+  if ($contactGiftAidEligibleStatus) {
     CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID, $contributionGiftAidEligibleStatus, '');
   }
 }
@@ -290,10 +241,6 @@ function civigiftaid_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 }
 
 function civigiftaid_callback_civicrm_post_contribution($params) {
-  if (isset(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
-    return;
-  }
-  Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
   civigiftaid_update_declaration_amount($params['id']);
 }
 
