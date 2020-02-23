@@ -15,6 +15,7 @@ This (MJW) version automatically calculates the gift-aid amount when the contrib
 to meet current CiviCRM Coding standards and improves performance significantly.
 
 This extension is currently "equivalent" to https://github.com/compucorp/uk.co.compucorp.civicrm.giftaid/releases/tag/3.1.0 (all changes have been reviewed and merged if appropriate).
+
 ## Installation
 
 See: https://docs.civicrm.org/sysadmin/en/latest/customize/extensions/#installing-a-new-extension

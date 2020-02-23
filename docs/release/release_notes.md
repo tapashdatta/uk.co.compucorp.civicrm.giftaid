@@ -1,3 +1,10 @@
+## Release 3.3.2
+
+* Handle transitions between the 3 declaration states without losing information - create a new declaration when state is changed.
+* Refactor creating/updating declaration when contribution is created/updated.
+* Properly escape SQL parameters when updating gift aid declaration.
+* Extract code to check if charity column exists.
+
 ## Release 3.3.1
 
 * Major performance improvement to "Add to Batch".
@@ -21,7 +28,7 @@ This allows us to create a new declaration (as it will be the user filling in a 
 * Match on OptionValue value when running upgrader as name is not always consistent.
 
 ## Release 3.2
-* Be stricter checking eligible_for_gift_aid variable type 
+* Be stricter checking eligible_for_gift_aid variable type
 * Fix issues with entity definition and regenerate
 * Fix PHP notice
 * Refactor addtobatch for performance, refactor upgrader for reliability
