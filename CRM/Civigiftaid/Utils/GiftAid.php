@@ -264,16 +264,20 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
     if (CRM_Utils_Array::value('id', $params)) {
       $keyVals = [];
+      $queryParams[1] = [$params['id'], 'Integer'];
+      $count = 2;
       foreach ($cols as $colName => $colType) {
         if (isset($params[$colName])) {
-          $keyVals[] = "{$colName}='{$params[$colName]}'";
+          $keyVals[] = "{$colName}=%{$count}";
+          $queryParams[$count] = [
+            CRM_Utils_Array::value($colName, $params, ''),
+            $colType
+          ];
         }
+        $count++;
       }
       $keyValsString = implode(',', $keyVals);
-      $queryParams = [];
-      $cols['id'] = 'Integer';
-
-      $query = "UPDATE civicrm_value_gift_aid_declaration SET {$keyValsString} WHERE id={$params['id']}";
+      $query = "UPDATE civicrm_value_gift_aid_declaration SET {$keyValsString} WHERE id=%1";
     }
     else {
       $count = 1;
