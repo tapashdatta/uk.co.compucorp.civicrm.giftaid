@@ -23,17 +23,12 @@ class CRM_Civigiftaid_Utils_GiftAid {
    * @return array            - declaration record as associative array, else empty array.
    */
   public static function getDeclaration($contactID, $date = NULL, $charity = NULL) {
-    static $charityColumnExists = NULL;
-
     if (is_null($date)) {
       $date = date('YmdHis');
     }
 
-    if ($charityColumnExists === NULL) {
-      $charityColumnExists = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_value_gift_aid_declaration', 'charity');
-    }
     $charityClause = '';
-    if ($charityColumnExists) {
+    if (self::isCharityColumnExists([])) {
       $charityClause = $charity ? " AND charity='{$charity}'" : " AND (charity IS NULL OR charity = '')";
     }
 
@@ -92,14 +87,13 @@ class CRM_Civigiftaid_Utils_GiftAid {
    * @return array   TODO
    */
   public static function setDeclaration($params) {
-    static $charityColumnExists = NULL;
-
     if (!CRM_Utils_Array::value('entity_id', $params)) {
       return([
         'is_error' => 1,
         'error_message' => 'entity_id is required',
       ]);
     }
+
     $charity = CRM_Utils_Array::value('charity', $params);
 
     // Retrieve existing declarations for this user.
@@ -114,10 +108,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
     }
 
     $charityClause = '';
-    if ($charityColumnExists === NULL) {
-      $charityColumnExists = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_value_gift_aid_declaration', 'charity');
-    }
-    if ($charityColumnExists) {
+    if (self::isCharityColumnExists($params)) {
       $charityClause = $charity ? " AND charity='{$charity}'" : " AND (charity IS NULL OR charity = '')";
     }
 
@@ -255,13 +246,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
    * @param string $endTimestamp
    */
   private static function insertDeclaration($params) {
-    static $charityColumnExists = NULL;
-    if ($charityColumnExists === NULL) {
-      $charityColumnExists = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_value_gift_aid_declaration', 'charity');
-    }
-    if (!CRM_Utils_Array::value('charity', $params)) {
-      $charityColumnExists = FALSE;
-    }
 
     $cols = [
       'entity_id' => 'Integer',
@@ -274,7 +258,7 @@ class CRM_Civigiftaid_Utils_GiftAid {
       'source' => 'String',
       'notes' => 'String',
     ];
-    if ($charityColumnExists) {
+    if (self::isCharityColumnExists($params)) {
       $cols['charity'] = 'String';
     }
 
@@ -308,6 +292,29 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
     // Insert
     CRM_Core_DAO::executeQuery($query, $queryParams);
+  }
+
+  /**
+   * Does the charity column exist
+   *
+   * @param array $params
+   *
+   * @return bool
+   */
+  public static function isCharityColumnExists($params): bool {
+    if (isset(\Civi::$statics[__CLASS__]['charityColumnExists'])) {
+      return \Civi::$statics[__CLASS__]['charityColumnExists'];
+    }
+
+    $charityColumnExists = FALSE;
+    if ($charityColumnExists === NULL) {
+      $charityColumnExists = CRM_Core_BAO_SchemaHandler::checkIfFieldExists('civicrm_value_gift_aid_declaration', 'charity');
+    }
+    if (!CRM_Utils_Array::value('charity', $params)) {
+      $charityColumnExists = FALSE;
+    }
+    \Civi::$statics[__CLASS__]['charityColumnExists'] = $charityColumnExists;
+    return \Civi::$statics[__CLASS__]['charityColumnExists'];
   }
 
   /**
