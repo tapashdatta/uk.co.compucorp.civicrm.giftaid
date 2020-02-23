@@ -51,11 +51,11 @@ class CRM_Civigiftaid_Utils_GiftAid {
       $currentDeclaration['id'] = (int) $dao->id;
       $currentDeclaration['entity_id'] = (int) $dao->entity_id;
       $currentDeclaration['eligible_for_gift_aid'] = (int) $dao->eligible_for_gift_aid;
-      $currentDeclaration['start_date'] = $dao->start_date;
-      $currentDeclaration['end_date'] = $dao->end_date;
-      $currentDeclaration['reason_ended'] = $dao->reason_ended;
-      $currentDeclaration['source'] = $dao->source;
-      $currentDeclaration['notes'] = $dao->notes;
+      $currentDeclaration['start_date'] = CRM_Utils_Date::isoToMysql($dao->start_date);
+      $currentDeclaration['end_date'] = CRM_Utils_Date::isoToMysql($dao->end_date);
+      $currentDeclaration['reason_ended'] = (string) $dao->reason_ended;
+      $currentDeclaration['source'] = (string) $dao->source;
+      $currentDeclaration['notes'] = (string) $dao->notes;
     }
     return $currentDeclaration;
   }
@@ -99,12 +99,17 @@ class CRM_Civigiftaid_Utils_GiftAid {
     // Retrieve existing declarations for this user.
     $currentDeclaration = CRM_Civigiftaid_Utils_GiftAid::getDeclaration($params['entity_id'], $params['start_date'], $charity);
     $partialDeclaration = CRM_Civigiftaid_Utils_GiftAid::getPartialDeclaration($params['entity_id']);
-    if ($currentDeclaration && !empty($partialDeclaration)) {
-      // We've got partial declarations (no post_code, no start_date) and a current (valid) declaration so delete the partials
-      CRM_Civigiftaid_Utils_GiftAid::deletePartialDeclaration($params['entity_id']);
-    }
-    elseif (!empty($partialDeclaration)) {
+    if (!empty($partialDeclaration)) {
+      // Merge the "new" params in (eg. new selection for eligible_for_gift_aid)
       $params = array_merge($params, $partialDeclaration);
+      if (!empty($currentDeclaration)) {
+        // We've got partial declarations (no post_code, no start_date) and a current (valid) declaration so delete the partials
+        CRM_Civigiftaid_Utils_GiftAid::deletePartialDeclaration($params['entity_id']);
+        // We want the ID of the currentDeclaration, not the partial one we just deleted
+        unset($params['id']);
+        // Now merge the current declaration into the params (params overwrite current values if they exist)
+        $params = array_merge($currentDeclaration, $params);
+      }
     }
 
     $charityClause = '';
@@ -169,9 +174,14 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
         }
         elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_NO || $currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_PAST_4_YEARS) {
-          //   - if current negative, set its end_date to now and create new ending new_end_date.
-          $params['id'] = $currentDeclaration['id'];
-          $params['end_date'] = $params['start_date'];
+          //   - if current declaration "negative", set its end_date to now and create a new declaration.
+          $updateParams = [
+            'id' => $currentDeclaration['id'],
+            'end_date' => $params['start_date'],
+          ];
+          $updateParams = self::addReasonEndedContactDeclined($updateParams);
+          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          unset($params['id'], $params['end_date']);
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
         break;
@@ -203,10 +213,24 @@ class CRM_Civigiftaid_Utils_GiftAid {
           // There is no current declaration so create new.
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
-        elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_YES || $currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_PAST_4_YEARS) {
+        elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_YES) {
           // If current declaration is "Yes", set its end_date to now and create new ending new_end_date.
-          $params['id'] = $currentDeclaration['id'];
-          $params['end_date'] = $params['start_date'];
+          $updateParams = $params;
+          $updateParams['id'] = $currentDeclaration['id'];
+          $updateParams['end_date'] = $params['start_date'];
+          $updateParams = self::addReasonEndedContactDeclined($updateParams);
+          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+        }
+        elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_PAST_4_YEARS) {
+          // If current declaration is "Yes, and past 4 years" we need to keep that information
+          // set its end_date to now and create new ending new_end_date.
+          $updateParams = [
+            'id' => $currentDeclaration['id'],
+            'end_date' => $params['start_date'],
+          ];
+          $updateParams = self::addReasonEndedContactDeclined($updateParams);
+          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          unset($params['id'], $params['end_date']);
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
         break;
@@ -220,22 +244,31 @@ class CRM_Civigiftaid_Utils_GiftAid {
   }
 
   /**
+   * Add the "Contact Declined" param to the array of declaration params
+   * @param array $params
+   *
+   * @return array
+   * @throws \CiviCRM_API3_Exception
+   */
+  private static function addReasonEndedContactDeclined($params): array {
+    $contactDeclined = civicrm_api3('OptionValue', 'get', [
+      'option_group_id' => "reason_ended",
+      'name' => "Contact_Declined",
+    ]);
+    if (!empty($contactDeclined['id'])) {
+      $params['reason_ended'] = $contactDeclined['values'][$contactDeclined['id']]['value'];
+    }
+    return $params;
+  }
+
+  /**
    * Private helper function for setDeclaration
    * - update a declaration record.
    *
    * @param array $params
    */
   private static function updateDeclaration($params) {
-    // Update (currently we only need to update end_date but can make generic)
-    // $params['end_date'] should by in date('YmdHis') format
-    $sql = "
-        UPDATE civicrm_value_gift_aid_declaration
-        SET    end_date = %1
-        WHERE  id = %2";
-    CRM_Core_DAO::executeQuery($sql, [
-      1 => [$params['end_date'], 'Timestamp'],
-      2 => [$params['id'], 'Integer'],
-    ]);
+    self::insertDeclaration($params);
   }
 
   /**
@@ -246,7 +279,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
    * @param string $endTimestamp
    */
   private static function insertDeclaration($params) {
-
     $cols = [
       'entity_id' => 'Integer',
       'eligible_for_gift_aid' => 'Integer',
@@ -511,8 +543,8 @@ class CRM_Civigiftaid_Utils_GiftAid {
     $dao->fetch();
     if (!empty($dao->id) && empty($dao->start_date)) {
       return [
-        'id' => $dao->id,
-        'eligible_for_gift_aid' => $dao->eligible_for_gift_aid,
+        'id' => (int) $dao->id,
+        'eligible_for_gift_aid' => (int) $dao->eligible_for_gift_aid,
       ];
     }
 

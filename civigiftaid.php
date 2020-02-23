@@ -241,6 +241,10 @@ function civigiftaid_civicrm_post($op, $objectName, $objectId, &$objectRef) {
 }
 
 function civigiftaid_callback_civicrm_post_contribution($params) {
+  if (isset(Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'])) {
+    return;
+  }
+  Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
   civigiftaid_update_declaration_amount($params['id']);
 }
 
