@@ -84,14 +84,12 @@ class CRM_Civigiftaid_Utils_GiftAid {
    *               - start_date: start date of declaration (in ISO date format)
    *               - end_date:   end date of declaration (in ISO date format)
    *
-   * @return array   TODO
+   * @throws \CRM_Core_Exception
+   * @throws \CiviCRM_API3_Exception
    */
   public static function setDeclaration($params) {
     if (!CRM_Utils_Array::value('entity_id', $params)) {
-      return([
-        'is_error' => 1,
-        'error_message' => 'entity_id is required',
-      ]);
+      Throw new CRM_Core_Exception('GiftAid setDeclaration: entity_id is required');
     }
 
     $charity = CRM_Utils_Array::value('charity', $params);
@@ -166,13 +164,16 @@ class CRM_Civigiftaid_Utils_GiftAid {
           // There is no current declaration so create new.
           CRM_Civigiftaid_Utils_GiftAid::insertDeclaration($params);
         }
-        elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_YES && $endTimestamp) {
+        elseif (($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_YES)
+          && $endTimestamp) {
           //   - if current positive, extend its end_date to new_end_date.
           $updateParams = [
             'id' => $currentDeclaration['id'],
             'end_date' => date('YmdHis', $endTimestamp),
           ];
-          CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          if ($updateParams['end_date'] !== $currentDeclaration['end_date']) {
+            CRM_Civigiftaid_Utils_GiftAid::updateDeclaration($updateParams);
+          }
 
         }
         elseif ($currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_NO || $currentDeclaration['eligible_for_gift_aid'] === self::DECLARATION_IS_PAST_4_YEARS) {
@@ -239,10 +240,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
 
         // If current negative, leave as is.
     }
-
-    return [
-      'is_error' => 0,
-    ];
   }
 
   /**
