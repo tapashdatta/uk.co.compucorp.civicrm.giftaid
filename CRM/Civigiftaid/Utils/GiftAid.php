@@ -594,7 +594,6 @@ class CRM_Civigiftaid_Utils_GiftAid {
       $startDateTS = strtotime(date('Ymd 00:00:00', strtotime($declaration['start_date'])));
       $endDateTS = !empty($declaration['end_date']) ? strtotime(date('Ymd 00:00:00', strtotime($declaration['end_date']))) : NULL;
       $contributionDateTS = strtotime($contribution['receive_date']);
-      $contributionDateTS = strtotime($contribution['receive_date']);
 
       /**
        * Check between which date the contribution's receive date falls.
