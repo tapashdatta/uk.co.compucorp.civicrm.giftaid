@@ -102,14 +102,16 @@ class CRM_Civigiftaid_Utils_GiftAid {
     if (!empty($partialDeclaration)) {
       // Merge the "new" params in (eg. new selection for eligible_for_gift_aid)
       $params = array_merge($params, $partialDeclaration);
-      if (!empty($currentDeclaration)) {
+    }
+    if (!empty($currentDeclaration)) {
+      if (!empty($partialDeclaration)) {
         // We've got partial declarations (no post_code, no start_date) and a current (valid) declaration so delete the partials
         CRM_Civigiftaid_Utils_GiftAid::deletePartialDeclaration($params['entity_id']);
         // We want the ID of the currentDeclaration, not the partial one we just deleted
         unset($params['id']);
-        // Now merge the current declaration into the params (params overwrite current values if they exist)
-        $params = array_merge($currentDeclaration, $params);
       }
+      // Now merge the current declaration into the params (params overwrite current values if they exist)
+      $params = array_merge($currentDeclaration, $params);
     }
 
     $charityClause = '';
