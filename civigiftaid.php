@@ -165,13 +165,28 @@ function civigiftaid_civicrm_postProcess($formName, &$form) {
   }
 }
 
-function civigiftaid_update_declaration_amount($contributionID) {
+function civigiftaid_update_declaration_amount($contributionID, $op) {
   $contributionCustomGiftAidEligibleFieldName = CRM_Civigiftaid_Utils::getCustomByName('Eligible_for_Gift_Aid', 'Gift_Aid');
+  $contributionCustomGiftAidBatchNameFieldName = CRM_Civigiftaid_Utils::getCustomByName('Batch_Name', 'Gift_Aid');
 
   $contribution = civicrm_api3('Contribution', 'getsingle', [
     'id' => $contributionID,
-    'return' => ['contact_id', 'receive_date', $contributionCustomGiftAidEligibleFieldName]
+    'return' => ['contact_id',
+      'receive_date',
+      $contributionCustomGiftAidEligibleFieldName,
+      $contributionCustomGiftAidBatchNameFieldName,
+      'contribution_recur_id'
+    ]
   ]);
+
+  if (!empty($contribution['contribution_recur_id']) && ($op === 'create')) {
+    $contribution[$contributionCustomGiftAidBatchNameFieldName] = '';
+  }
+
+  // Don't touch gift aid fields if already part of a batch
+  if (!empty($contribution[$contributionCustomGiftAidBatchNameFieldName])) {
+    return;
+  }
 
   $contactGiftAidEligibleStatus = CRM_Civigiftaid_Utils_GiftAid::isEligibleForGiftAid($contribution);
   $contributionGiftAidEligibleStatus = $contribution[$contributionCustomGiftAidEligibleFieldName];
@@ -197,7 +212,7 @@ function civigiftaid_update_declaration_amount($contributionID) {
   ];
   CRM_Civigiftaid_Utils_GiftAid::setDeclaration($params);
   if ($contactGiftAidEligibleStatus) {
-    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID, $contributionGiftAidEligibleStatus, '');
+    CRM_Civigiftaid_Utils_Contribution::updateGiftAidFields($contributionID, $contributionGiftAidEligibleStatus);
   }
 }
 
@@ -245,7 +260,7 @@ function civigiftaid_callback_civicrm_post_contribution($params) {
     return;
   }
   Civi::$statics[E::LONG_NAME]['updatedDeclarationAmount'] = TRUE;
-  civigiftaid_update_declaration_amount($params['id']);
+  civigiftaid_update_declaration_amount($params['id'], $params['op']);
 }
 
 /**
