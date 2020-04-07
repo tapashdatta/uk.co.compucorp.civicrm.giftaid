@@ -23,6 +23,7 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     $this->upgrade_3101();
     $this->upgrade_3103();
     $this->upgrade_3104();
+    $this->upgrade_3105();
   }
 
   /**
@@ -139,6 +140,18 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     $this->log('Applying update 3104 - checking optiongroups');
     $this->setOptionGroups();
 
+    return TRUE;
+  }
+
+  public function upgrade_3105() {
+    $this->log('Set contribution "Eligible Amount" custom field label');
+    $amountCustomField = civicrm_api3('CustomField', 'getsingle', [
+      'custom_group_id' => "Gift_Aid",
+      'name' => "Amount",
+    ]);
+    if ($amountCustomField['label'] !== 'Eligible Amount') {
+      civicrm_api3('CustomField', 'create', ['id' => $amountCustomField['id'], 'label' => 'Eligible Amount']);
+    }
     return TRUE;
   }
 
@@ -288,17 +301,17 @@ class CRM_Civigiftaid_Upgrader extends CRM_Civigiftaid_Upgrader_Base {
     $declarationCustomGroupID = CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid_Declaration']));
     $submissionCustomGroupID = CRM_Utils_Array::value('id', civicrm_api3('CustomGroup', 'getsingle', ['name' => 'Gift_Aid']));
 
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['eligibility_declaration_options']['id']} 
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['eligibility_declaration_options']['id']}
 WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$declarationCustomGroupID}");
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['reason_ended']['id']} 
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['reason_ended']['id']}
 WHERE name = 'Reason_Ended' AND custom_group_id = {$declarationCustomGroupID}");
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['uk_taxpayer_options']['id']} 
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['uk_taxpayer_options']['id']}
 WHERE name = 'Eligible_for_Gift_Aid' AND custom_group_id = {$submissionCustomGroupID}");
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['giftaid_batch_name']['id']} 
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_custom_field SET option_group_id = {$optionGroups['giftaid_batch_name']['id']}
 WHERE name = 'Batch_Name' AND custom_group_id = {$submissionCustomGroupID}");
 
     // Make sure profile is active
-    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_group SET is_active = 1 
+    CRM_Core_DAO::executeQuery("UPDATE civicrm_uf_group SET is_active = 1
 WHERE name = 'Gift_Aid'");
   }
 
